@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uz" class="dark">
+<html lang="uz" class="dark h-full">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abonentlar Boshqaruvi — Pro CRM Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Abonentlar CRM Mobile — Ultra App</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -21,23 +21,22 @@
               700: '#4338ca',
               900: '#312e81',
             },
-            darkbg: '#0b0f19',
-            cardbg: '#111827',
-            glassborder: 'rgba(255, 255, 255, 0.08)'
+            darkbg: '#070a13',
+            cardbg: 'rgba(17, 24, 39, 0.75)',
           },
           animation: {
             'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'glow': 'glow 2s ease-in-out infinite alternate',
-            'float': 'float 4s ease-in-out infinite'
+            'bounce-subtle': 'bounceSubtle 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards'
           },
           keyframes: {
-            glow: {
-              '0%': { boxShadow: '0 0 15px rgba(99, 102, 241, 0.3)' },
-              '100%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.7)' }
+            bounceSubtle: {
+              '0%': { transform: 'scale(0.9) translateY(4px)' },
+              '100%': { transform: 'scale(1) translateY(0)' }
             },
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-6px)' }
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(16px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
             }
           }
         }
@@ -48,314 +47,342 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Chart.js Vizualizatsiya uchun -->
+  <!-- Chart.js for Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Custom Glassmorphism Styles -->
+  <!-- Custom CSS for Touch & Glassmorphism -->
   <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea {
+      user-select: text;
+    }
+
     body {
-      background-color: #0b0f19;
+      background-color: #070a13;
       background-image: 
-        radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.2) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
       background-attachment: fixed;
     }
 
     .glass-panel {
-      background: rgba(17, 24, 39, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .glass-card {
-      background: rgba(31, 41, 55, 0.5);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(26, 34, 52, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    .glass-card:hover {
+    .glass-card:active {
+      transform: scale(0.98);
       border-color: rgba(99, 102, 241, 0.4);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .bottom-nav-blur {
+      background: rgba(13, 18, 30, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+      width: 4px;
+      height: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(99, 102, 241, 0.3);
+      background: rgba(99, 102, 241, 0.4);
       border-radius: 9999px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(99, 102, 241, 0.6);
+
+    /* Tab Switch Visibility */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
-<body class="text-slate-200 min-h-screen font-sans flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+<body class="text-slate-100 min-h-full font-sans flex flex-col pb-24 antialiased selection:bg-indigo-500 selection:text-white">
 
-  <!-- Navigation / Header Bar -->
-  <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+  <!-- Mobile Top Bar Header -->
+  <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-4 py-3">
+    <div class="max-w-md mx-auto flex items-center justify-between">
       
-      <!-- Brand & Status -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 animate-pulse-slow">
-          <i class="fa-solid fa-bolt text-lg"></i>
+      <!-- Brand & Status Badge -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 animate-pulse-slow">
+          <i class="fa-solid fa-bolt text-base"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-base font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
               NEXTGEN CRM
             </h1>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-ping"></span> Live Sync
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-ping"></span> Live
             </span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">Google Sheets Powered Abonent Boshqaruvi</p>
+          <p class="text-[10px] text-slate-400">Smart Abonent Boshqaruvi</p>
         </div>
       </div>
 
-      <!-- Quick Action Controls -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <!-- API Setup Button -->
-        <button onclick="openApiModal()" class="px-3 py-1.5 rounded-lg glass-card text-xs font-medium text-slate-300 hover:text-white flex items-center gap-2 hover:bg-slate-800/60 transition">
-          <i class="fa-solid fa-plug text-indigo-400"></i>
-          <span class="hidden md:inline">API Sozlash</span>
+      <!-- Header Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Manual Data Refresh -->
+        <button onclick="loadData()" id="refresh-btn" class="w-9 h-9 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 flex items-center justify-center transition active:scale-90">
+          <i class="fa-solid fa-rotate-right text-xs" id="refresh-icon"></i>
         </button>
-
-        <!-- Refresh Button -->
-        <button onclick="loadData()" id="refresh-btn" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
-          <i class="fa-solid fa-rotate-right" id="refresh-icon"></i>
-          <span class="hidden sm:inline">Yangilash</span>
+        <!-- API Setup Quick Trigger -->
+        <button onclick="switchTab('settings')" class="w-9 h-9 rounded-xl glass-card text-slate-300 flex items-center justify-center transition active:scale-90">
+          <i class="fa-solid fa-gear text-xs text-indigo-400"></i>
         </button>
-
-        <!-- Staff Profile Avatar -->
-        <div class="flex items-center pl-2 border-l border-slate-800">
-          <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs font-bold">
-            XD
-          </div>
-        </div>
       </div>
 
     </div>
   </header>
 
-  <!-- Main Content Layout -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+  <!-- Main View Area -->
+  <main class="flex-1 max-w-md w-full mx-auto px-4 pt-4 space-y-4">
 
-    <!-- Top Metrics and Interactive Charts Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- TAB 1: ABONENTLAR KARTA KO'RINISHI -->
+    <section id="tab-subscribers" class="tab-content active space-y-3">
       
-      <!-- Metric 1: Total Subscribers -->
-      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Jami Abonentlar</p>
-            <h3 class="text-3xl font-extrabold text-white mt-2 tracking-tight" id="stat-total">0</h3>
-          </div>
-          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-users"></i>
-          </div>
+      <!-- Quick Filter Chips & Count -->
+      <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-1 overflow-x-auto custom-scrollbar text-xs">
+          <button onclick="setFilter('all')" id="chip-all" class="chip-btn px-3 py-1.5 rounded-xl font-medium bg-indigo-600 text-white transition">Hamma</button>
+          <button onclick="setFilter('active')" id="chip-active" class="chip-btn px-3 py-1.5 rounded-xl font-medium bg-slate-800 text-slate-300 transition">🟢 Musbat</button>
+          <button onclick="setFilter('debt')" id="chip-debt" class="chip-btn px-3 py-1.5 rounded-xl font-medium bg-slate-800 text-slate-300 transition">🔴 Qarzdor</button>
         </div>
-        <div class="mt-3 flex items-center text-xs text-indigo-300">
-          <i class="fa-solid fa-chart-line mr-1"></i> Baza to'liq aktiv holatda
-        </div>
+        <span class="text-[11px] font-bold text-indigo-300 px-2 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20" id="card-count-badge">0 ta</span>
       </div>
 
-      <!-- Metric 2: Active Subscribers -->
-      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Faol Abonentlar</p>
-            <h3 class="text-3xl font-extrabold text-emerald-400 mt-2 tracking-tight" id="stat-active">0</h3>
-          </div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-user-check"></i>
-          </div>
-        </div>
-        <div class="mt-3 flex items-center text-xs text-emerald-400">
-          <i class="fa-solid fa-arrow-up mr-1"></i> Musbat balans egalari
-        </div>
-      </div>
-
-      <!-- Metric 3: Debtors -->
-      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Qarzdorlar</p>
-            <h3 class="text-3xl font-extrabold text-rose-400 mt-2 tracking-tight" id="stat-debtors">0</h3>
-          </div>
-          <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-user-xmark"></i>
-          </div>
-        </div>
-        <div class="mt-3 flex items-center text-xs text-rose-400">
-          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Manfiy balansdagi abonentlar
-        </div>
-      </div>
-
-      <!-- Metric 4: Balance Summary -->
-      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Umumiy Balans</p>
-            <h3 class="text-2xl font-extrabold text-purple-300 mt-2 tracking-tight truncate" id="stat-balance">0 so'm</h3>
-          </div>
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-wallet"></i>
-          </div>
-        </div>
-        <div class="mt-3 flex items-center text-xs text-purple-300">
-          <i class="fa-solid fa-shield-halved mr-1"></i> Avto-hisob tizimi
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Analytics Chart Drawer -->
-    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <div>
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie text-indigo-400"></i> Abonentlar Tahlili va Status Ko'rsatkichlari
-          </h2>
-          <p class="text-xs text-slate-400">Tariflar va to'lov holati bo'yicha vizual taqsimot</p>
-        </div>
-        <button onclick="toggleChart()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1">
-          <span id="chart-toggle-text">Grafikni yashirish</span> <i class="fa-solid fa-chevron-up" id="chart-toggle-icon"></i>
+      <!-- Quick Search Bar in Subscribers View -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+        <input type="text" id="quick-search-input" oninput="filterData()" placeholder="Abonent qidirish (Ism, Telefon, Login)..." 
+               class="w-full bg-slate-900/90 text-xs text-slate-100 placeholder-slate-500 pl-9 pr-8 py-2.5 rounded-xl border border-slate-700/80 focus:outline-none focus:border-indigo-500 transition">
+        <button onclick="clearSearch()" id="clear-search-btn" class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-white text-xs">
+          <i class="fa-solid fa-circle-xmark"></i>
         </button>
       </div>
 
-      <div id="chart-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
-        <div class="h-48 flex items-center justify-center p-2 bg-slate-900/40 rounded-xl border border-slate-800/60">
+      <!-- Subscribers Cards Container -->
+      <div id="subscribers-card-container" class="space-y-3">
+        <!-- Dynamic Mobile Subscriber Cards will be injected here -->
+      </div>
+
+      <!-- Skeleton Loading State -->
+      <div id="loading-state" class="space-y-3">
+        <div class="glass-card p-4 rounded-2xl animate-pulse space-y-3">
+          <div class="flex justify-between items-center">
+            <div class="h-4 bg-slate-700 rounded w-1/3"></div>
+            <div class="h-4 bg-slate-700 rounded w-1/4"></div>
+          </div>
+          <div class="h-3 bg-slate-800 rounded w-2/3"></div>
+          <div class="h-8 bg-slate-800 rounded-xl w-full"></div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl animate-pulse space-y-3">
+          <div class="flex justify-between items-center">
+            <div class="h-4 bg-slate-700 rounded w-1/2"></div>
+            <div class="h-4 bg-slate-700 rounded w-1/5"></div>
+          </div>
+          <div class="h-3 bg-slate-800 rounded w-3/4"></div>
+          <div class="h-8 bg-slate-800 rounded-xl w-full"></div>
+        </div>
+      </div>
+
+      <!-- Empty Data Placeholder -->
+      <div id="empty-state" class="hidden p-8 text-center glass-panel rounded-2xl">
+        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 text-xl">
+          <i class="fa-solid fa-user-slash"></i>
+        </div>
+        <h3 class="text-slate-200 font-bold text-sm">Abonentlar topilmadi</h3>
+        <p class="text-slate-400 text-xs mt-1">Qidiruv yoki filtr mezonini o'zgartirib ko'ring.</p>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: STATISTIKA VA TAHLIL -->
+    <section id="tab-stats" class="tab-content space-y-4">
+      
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-indigo-400"></i> Baza Statistikasi
+        </h2>
+        <span class="text-[10px] text-slate-400">Real-vaqt ko'rsatkichlari</span>
+      </div>
+
+      <!-- Top Summary Grid -->
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Metric 1 -->
+        <div class="glass-card p-3.5 rounded-2xl relative overflow-hidden">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Jami Abonent</p>
+          <h3 class="text-2xl font-black text-white mt-1" id="stat-total">0</h3>
+          <div class="mt-1 text-[10px] text-indigo-300 flex items-center">
+            <i class="fa-solid fa-users mr-1"></i> Aktiv Baza
+          </div>
+        </div>
+
+        <!-- Metric 2 -->
+        <div class="glass-card p-3.5 rounded-2xl relative overflow-hidden">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Faol Abonent</p>
+          <h3 class="text-2xl font-black text-emerald-400 mt-1" id="stat-active">0</h3>
+          <div class="mt-1 text-[10px] text-emerald-400 flex items-center">
+            <i class="fa-solid fa-circle-check mr-1"></i> Musbat Balans
+          </div>
+        </div>
+
+        <!-- Metric 3 -->
+        <div class="glass-card p-3.5 rounded-2xl relative overflow-hidden">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Qarzdorlar</p>
+          <h3 class="text-2xl font-black text-rose-400 mt-1" id="stat-debtors">0</h3>
+          <div class="mt-1 text-[10px] text-rose-400 flex items-center">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Manfiy Balans
+          </div>
+        </div>
+
+        <!-- Metric 4 -->
+        <div class="glass-card p-3.5 rounded-2xl relative overflow-hidden">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Umumiy Balans</p>
+          <h3 class="text-base font-extrabold text-purple-300 mt-1 truncate" id="stat-balance">0 so'm</h3>
+          <div class="mt-1 text-[10px] text-purple-300 flex items-center">
+            <i class="fa-solid fa-wallet mr-1"></i> Hisob Tizimi
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Charts Container -->
+      <div class="glass-panel p-4 rounded-2xl space-y-4">
+        <h3 class="text-xs font-bold text-slate-200">Abonentlar Status Taqsimoti</h3>
+        <div class="h-44 flex items-center justify-center p-2 bg-slate-900/50 rounded-xl">
           <canvas id="statusPieChart"></canvas>
         </div>
-        <div class="h-48 flex items-center justify-center p-2 bg-slate-900/40 rounded-xl border border-slate-800/60">
+      </div>
+
+      <div class="glass-panel p-4 rounded-2xl space-y-4">
+        <h3 class="text-xs font-bold text-slate-200">Tariflar Bo'yicha Boshqaruv</h3>
+        <div class="h-44 flex items-center justify-center p-2 bg-slate-900/50 rounded-xl">
           <canvas id="tariffBarChart"></canvas>
         </div>
       </div>
-    </div>
 
-    <!-- Search & Filter Glass Toolbar -->
-    <div class="glass-panel p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row gap-3 items-center justify-between">
-      
-      <!-- Live Search Box -->
-      <div class="relative w-full md:w-96">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-        <input type="text" id="search-input" oninput="filterData()" placeholder="Login, Ism, Telefon yoki Manzil..." 
-               class="w-full bg-slate-900/80 text-sm text-slate-100 placeholder-slate-500 pl-10 pr-4 py-2 rounded-xl border border-slate-700/80 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-      </div>
+    </section>
 
-      <!-- Filters & Sorting options -->
-      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-start md:justify-end">
+    <!-- TAB 3: CHUQUR QIDIRUV VA FILTRLAR -->
+    <section id="tab-search" class="tab-content space-y-4">
+      <div class="glass-panel p-4 rounded-2xl space-y-3">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-indigo-400"></i> Filtr va Tartiblash
+        </h2>
         
-        <!-- Status Filter -->
-        <select id="status-filter" onchange="filterData()" 
-                class="bg-slate-900/80 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
-          <option value="all">Barcha Statuslar</option>
-          <option value="active">🟢 Musbat (Faol)</option>
-          <option value="debt">🔴 Manfiy (Qarzdor)</option>
-        </select>
+        <!-- Status Filter Dropdown -->
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Abonent Statusi</label>
+          <select id="status-filter" onchange="filterData()" 
+                  class="w-full bg-slate-900 text-xs text-slate-200 border border-slate-700 rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500">
+            <option value="all">Barcha Statuslar</option>
+            <option value="active">🟢 Musbat (Faol)</option>
+            <option value="debt">🔴 Manfiy (Qarzdor)</option>
+          </select>
+        </div>
 
-        <!-- Tarif Filter -->
-        <select id="tariff-filter" onchange="filterData()" 
-                class="bg-slate-900/80 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
-          <option value="all">Barcha Tariflar</option>
-        </select>
+        <!-- Tariff Filter Dropdown -->
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Tarif Rejasi</label>
+          <select id="tariff-filter" onchange="filterData()" 
+                  class="w-full bg-slate-900 text-xs text-slate-200 border border-slate-700 rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500">
+            <option value="all">Barcha Tariflar</option>
+          </select>
+        </div>
 
-        <!-- Sort Option -->
-        <select id="sort-filter" onchange="filterData()" 
-                class="bg-slate-900/80 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
-          <option value="default">Tartiblash (Standart)</option>
-          <option value="balance-asc">Balans: Kamdan Ko'pga</option>
-          <option value="balance-desc">Balans: Ko'pdan Kamga</option>
-          <option value="name">Ism bo'yicha (A-Z)</option>
-        </select>
+        <!-- Sorting Options -->
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Tartiblash Bo'yicha</label>
+          <select id="sort-filter" onchange="filterData()" 
+                  class="w-full bg-slate-900 text-xs text-slate-200 border border-slate-700 rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500">
+            <option value="default">Standart tartib</option>
+            <option value="balance-asc">Balans: Kamdan Ko'pga</option>
+            <option value="balance-desc">Balans: Ko'pdan Kamga</option>
+            <option value="name">Ism Bo'yicha (A-Z)</option>
+          </select>
+        </div>
 
+        <button onclick="switchTab('subscribers')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/30 transition mt-2">
+          Natijalarni Ko'rish
+        </button>
       </div>
-    </div>
+    </section>
 
-    <!-- Subscriber Table Container -->
-    <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
-      <div class="overflow-x-auto custom-scrollbar">
-        <table class="w-full text-left border-collapse min-w-[850px]">
-          <thead>
-            <tr class="bg-slate-900/90 text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-800">
-              <th class="py-4 px-4">Login</th>
-              <th class="py-4 px-4">Abonent Ismi</th>
-              <th class="py-4 px-4">Manzil</th>
-              <th class="py-4 px-4">Tarif</th>
-              <th class="py-4 px-4">Balans</th>
-              <th class="py-4 px-4">Tezkor A'loqa</th>
-              <th class="py-4 px-4">Izoh va Qaydlar</th>
-              <th class="py-4 px-4 text-center">Saqlash</th>
-            </tr>
-          </thead>
-          <tbody id="table-body" class="divide-y divide-slate-800/60 text-sm">
-            <!-- Dynamic JavaScript content load -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Loading Skeleton State -->
-      <div id="loading-state" class="p-8 space-y-4">
-        <div class="animate-pulse flex space-x-4 items-center">
-          <div class="rounded-lg bg-slate-800 h-8 w-24"></div>
-          <div class="flex-1 space-y-2 py-1">
-            <div class="h-4 bg-slate-800 rounded w-3/4"></div>
-            <div class="h-3 bg-slate-800/60 rounded w-1/2"></div>
+    <!-- TAB 4: API VA SOZLAMALAR -->
+    <section id="tab-settings" class="tab-content space-y-4">
+      <div class="glass-panel p-4 rounded-2xl space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-code"></i>
           </div>
-          <div class="h-8 bg-slate-800 rounded w-28"></div>
-        </div>
-        <div class="animate-pulse flex space-x-4 items-center">
-          <div class="rounded-lg bg-slate-800 h-8 w-24"></div>
-          <div class="flex-1 space-y-2 py-1">
-            <div class="h-4 bg-slate-800 rounded w-2/3"></div>
-            <div class="h-3 bg-slate-800/60 rounded w-1/3"></div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Google Sheets Web API</h3>
+            <p class="text-[11px] text-slate-400">Apps Script deployment linkini sozlash</p>
           </div>
-          <div class="h-8 bg-slate-800 rounded w-28"></div>
         </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-semibold text-slate-300">Web App URL:</label>
+          <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" 
+                 class="w-full bg-slate-900 text-xs text-slate-100 p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <button onclick="saveApiUrl()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/30 transition">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Sozlamalarni Saqlash
+        </button>
       </div>
 
-      <!-- Empty Data State -->
-      <div id="empty-state" class="hidden p-12 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800/60 flex items-center justify-center text-slate-500 text-2xl">
-          <i class="fa-solid fa-folder-open"></i>
-        </div>
-        <h3 class="text-slate-300 font-semibold text-base">Ma'lumot topilmadi</h3>
-        <p class="text-slate-500 text-xs mt-1">Qidiruv so'rovingizga mos keldigan abonentlar yo'q yoki API ulanmagan.</p>
+      <!-- Deployment Instruction Cards -->
+      <div class="glass-panel p-4 rounded-2xl space-y-3 text-xs text-slate-300">
+        <h4 class="font-bold text-indigo-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info"></i> Ulash Bo'yicha Yo'riqnoma:
+        </h4>
+        <ol class="list-decimal pl-4 space-y-2 text-slate-400">
+          <li>Google Sheet yaratib, 1-qator ustunlarini quyidagicha belgilang:<br>
+            <span class="text-indigo-300 font-mono text-[10px] bg-slate-900 px-1 py-0.5 rounded border border-slate-800 block mt-1">Login | Ism | Familya | Telefon | Manzil | Tarif | Balans | Izoh</span>
+          </li>
+          <li>Menyudan <b>Extensions > Apps Script</b> bo'limiga o'ting.</li>
+          <li>Kodni joylang hamda Web App sifatida Publish deploy qiling (Access: <b>Anyone</b>).</li>
+          <li>Olingan URL manzilni yuqoridagi maydonga saqlang.</li>
+        </ol>
       </div>
-
-    </div>
+    </section>
 
   </main>
 
-  <!-- MODAL 1: Call Modal -->
-  <div id="call-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 max-w-sm w-full text-center relative shadow-2xl animate-float">
+  <!-- MODAL 1: Call Popup Modal -->
+  <div id="call-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-3xl p-5 max-w-sm w-full text-center relative shadow-2xl animate-bounce-subtle mb-16 sm:mb-0">
       <button onclick="closeModal('call-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+      <div class="w-14 h-14 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center text-xl mx-auto mb-3 animate-pulse">
         <i class="fa-solid fa-phone-flip"></i>
       </div>
-      <h3 class="text-lg font-bold text-white" id="modal-subscriber-name">---</h3>
-      <p class="text-xs text-slate-400 mt-1" id="modal-subscriber-phone">---</p>
+      <h3 class="text-base font-bold text-white" id="modal-subscriber-name">---</h3>
+      <p class="text-xs text-slate-400 mt-0.5 font-mono" id="modal-subscriber-phone">---</p>
       
-      <div class="mt-6 flex flex-col gap-2">
+      <div class="mt-5 flex flex-col gap-2">
         <a id="modal-call-link" href="#" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition">
-          <i class="fa-solid fa-phone"></i> Telefoniya Orqali Chaqirish
+          <i class="fa-solid fa-phone"></i> Chaqirish
         </a>
         <button onclick="copyPhone()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-700 transition">
           <i class="fa-solid fa-copy"></i> Raqamni Nusxalash
@@ -364,89 +391,74 @@
     </div>
   </div>
 
-  <!-- MODAL 2: Map Address Preview Modal -->
-  <div id="map-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 max-w-lg w-full relative shadow-2xl">
+  <!-- MODAL 2: Google Maps Location Modal -->
+  <div id="map-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-3xl p-5 max-w-md w-full relative shadow-2xl mb-16 sm:mb-0">
       <button onclick="closeModal('map-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center text-lg">
+      <div class="flex items-center gap-2.5 mb-3">
+        <div class="w-9 h-9 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center text-base">
           <i class="fa-solid fa-map-location-dot"></i>
         </div>
-        <div>
-          <h3 class="text-sm font-bold text-white">Abonent Joylashuvi</h3>
-          <p class="text-xs text-slate-400" id="map-address-text">---</p>
+        <div class="pr-6">
+          <h3 class="text-xs font-bold text-white">Abonent Manzili</h3>
+          <p class="text-[11px] text-slate-400 truncate" id="map-address-text">---</p>
         </div>
       </div>
-      <div class="w-full h-64 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 relative">
+      <div class="w-full h-52 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 relative">
         <iframe id="map-iframe" class="w-full h-full border-0" loading="lazy" src=""></iframe>
       </div>
-      <div class="mt-4 flex justify-end">
-        <a id="external-map-btn" href="#" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl flex items-center gap-2 shadow-md">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Maps'da Ochiq Ko'rish
+      <div class="mt-3 flex justify-end">
+        <a id="external-map-btn" href="#" target="_blank" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-md">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Maps'da Ochish
         </a>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: Apps Script API Setup Guide for Staff -->
-  <div id="api-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 max-w-xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
-      <button onclick="closeModal('api-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+  <!-- FIXED ANIMATED FLOATING BOTTOM NAVIGATION BAR (PASTDAGI BAR) -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bottom-nav-blur px-3 py-2">
+    <div class="max-w-md mx-auto flex items-center justify-around relative">
       
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-lg">
-          <i class="fa-solid fa-code"></i>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-white">Google Sheets API Sinxronizatsiyasi</h3>
-          <p class="text-xs text-slate-400">Tizim ma'lumotlarini jadvalga ulash bo'yicha ko'rsatma</p>
-        </div>
-      </div>
+      <!-- Nav Item 1: Subscriber Cards List -->
+      <button onclick="switchTab('subscribers')" id="nav-subscribers" class="nav-btn flex-1 flex flex-col items-center justify-center py-1 text-indigo-400 transition">
+        <i class="fa-solid fa-id-card text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Abonentlar</span>
+      </button>
 
-      <div class="space-y-4 text-xs text-slate-300">
-        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
-          <p class="font-bold text-indigo-300 mb-1">1-Qadam: Web App URL manzilini kiriting</p>
-          <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" 
-                 class="w-full bg-slate-900 text-xs text-slate-100 p-2.5 rounded-lg border border-slate-700 focus:outline-none focus:border-indigo-500">
-        </div>
+      <!-- Nav Item 2: Quick Analytics -->
+      <button onclick="switchTab('stats')" id="nav-stats" class="nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 hover:text-indigo-300 transition">
+        <i class="fa-solid fa-chart-line text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Statistika</span>
+      </button>
 
-        <div class="space-y-2">
-          <p class="font-semibold text-slate-200">Google Sheets Sozlash Tizimi:</p>
-          <ol class="list-decimal pl-4 space-y-1.5 text-slate-400">
-            <li>Google Sheet Ochib, 1-qatorga ushbu ustunlarni yozing: <br>
-              <code class="text-indigo-300 bg-slate-800 px-1 py-0.5 rounded">Login | Ism | Familya | Telefon | Manzil | Tarif | Balans | Izoh</code>
-            </li>
-            <li>Jadval menyusidan <b>Extensions > Apps Script</b> bo'limiga o'ting.</li>
-            <li>Apps Script kodi oynasiga tayyor `apps_script.js` kodini joylang va saqlang.</li>
-            <li><b>Deploy > New deployment > Web App</b> ni tanlang. Access huquqini <b>"Anyone"</b> qiling va Deploy bosing.</li>
-            <li>Berilgan Web App URL'ni oling va tepadagi maydonga joylab saqlang.</li>
-          </ol>
-        </div>
+      <!-- Nav Item 3: Deep Search & Filters -->
+      <button onclick="switchTab('search')" id="nav-search" class="nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 hover:text-indigo-300 transition">
+        <i class="fa-solid fa-magnifying-glass text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Filtr</span>
+      </button>
 
-      </div>
-
-      <div class="mt-6 flex justify-end gap-2">
-        <button onclick="saveApiUrl()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold shadow-lg shadow-indigo-600/30 transition">
-          Sozlamalarni Saqlash
-        </button>
-      </div>
+      <!-- Nav Item 4: Settings & API -->
+      <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 hover:text-indigo-300 transition">
+        <i class="fa-solid fa-sliders text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">API & Sozlash</span>
+      </button>
 
     </div>
-  </div>
+  </nav>
 
+  <!-- JavaScript Engine & API Logic -->
   <script>
-    // System Global Variables & State
+    // Global Application State Variables
     let API_URL = localStorage.getItem('crm_api_url') || "";
     let rawData = [];
+    let currentFilterStatus = 'all';
     let activePhoneForCopy = "";
     let statusChartInstance = null;
     let tariffChartInstance = null;
 
-    // Demo Initial Data Placeholder if API is disconnected
+    // Fallback Mock Data for immediate offline or demo use
     const demoData = [
       { rowIndex: 2, Login: "user101", Ism: "Jasur", Familya: "Ikromov", Telefon: "+998901234567", Manzil: "Toshkent sh., Yunusobod 4-mavze", Tarif: "VIP Unlimited", Balans: 120000, Izoh: "Muntazam to'lovchi" },
       { rowIndex: 3, Login: "user102", Ism: "Malika", Familya: "Sodiqova", Telefon: "+998939876543", Manzil: "Samarqand sh., Registon ko'chasi", Tarif: "Standart 100", Balans: -35000, Izoh: "Qarzdorlik bo'yicha ogohlantirildi" },
@@ -455,7 +467,7 @@
       { rowIndex: 6, Login: "user105", Ism: "Otabek", Familya: "Mirzayev", Telefon: "+998914447788", Manzil: "Andijon sh., Bobur shoh ko'chasi", Tarif: "Start Fast", Balans: 45000, Izoh: "Yangi abonent" }
     ];
 
-    // Initialize Application
+    // On Load Initialization
     window.onload = function() {
       if (API_URL) {
         document.getElementById('api-url-input').value = API_URL;
@@ -463,7 +475,7 @@
       loadData();
     };
 
-    // Load Data from Apps Script or Fallback Demo
+    // Load Data from Google Apps Script Web App
     async function loadData() {
       const loading = document.getElementById('loading-state');
       const emptyState = document.getElementById('empty-state');
@@ -480,7 +492,7 @@
           renderAll();
           refreshIcon.classList.remove('fa-spin');
           loading.classList.add('hidden');
-        }, 600);
+        }, 500);
         return;
       }
 
@@ -490,7 +502,6 @@
         renderAll();
       } catch (error) {
         console.error("API Error:", error);
-        alert("Google Sheets bilan bog'lanishda xatolik yuz berdi. Demo ma'lumotlar ko'rsatilmoqda.");
         rawData = demoData;
         renderAll();
       } finally {
@@ -499,7 +510,7 @@
       }
     }
 
-    // Render Data and Visuals
+    // Render All Dynamic UI Elements
     function renderAll() {
       populateTariffFilter();
       renderStats();
@@ -507,7 +518,207 @@
       filterData();
     }
 
-    // Render Metric Cards
+    // Switch Bottom Bar Tabs with Animation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-indigo-400');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.classList.remove('text-slate-400');
+        activeNav.classList.add('text-indigo-400');
+      }
+    }
+
+    // Filter Chips Trigger
+    function setFilter(status) {
+      currentFilterStatus = status;
+      document.querySelectorAll('.chip-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+
+      const activeChip = document.getElementById(`chip-${status}`);
+      if (activeChip) {
+        activeChip.classList.remove('bg-slate-800', 'text-slate-300');
+        activeChip.classList.add('bg-indigo-600', 'text-white');
+      }
+
+      filterData();
+    }
+
+    // Clear Search Field
+    function clearSearch() {
+      const input = document.getElementById('quick-search-input');
+      input.value = "";
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      filterData();
+    }
+
+    // Filter, Search, and Sort Main Logic
+    function filterData() {
+      const query = document.getElementById('quick-search-input').value.toLowerCase();
+      const clearBtn = document.getElementById('clear-search-btn');
+      
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      const statusFilterSelect = document.getElementById('status-filter').value;
+      const tariffFilter = document.getElementById('tariff-filter').value;
+      const sortFilter = document.getElementById('sort-filter').value;
+
+      let filtered = rawData.filter(item => {
+        const matchesQuery = 
+          String(item.Login || '').toLowerCase().includes(query) ||
+          String(item.Ism || '').toLowerCase().includes(query) ||
+          String(item.Familya || '').toLowerCase().includes(query) ||
+          String(item.Telefon || '').toLowerCase().includes(query) ||
+          String(item.Manzil || '').toLowerCase().includes(query);
+
+        const balance = Number(item.Balans) || 0;
+        let matchesStatus = true;
+
+        if (currentFilterStatus === 'active' || statusFilterSelect === 'active') matchesStatus = balance >= 0;
+        if (currentFilterStatus === 'debt' || statusFilterSelect === 'debt') matchesStatus = balance < 0;
+
+        let matchesTariff = true;
+        if (tariffFilter !== 'all') matchesTariff = (item.Tarif || 'Standart') === tariffFilter;
+
+        return matchesQuery && matchesStatus && matchesTariff;
+      });
+
+      // Sorting Logic
+      if (sortFilter === 'balance-asc') {
+        filtered.sort((a, b) => (Number(a.Balans) || 0) - (Number(b.Balans) || 0));
+      } else if (sortFilter === 'balance-desc') {
+        filtered.sort((a, b) => (Number(b.Balans) || 0) - (Number(a.Balans) || 0));
+      } else if (sortFilter === 'name') {
+        filtered.sort((a, b) => String(a.Ism || '').localeCompare(String(b.Ism || '')));
+      }
+
+      document.getElementById('card-count-badge').innerText = `${filtered.length} ta`;
+      renderSubscriberCards(filtered);
+    }
+
+    // Render Compact Mobile Subscriber Cards (Karta Ko'rinishi)
+    function renderSubscriberCards(data) {
+      const container = document.getElementById('subscribers-card-container');
+      const emptyState = document.getElementById('empty-state');
+      container.innerHTML = "";
+
+      if (data.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      data.forEach(item => {
+        const balance = Number(item.Balans) || 0;
+        const isNegative = balance < 0;
+        const phone = item.Telefon ? String(item.Telefon).replace(/[^0-9+]/g, '') : '';
+        const fullName = `${item.Ism || ''} ${item.Familya || ''}`.trim() || 'Abonent';
+
+        const card = document.createElement('div');
+        card.className = "glass-card p-4 rounded-2xl border border-slate-800 space-y-3 transition duration-200 animate-slide-up";
+
+        card.innerHTML = `
+          <!-- Card Header: Login Badge & Status -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                ${item.Login || 'N/A'}
+              </span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${isNegative ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                ${item.Tarif || 'Standart'}
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 font-bold text-xs ${isNegative ? 'text-rose-400' : 'text-emerald-400'}">
+              <span class="w-2 h-2 rounded-full ${isNegative ? 'bg-rose-500 animate-ping' : 'bg-emerald-500'}"></span>
+              ${balance.toLocaleString('uz-UZ')} so'm
+            </div>
+          </div>
+
+          <!-- Card Body: Abonent Info -->
+          <div>
+            <h4 class="text-sm font-bold text-white">${fullName}</h4>
+            <p class="text-[11px] text-slate-400 font-mono mt-0.5">
+              <i class="fa-solid fa-phone text-slate-500 mr-1 text-[10px]"></i>${item.Telefon || 'Raqam yo\'q'}
+            </p>
+            ${item.Manzil ? `
+              <p class="text-[11px] text-slate-400 mt-1 truncate">
+                <i class="fa-solid fa-location-dot text-rose-400 mr-1 text-[10px]"></i>${item.Manzil}
+              </p>
+            ` : ''}
+          </div>
+
+          <!-- Inline Comment / Note Edit -->
+          <div class="flex items-center gap-2 pt-1 border-t border-slate-800/80">
+            <input type="text" value="${item.Izoh || ''}" id="input-${item.rowIndex}" placeholder="Izoh yozing..." 
+                   class="flex-1 bg-slate-900/80 text-[11px] text-slate-200 border border-slate-700/60 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 transition">
+            <button onclick="saveComment(${item.rowIndex})" 
+                    class="px-2.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 text-xs transition flex items-center gap-1 font-semibold">
+              <i class="fa-solid fa-floppy-disk text-[10px]"></i> Saqlash
+            </button>
+          </div>
+
+          <!-- Quick Mobile Actions Bar -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            ${phone ? `
+              <button onclick="openCallModal('${fullName}', '${phone}')" 
+                      class="py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-phone text-[11px]"></i> Qo'ng'iroq
+              </button>
+            ` : '<div class="py-2 text-center text-slate-500 text-xs">Raqam yo\'q</div>'}
+
+            ${item.Manzil ? `
+              <button onclick="openMapModal('${encodeURIComponent(item.Manzil)}')" 
+                      class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-map-pin text-[11px] text-rose-400"></i> Xarita
+              </button>
+            ` : `
+              <div class="py-2 text-center text-slate-500 text-xs">Manzil yo'q</div>
+            `}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Save Updated Comment to Apps Script Backend
+    async function saveComment(rowIndex) {
+      const commentInput = document.getElementById(`input-${rowIndex}`);
+      const newComment = commentInput.value;
+
+      if (!API_URL) {
+        alert("Demo rejim: Izoh saqlandi (Haqiqiy sinxronizatsiya uchun API kiriting).");
+        return;
+      }
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'updateComment',
+            rowIndex: rowIndex,
+            comment: newComment
+          })
+        });
+        alert("Izoh Google Sheets'ga saqlandi!");
+      } catch (e) {
+        alert("Saqlashda xatolik yuz berdi");
+      }
+    }
+
+    // Render Stats Counters
     function renderStats() {
       let active = 0, debtors = 0, totalBalance = 0;
       rawData.forEach(item => {
@@ -539,141 +750,6 @@
       tariffSelect.value = currentVal;
     }
 
-    // Filter, Search, and Sort Engine
-    function filterData() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const statusFilter = document.getElementById('status-filter').value;
-      const tariffFilter = document.getElementById('tariff-filter').value;
-      const sortFilter = document.getElementById('sort-filter').value;
-
-      let filtered = rawData.filter(item => {
-        const matchesQuery = 
-          String(item.Login || '').toLowerCase().includes(query) ||
-          String(item.Ism || '').toLowerCase().includes(query) ||
-          String(item.Familya || '').toLowerCase().includes(query) ||
-          String(item.Telefon || '').toLowerCase().includes(query) ||
-          String(item.Manzil || '').toLowerCase().includes(query);
-
-        const balance = Number(item.Balans) || 0;
-        let matchesStatus = true;
-        if (statusFilter === 'active') matchesStatus = balance >= 0;
-        if (statusFilter === 'debt') matchesStatus = balance < 0;
-
-        let matchesTariff = true;
-        if (tariffFilter !== 'all') matchesTariff = (item.Tarif || 'Standart') === tariffFilter;
-
-        return matchesQuery && matchesStatus && matchesTariff;
-      });
-
-      // Sorting
-      if (sortFilter === 'balance-asc') {
-        filtered.sort((a, b) => (Number(a.Balans) || 0) - (Number(b.Balans) || 0));
-      } else if (sortFilter === 'balance-desc') {
-        filtered.sort((a, b) => (Number(b.Balans) || 0) - (Number(a.Balans) || 0));
-      } else if (sortFilter === 'name') {
-        filtered.sort((a, b) => String(a.Ism || '').localeCompare(String(b.Ism || '')));
-      }
-
-      renderTable(filtered);
-    }
-
-    // Render Table Row Elements
-    function renderTable(data) {
-      const tbody = document.getElementById('table-body');
-      const emptyState = document.getElementById('empty-state');
-      tbody.innerHTML = "";
-
-      if (data.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
-      } else {
-        emptyState.classList.add('hidden');
-      }
-
-      data.forEach(item => {
-        const balance = Number(item.Balans) || 0;
-        const isNegative = balance < 0;
-        const phone = item.Telefon ? String(item.Telefon).replace(/[^0-9+]/g, '') : '';
-        const fullName = `${item.Ism || ''} ${item.Familya || ''}`.trim() || 'Abonent';
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/40 transition duration-150 group border-b border-slate-800/40";
-
-        tr.innerHTML = `
-          <td class="py-3.5 px-4 font-mono text-xs font-semibold text-indigo-400">${item.Login || '-'}</td>
-          <td class="py-3.5 px-4">
-            <div class="font-medium text-slate-100">${fullName}</div>
-            <div class="text-[11px] text-slate-400 font-mono">${item.Telefon || '-'}</div>
-          </td>
-          <td class="py-3.5 px-4 max-w-xs">
-            <div class="text-xs text-slate-300 truncate" title="${item.Manzil || ''}">
-              <i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> ${item.Manzil || 'Ko\'rsatilmagan'}
-            </div>
-            ${item.Manzil ? `
-              <button onclick="openMapModal('${encodeURIComponent(item.Manzil)}')" class="text-[10px] text-indigo-400 hover:text-indigo-300 hover:underline mt-0.5 block">
-                Xaritada Ochish
-              </button>
-            ` : ''}
-          </td>
-          <td class="py-3.5 px-4">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-indigo-300 border border-slate-700">
-              ${item.Tarif || 'Standart'}
-            </span>
-          </td>
-          <td class="py-3.5 px-4 font-semibold ${isNegative ? 'text-rose-400' : 'text-emerald-400'}">
-            <span class="inline-flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full ${isNegative ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}"></span>
-              ${balance.toLocaleString('uz-UZ')} so'm
-            </span>
-          </td>
-          <td class="py-3.5 px-4">
-            ${phone ? `
-              <button onclick="openCallModal('${fullName}', '${phone}')" 
-                      class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
-                <i class="fa-solid fa-phone text-xs"></i> Qo'ng'iroq
-              </button>
-            ` : '<span class="text-xs text-slate-500">Raqam Yo\'q</span>'}
-          </td>
-          <td class="py-3.5 px-4">
-            <input type="text" value="${item.Izoh || ''}" id="input-${item.rowIndex}" 
-                   class="w-full bg-slate-900/60 text-xs text-slate-200 border border-slate-700/60 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 transition">
-          </td>
-          <td class="py-3.5 px-4 text-center">
-            <button onclick="saveComment(${item.rowIndex})" 
-                    class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white border border-indigo-500/30 transition flex items-center justify-center mx-auto">
-              <i class="fa-solid fa-floppy-disk text-xs"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Save Updated Comment to Backend
-    async function saveComment(rowIndex) {
-      const commentInput = document.getElementById(`input-${rowIndex}`);
-      const newComment = commentInput.value;
-
-      if (!API_URL) {
-        alert("Demo rejim: Izoh saqlandi (Google Sheets ulash uchun API URL kiriting).");
-        return;
-      }
-
-      try {
-        await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'updateComment',
-            rowIndex: rowIndex,
-            comment: newComment
-          })
-        });
-        alert("Izoh Google Sheets'da saqlandi!");
-      } catch (e) {
-        alert("Saqlashda xatolik bo'ldi");
-      }
-    }
-
     // Chart Visualizations
     function renderCharts() {
       const activeCount = rawData.filter(i => (Number(i.Balans) || 0) >= 0).length;
@@ -685,7 +761,7 @@
       statusChartInstance = new Chart(ctx1, {
         type: 'doughnut',
         data: {
-          labels: ['Faol Abonentlar', 'Qarzdorlar'],
+          labels: ['Faol', 'Qarzdor'],
           datasets: [{
             data: [activeCount, debtorCount],
             backgroundColor: ['#10b981', '#f43f5e'],
@@ -696,7 +772,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+            legend: { labels: { color: '#94a3b8', font: { size: 10 } } }
           }
         }
       });
@@ -715,7 +791,7 @@
         data: {
           labels: Object.keys(tariffCounts),
           datasets: [{
-            label: 'Abonentlar Soni',
+            label: 'Abonentlar',
             data: Object.values(tariffCounts),
             backgroundColor: '#6366f1',
             borderRadius: 6
@@ -725,8 +801,8 @@
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
-            y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
           },
           plugins: {
             legend: { display: false }
@@ -752,10 +828,6 @@
       document.getElementById('map-modal').classList.remove('hidden');
     }
 
-    function openApiModal() {
-      document.getElementById('api-modal').classList.remove('hidden');
-    }
-
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
@@ -763,7 +835,7 @@
     function copyPhone() {
       if (activePhoneForCopy) {
         navigator.clipboard.writeText(activePhoneForCopy);
-        alert("Telefon raqami nusxalandi: " + activePhoneForCopy);
+        alert("Raqam nusxalandi: " + activePhoneForCopy);
       }
     }
 
@@ -771,24 +843,8 @@
       const url = document.getElementById('api-url-input').value.trim();
       localStorage.setItem('crm_api_url', url);
       API_URL = url;
-      closeModal('api-modal');
+      alert("API URL muvaffaqiyatli saqlandi!");
       loadData();
-    }
-
-    function toggleChart() {
-      const container = document.getElementById('chart-container');
-      const text = document.getElementById('chart-toggle-text');
-      const icon = document.getElementById('chart-toggle-icon');
-
-      if (container.classList.contains('hidden')) {
-        container.classList.remove('hidden');
-        text.innerText = "Grafikni yashirish";
-        icon.className = "fa-solid fa-chevron-up";
-      } else {
-        container.classList.add('hidden');
-        text.innerText = "Grafikni ko'rsatish";
-        icon.className = "fa-solid fa-chevron-down";
-      }
     }
   </script>
 </body>
