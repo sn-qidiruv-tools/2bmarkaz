@@ -1,30 +1,795 @@
-function doGet() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  var headers = data[0];
-  var result = [];
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abonentlar Boshqaruvi — Pro CRM Dashboard</title>
 
-  for (var i = 1; i < data.length; i++) {
-    var row = data[i];
-    var obj = { rowIndex: i + 1 };
-    for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = row[j];
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            },
+            darkbg: '#0b0f19',
+            cardbg: '#111827',
+            glassborder: 'rgba(255, 255, 255, 0.08)'
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'float': 'float 4s ease-in-out infinite'
+          },
+          keyframes: {
+            glow: {
+              '0%': { boxShadow: '0 0 15px rgba(99, 102, 241, 0.3)' },
+              '100%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.7)' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            }
+          }
+        }
+      }
     }
-    result.push(obj);
-  }
+  </script>
 
-  return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  var params = JSON.parse(e.postData.contents);
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  if (params.action === "updateComment") {
-    // H ustun (8-ustun) - Izohni yangilash
-    sheet.getRange(params.rowIndex, 8).setValue(params.comment);
-    return ContentService.createTextOutput("OK");
-  }
-}
+  <!-- Chart.js Vizualizatsiya uchun -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Glassmorphism Styles -->
+  <style>
+    body {
+      background-color: #0b0f19;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: rgba(31, 41, 55, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.6);
+    }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen font-sans flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Navigation / Header Bar -->
+  <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand & Status -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 animate-pulse-slow">
+          <i class="fa-solid fa-bolt text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
+              NEXTGEN CRM
+            </h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-ping"></span> Live Sync
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Google Sheets Powered Abonent Boshqaruvi</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- API Setup Button -->
+        <button onclick="openApiModal()" class="px-3 py-1.5 rounded-lg glass-card text-xs font-medium text-slate-300 hover:text-white flex items-center gap-2 hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-plug text-indigo-400"></i>
+          <span class="hidden md:inline">API Sozlash</span>
+        </button>
+
+        <!-- Refresh Button -->
+        <button onclick="loadData()" id="refresh-btn" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
+          <i class="fa-solid fa-rotate-right" id="refresh-icon"></i>
+          <span class="hidden sm:inline">Yangilash</span>
+        </button>
+
+        <!-- Staff Profile Avatar -->
+        <div class="flex items-center pl-2 border-l border-slate-800">
+          <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs font-bold">
+            XD
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- Top Metrics and Interactive Charts Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Metric 1: Total Subscribers -->
+      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Jami Abonentlar</p>
+            <h3 class="text-3xl font-extrabold text-white mt-2 tracking-tight" id="stat-total">0</h3>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center text-xs text-indigo-300">
+          <i class="fa-solid fa-chart-line mr-1"></i> Baza to'liq aktiv holatda
+        </div>
+      </div>
+
+      <!-- Metric 2: Active Subscribers -->
+      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Faol Abonentlar</p>
+            <h3 class="text-3xl font-extrabold text-emerald-400 mt-2 tracking-tight" id="stat-active">0</h3>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center text-xs text-emerald-400">
+          <i class="fa-solid fa-arrow-up mr-1"></i> Musbat balans egalari
+        </div>
+      </div>
+
+      <!-- Metric 3: Debtors -->
+      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Qarzdorlar</p>
+            <h3 class="text-3xl font-extrabold text-rose-400 mt-2 tracking-tight" id="stat-debtors">0</h3>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-xmark"></i>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center text-xs text-rose-400">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Manfiy balansdagi abonentlar
+        </div>
+      </div>
+
+      <!-- Metric 4: Balance Summary -->
+      <div class="glass-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Umumiy Balans</p>
+            <h3 class="text-2xl font-extrabold text-purple-300 mt-2 tracking-tight truncate" id="stat-balance">0 so'm</h3>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center text-xs text-purple-300">
+          <i class="fa-solid fa-shield-halved mr-1"></i> Avto-hisob tizimi
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Analytics Chart Drawer -->
+    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-indigo-400"></i> Abonentlar Tahlili va Status Ko'rsatkichlari
+          </h2>
+          <p class="text-xs text-slate-400">Tariflar va to'lov holati bo'yicha vizual taqsimot</p>
+        </div>
+        <button onclick="toggleChart()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1">
+          <span id="chart-toggle-text">Grafikni yashirish</span> <i class="fa-solid fa-chevron-up" id="chart-toggle-icon"></i>
+        </button>
+      </div>
+
+      <div id="chart-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
+        <div class="h-48 flex items-center justify-center p-2 bg-slate-900/40 rounded-xl border border-slate-800/60">
+          <canvas id="statusPieChart"></canvas>
+        </div>
+        <div class="h-48 flex items-center justify-center p-2 bg-slate-900/40 rounded-xl border border-slate-800/60">
+          <canvas id="tariffBarChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Glass Toolbar -->
+    <div class="glass-panel p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row gap-3 items-center justify-between">
+      
+      <!-- Live Search Box -->
+      <div class="relative w-full md:w-96">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+        <input type="text" id="search-input" oninput="filterData()" placeholder="Login, Ism, Telefon yoki Manzil..." 
+               class="w-full bg-slate-900/80 text-sm text-slate-100 placeholder-slate-500 pl-10 pr-4 py-2 rounded-xl border border-slate-700/80 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+      </div>
+
+      <!-- Filters & Sorting options -->
+      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-start md:justify-end">
+        
+        <!-- Status Filter -->
+        <select id="status-filter" onchange="filterData()" 
+                class="bg-slate-900/80 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+          <option value="all">Barcha Statuslar</option>
+          <option value="active">🟢 Musbat (Faol)</option>
+          <option value="debt">🔴 Manfiy (Qarzdor)</option>
+        </select>
+
+        <!-- Tarif Filter -->
+        <select id="tariff-filter" onchange="filterData()" 
+                class="bg-slate-900/80 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+          <option value="all">Barcha Tariflar</option>
+        </select>
+
+        <!-- Sort Option -->
+        <select id="sort-filter" onchange="filterData()" 
+                class="bg-slate-900/80 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+          <option value="default">Tartiblash (Standart)</option>
+          <option value="balance-asc">Balans: Kamdan Ko'pga</option>
+          <option value="balance-desc">Balans: Ko'pdan Kamga</option>
+          <option value="name">Ism bo'yicha (A-Z)</option>
+        </select>
+
+      </div>
+    </div>
+
+    <!-- Subscriber Table Container -->
+    <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left border-collapse min-w-[850px]">
+          <thead>
+            <tr class="bg-slate-900/90 text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-800">
+              <th class="py-4 px-4">Login</th>
+              <th class="py-4 px-4">Abonent Ismi</th>
+              <th class="py-4 px-4">Manzil</th>
+              <th class="py-4 px-4">Tarif</th>
+              <th class="py-4 px-4">Balans</th>
+              <th class="py-4 px-4">Tezkor A'loqa</th>
+              <th class="py-4 px-4">Izoh va Qaydlar</th>
+              <th class="py-4 px-4 text-center">Saqlash</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="divide-y divide-slate-800/60 text-sm">
+            <!-- Dynamic JavaScript content load -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Loading Skeleton State -->
+      <div id="loading-state" class="p-8 space-y-4">
+        <div class="animate-pulse flex space-x-4 items-center">
+          <div class="rounded-lg bg-slate-800 h-8 w-24"></div>
+          <div class="flex-1 space-y-2 py-1">
+            <div class="h-4 bg-slate-800 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-800/60 rounded w-1/2"></div>
+          </div>
+          <div class="h-8 bg-slate-800 rounded w-28"></div>
+        </div>
+        <div class="animate-pulse flex space-x-4 items-center">
+          <div class="rounded-lg bg-slate-800 h-8 w-24"></div>
+          <div class="flex-1 space-y-2 py-1">
+            <div class="h-4 bg-slate-800 rounded w-2/3"></div>
+            <div class="h-3 bg-slate-800/60 rounded w-1/3"></div>
+          </div>
+          <div class="h-8 bg-slate-800 rounded w-28"></div>
+        </div>
+      </div>
+
+      <!-- Empty Data State -->
+      <div id="empty-state" class="hidden p-12 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800/60 flex items-center justify-center text-slate-500 text-2xl">
+          <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <h3 class="text-slate-300 font-semibold text-base">Ma'lumot topilmadi</h3>
+        <p class="text-slate-500 text-xs mt-1">Qidiruv so'rovingizga mos keldigan abonentlar yo'q yoki API ulanmagan.</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL 1: Call Modal -->
+  <div id="call-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 max-w-sm w-full text-center relative shadow-2xl animate-float">
+      <button onclick="closeModal('call-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+        <i class="fa-solid fa-phone-flip"></i>
+      </div>
+      <h3 class="text-lg font-bold text-white" id="modal-subscriber-name">---</h3>
+      <p class="text-xs text-slate-400 mt-1" id="modal-subscriber-phone">---</p>
+      
+      <div class="mt-6 flex flex-col gap-2">
+        <a id="modal-call-link" href="#" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition">
+          <i class="fa-solid fa-phone"></i> Telefoniya Orqali Chaqirish
+        </a>
+        <button onclick="copyPhone()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-700 transition">
+          <i class="fa-solid fa-copy"></i> Raqamni Nusxalash
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Map Address Preview Modal -->
+  <div id="map-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 max-w-lg w-full relative shadow-2xl">
+      <button onclick="closeModal('map-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center text-lg">
+          <i class="fa-solid fa-map-location-dot"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Abonent Joylashuvi</h3>
+          <p class="text-xs text-slate-400" id="map-address-text">---</p>
+        </div>
+      </div>
+      <div class="w-full h-64 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 relative">
+        <iframe id="map-iframe" class="w-full h-full border-0" loading="lazy" src=""></iframe>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <a id="external-map-btn" href="#" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl flex items-center gap-2 shadow-md">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Maps'da Ochiq Ko'rish
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Apps Script API Setup Guide for Staff -->
+  <div id="api-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 max-w-xl w-full relative shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <button onclick="closeModal('api-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-lg">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white">Google Sheets API Sinxronizatsiyasi</h3>
+          <p class="text-xs text-slate-400">Tizim ma'lumotlarini jadvalga ulash bo'yicha ko'rsatma</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-xs text-slate-300">
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+          <p class="font-bold text-indigo-300 mb-1">1-Qadam: Web App URL manzilini kiriting</p>
+          <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" 
+                 class="w-full bg-slate-900 text-xs text-slate-100 p-2.5 rounded-lg border border-slate-700 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="space-y-2">
+          <p class="font-semibold text-slate-200">Google Sheets Sozlash Tizimi:</p>
+          <ol class="list-decimal pl-4 space-y-1.5 text-slate-400">
+            <li>Google Sheet Ochib, 1-qatorga ushbu ustunlarni yozing: <br>
+              <code class="text-indigo-300 bg-slate-800 px-1 py-0.5 rounded">Login | Ism | Familya | Telefon | Manzil | Tarif | Balans | Izoh</code>
+            </li>
+            <li>Jadval menyusidan <b>Extensions > Apps Script</b> bo'limiga o'ting.</li>
+            <li>Apps Script kodi oynasiga tayyor `apps_script.js` kodini joylang va saqlang.</li>
+            <li><b>Deploy > New deployment > Web App</b> ni tanlang. Access huquqini <b>"Anyone"</b> qiling va Deploy bosing.</li>
+            <li>Berilgan Web App URL'ni oling va tepadagi maydonga joylab saqlang.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="saveApiUrl()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold shadow-lg shadow-indigo-600/30 transition">
+          Sozlamalarni Saqlash
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // System Global Variables & State
+    let API_URL = localStorage.getItem('crm_api_url') || "";
+    let rawData = [];
+    let activePhoneForCopy = "";
+    let statusChartInstance = null;
+    let tariffChartInstance = null;
+
+    // Demo Initial Data Placeholder if API is disconnected
+    const demoData = [
+      { rowIndex: 2, Login: "user101", Ism: "Jasur", Familya: "Ikromov", Telefon: "+998901234567", Manzil: "Toshkent sh., Yunusobod 4-mavze", Tarif: "VIP Unlimited", Balans: 120000, Izoh: "Muntazam to'lovchi" },
+      { rowIndex: 3, Login: "user102", Ism: "Malika", Familya: "Sodiqova", Telefon: "+998939876543", Manzil: "Samarqand sh., Registon ko'chasi", Tarif: "Standart 100", Balans: -35000, Izoh: "Qarzdorlik bo'yicha ogohlantirildi" },
+      { rowIndex: 4, Login: "user103", Ism: "Sardor", Familya: "Rahmatov", Telefon: "+998945551122", Manzil: "Buxoro sh., B.Naqshband ko'chasi", Tarif: "Biznes Pro", Balans: 85000, Izoh: "Tarifni oshirmoqchi" },
+      { rowIndex: 5, Login: "user104", Ism: "Nigora", Familya: "Azimova", Telefon: "+998971112233", Manzil: "Farg'ona sh., Al-Farg'oniy ko'chasi", Tarif: "Standart 100", Balans: -12000, Izoh: "SMS yuborildi" },
+      { rowIndex: 6, Login: "user105", Ism: "Otabek", Familya: "Mirzayev", Telefon: "+998914447788", Manzil: "Andijon sh., Bobur shoh ko'chasi", Tarif: "Start Fast", Balans: 45000, Izoh: "Yangi abonent" }
+    ];
+
+    // Initialize Application
+    window.onload = function() {
+      if (API_URL) {
+        document.getElementById('api-url-input').value = API_URL;
+      }
+      loadData();
+    };
+
+    // Load Data from Apps Script or Fallback Demo
+    async function loadData() {
+      const loading = document.getElementById('loading-state');
+      const emptyState = document.getElementById('empty-state');
+      const refreshIcon = document.getElementById('refresh-icon');
+
+      loading.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+      refreshIcon.classList.add('fa-spin');
+
+      if (!API_URL) {
+        // Fallback demo Mode
+        setTimeout(() => {
+          rawData = demoData;
+          renderAll();
+          refreshIcon.classList.remove('fa-spin');
+          loading.classList.add('hidden');
+        }, 600);
+        return;
+      }
+
+      try {
+        const response = await fetch(API_URL);
+        rawData = await response.json();
+        renderAll();
+      } catch (error) {
+        console.error("API Error:", error);
+        alert("Google Sheets bilan bog'lanishda xatolik yuz berdi. Demo ma'lumotlar ko'rsatilmoqda.");
+        rawData = demoData;
+        renderAll();
+      } finally {
+        loading.classList.add('hidden');
+        refreshIcon.classList.remove('fa-spin');
+      }
+    }
+
+    // Render Data and Visuals
+    function renderAll() {
+      populateTariffFilter();
+      renderStats();
+      renderCharts();
+      filterData();
+    }
+
+    // Render Metric Cards
+    function renderStats() {
+      let active = 0, debtors = 0, totalBalance = 0;
+      rawData.forEach(item => {
+        let b = Number(item.Balans) || 0;
+        totalBalance += b;
+        if (b >= 0) active++;
+        else debtors++;
+      });
+
+      document.getElementById('stat-total').innerText = rawData.length;
+      document.getElementById('stat-active').innerText = active;
+      document.getElementById('stat-debtors').innerText = debtors;
+      document.getElementById('stat-balance').innerText = totalBalance.toLocaleString('uz-UZ') + " so'm";
+    }
+
+    // Populate Dynamic Tariff Dropdown Options
+    function populateTariffFilter() {
+      const tariffSelect = document.getElementById('tariff-filter');
+      const currentVal = tariffSelect.value;
+      const tariffs = [...new Set(rawData.map(i => i.Tarif || 'Standart'))];
+
+      tariffSelect.innerHTML = '<option value="all">Barcha Tariflar</option>';
+      tariffs.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.innerText = t;
+        tariffSelect.appendChild(opt);
+      });
+      tariffSelect.value = currentVal;
+    }
+
+    // Filter, Search, and Sort Engine
+    function filterData() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const statusFilter = document.getElementById('status-filter').value;
+      const tariffFilter = document.getElementById('tariff-filter').value;
+      const sortFilter = document.getElementById('sort-filter').value;
+
+      let filtered = rawData.filter(item => {
+        const matchesQuery = 
+          String(item.Login || '').toLowerCase().includes(query) ||
+          String(item.Ism || '').toLowerCase().includes(query) ||
+          String(item.Familya || '').toLowerCase().includes(query) ||
+          String(item.Telefon || '').toLowerCase().includes(query) ||
+          String(item.Manzil || '').toLowerCase().includes(query);
+
+        const balance = Number(item.Balans) || 0;
+        let matchesStatus = true;
+        if (statusFilter === 'active') matchesStatus = balance >= 0;
+        if (statusFilter === 'debt') matchesStatus = balance < 0;
+
+        let matchesTariff = true;
+        if (tariffFilter !== 'all') matchesTariff = (item.Tarif || 'Standart') === tariffFilter;
+
+        return matchesQuery && matchesStatus && matchesTariff;
+      });
+
+      // Sorting
+      if (sortFilter === 'balance-asc') {
+        filtered.sort((a, b) => (Number(a.Balans) || 0) - (Number(b.Balans) || 0));
+      } else if (sortFilter === 'balance-desc') {
+        filtered.sort((a, b) => (Number(b.Balans) || 0) - (Number(a.Balans) || 0));
+      } else if (sortFilter === 'name') {
+        filtered.sort((a, b) => String(a.Ism || '').localeCompare(String(b.Ism || '')));
+      }
+
+      renderTable(filtered);
+    }
+
+    // Render Table Row Elements
+    function renderTable(data) {
+      const tbody = document.getElementById('table-body');
+      const emptyState = document.getElementById('empty-state');
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      data.forEach(item => {
+        const balance = Number(item.Balans) || 0;
+        const isNegative = balance < 0;
+        const phone = item.Telefon ? String(item.Telefon).replace(/[^0-9+]/g, '') : '';
+        const fullName = `${item.Ism || ''} ${item.Familya || ''}`.trim() || 'Abonent';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition duration-150 group border-b border-slate-800/40";
+
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 font-mono text-xs font-semibold text-indigo-400">${item.Login || '-'}</td>
+          <td class="py-3.5 px-4">
+            <div class="font-medium text-slate-100">${fullName}</div>
+            <div class="text-[11px] text-slate-400 font-mono">${item.Telefon || '-'}</div>
+          </td>
+          <td class="py-3.5 px-4 max-w-xs">
+            <div class="text-xs text-slate-300 truncate" title="${item.Manzil || ''}">
+              <i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> ${item.Manzil || 'Ko\'rsatilmagan'}
+            </div>
+            ${item.Manzil ? `
+              <button onclick="openMapModal('${encodeURIComponent(item.Manzil)}')" class="text-[10px] text-indigo-400 hover:text-indigo-300 hover:underline mt-0.5 block">
+                Xaritada Ochish
+              </button>
+            ` : ''}
+          </td>
+          <td class="py-3.5 px-4">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-indigo-300 border border-slate-700">
+              ${item.Tarif || 'Standart'}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 font-semibold ${isNegative ? 'text-rose-400' : 'text-emerald-400'}">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full ${isNegative ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}"></span>
+              ${balance.toLocaleString('uz-UZ')} so'm
+            </span>
+          </td>
+          <td class="py-3.5 px-4">
+            ${phone ? `
+              <button onclick="openCallModal('${fullName}', '${phone}')" 
+                      class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+                <i class="fa-solid fa-phone text-xs"></i> Qo'ng'iroq
+              </button>
+            ` : '<span class="text-xs text-slate-500">Raqam Yo\'q</span>'}
+          </td>
+          <td class="py-3.5 px-4">
+            <input type="text" value="${item.Izoh || ''}" id="input-${item.rowIndex}" 
+                   class="w-full bg-slate-900/60 text-xs text-slate-200 border border-slate-700/60 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 transition">
+          </td>
+          <td class="py-3.5 px-4 text-center">
+            <button onclick="saveComment(${item.rowIndex})" 
+                    class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white border border-indigo-500/30 transition flex items-center justify-center mx-auto">
+              <i class="fa-solid fa-floppy-disk text-xs"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Save Updated Comment to Backend
+    async function saveComment(rowIndex) {
+      const commentInput = document.getElementById(`input-${rowIndex}`);
+      const newComment = commentInput.value;
+
+      if (!API_URL) {
+        alert("Demo rejim: Izoh saqlandi (Google Sheets ulash uchun API URL kiriting).");
+        return;
+      }
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'updateComment',
+            rowIndex: rowIndex,
+            comment: newComment
+          })
+        });
+        alert("Izoh Google Sheets'da saqlandi!");
+      } catch (e) {
+        alert("Saqlashda xatolik bo'ldi");
+      }
+    }
+
+    // Chart Visualizations
+    function renderCharts() {
+      const activeCount = rawData.filter(i => (Number(i.Balans) || 0) >= 0).length;
+      const debtorCount = rawData.filter(i => (Number(i.Balans) || 0) < 0).length;
+
+      // Status Pie Chart
+      const ctx1 = document.getElementById('statusPieChart').getContext('2d');
+      if (statusChartInstance) statusChartInstance.destroy();
+      statusChartInstance = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: ['Faol Abonentlar', 'Qarzdorlar'],
+          datasets: [{
+            data: [activeCount, debtorCount],
+            backgroundColor: ['#10b981', '#f43f5e'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+          }
+        }
+      });
+
+      // Tariff Bar Chart
+      const tariffCounts = {};
+      rawData.forEach(i => {
+        const t = i.Tarif || 'Standart';
+        tariffCounts[t] = (tariffCounts[t] || 0) + 1;
+      });
+
+      const ctx2 = document.getElementById('tariffBarChart').getContext('2d');
+      if (tariffChartInstance) tariffChartInstance.destroy();
+      tariffChartInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(tariffCounts),
+          datasets: [{
+            label: 'Abonentlar Soni',
+            data: Object.values(tariffCounts),
+            backgroundColor: '#6366f1',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    // Modal Helpers
+    function openCallModal(name, phone) {
+      activePhoneForCopy = phone;
+      document.getElementById('modal-subscriber-name').innerText = name;
+      document.getElementById('modal-subscriber-phone').innerText = phone;
+      document.getElementById('modal-call-link').href = `tel:${phone}`;
+      document.getElementById('call-modal').classList.remove('hidden');
+    }
+
+    function openMapModal(encodedAddress) {
+      const address = decodeURIComponent(encodedAddress);
+      document.getElementById('map-address-text').innerText = address;
+      document.getElementById('map-iframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+      document.getElementById('external-map-btn').href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+      document.getElementById('map-modal').classList.remove('hidden');
+    }
+
+    function openApiModal() {
+      document.getElementById('api-modal').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function copyPhone() {
+      if (activePhoneForCopy) {
+        navigator.clipboard.writeText(activePhoneForCopy);
+        alert("Telefon raqami nusxalandi: " + activePhoneForCopy);
+      }
+    }
+
+    function saveApiUrl() {
+      const url = document.getElementById('api-url-input').value.trim();
+      localStorage.setItem('crm_api_url', url);
+      API_URL = url;
+      closeModal('api-modal');
+      loadData();
+    }
+
+    function toggleChart() {
+      const container = document.getElementById('chart-container');
+      const text = document.getElementById('chart-toggle-text');
+      const icon = document.getElementById('chart-toggle-icon');
+
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        text.innerText = "Grafikni yashirish";
+        icon.className = "fa-solid fa-chevron-up";
+      } else {
+        container.classList.add('hidden');
+        text.innerText = "Grafikni ko'rsatish";
+        icon.className = "fa-solid fa-chevron-down";
+      }
+    }
+  </script>
+</body>
+</html>
