@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sklad iOS 27 Next-Gen</title>
+<title>Sklad Pro · iOS 27 Glass</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --ios-bg: #000000;
   --ios-glass: rgba(255, 255, 255, 0.07);
-  --ios-glass-thick: rgba(255, 255, 255, 0.12);
-  --ios-border: rgba(255, 255, 255, 0.15);
+  --ios-glass-thick: rgba(255, 255, 255, 0.13);
+  --ios-border: rgba(255, 255, 255, 0.14);
+  --ios-border-hi: rgba(10, 132, 255, 0.5);
   --ios-accent: #0a84ff;
-  --ios-accent-glow: rgba(10, 132, 255, 0.4);
+  --ios-accent-glow: rgba(10, 132, 255, 0.35);
   --ios-purple: #bf5af2;
   --ios-green: #30d158;
   --ios-orange: #ff9f0a;
@@ -30,402 +31,468 @@
 html, body { height: 100%; margin: 0; padding: 0; background: var(--ios-bg); color: var(--text-main); }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
   display: flex;
   justify-content: center;
-  background: radial-gradient(1200px 800px at 50% -20%, #1c1c38 0%, #000000 100%) fixed;
+  background: radial-gradient(1200px 800px at 50% -20%, #1a1a36 0%, #000000 100%) fixed;
   overflow-x: hidden;
 }
 
 .mono { font-family: var(--mono); }
 
-/* iOS Dynamic Island Header */
+/* Dynamic Island Header */
 .dynamic-island-wrapper {
-  position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: calc(var(--app-max-width) - 32px);
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  width: calc(100% - 28px); max-width: calc(var(--app-max-width) - 28px);
   z-index: 1000;
 }
 
 .dynamic-island {
-  background: rgba(15, 15, 20, 0.75);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
-  border: 1px solid var(--ios-border);
-  border-radius: 28px;
-  padding: 10px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  background: rgba(15, 15, 22, 0.78);
+  backdrop-filter: blur(30px) saturate(210%); -webkit-backdrop-filter: blur(30px) saturate(210%);
+  border: 1px solid var(--ios-border); border-radius: 28px;
+  padding: 10px 18px; display: flex; align-items: center; justify-content: space-between;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .island-brand { display: flex; align-items: center; gap: 10px; }
 .island-logo {
-  width: 32px; height: 32px; border-radius: 50%;
+  width: 34px; height: 34px; border-radius: 50%;
   background: linear-gradient(135deg, var(--ios-accent), var(--ios-purple));
-  display: flex; align-items: center; justify-content: center; font-size: 14px;
-  box-shadow: 0 0 12px var(--ios-accent-glow);
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  box-shadow: 0 0 14px var(--ios-accent-glow);
 }
-.island-title { font-size: 13px; font-weight: 700; letter-spacing: -0.2px; }
-.island-status { font-size: 10px; color: var(--ios-green); display: flex; align-items: center; gap: 4px; }
+.island-title { font-size: 13.5px; font-weight: 700; }
+.island-status { font-size: 10.5px; color: var(--ios-green); display: flex; align-items: center; gap: 4px; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ios-green); box-shadow: 0 0 8px var(--ios-green); }
 
-/* Main Container */
+.icon-btn-round {
+  background: rgba(255,255,255,0.08); border: 1px solid var(--ios-border);
+  color: #fff; width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.icon-btn-round:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+
+/* App Viewport */
 .app-viewport {
-  width: 100%;
-  max-width: var(--app-max-width);
-  padding: 84px 16px 120px;
-  min-height: 100vh;
+  width: 100%; max-width: var(--app-max-width);
+  padding: 84px 16px 120px; min-height: 100vh;
 }
 
-/* iOS Widget Grid */
-.widget-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 24px;
+/* Login Screen */
+.login-overlay {
+  position: fixed; inset: 0; z-index: 3000;
+  background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #000000 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+}
+.login-card {
+  width: 100%; max-width: 360px;
+  background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+  border: 1px solid var(--ios-border); border-radius: 32px; padding: 30px 24px; text-align: center;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.8);
 }
 
+.field { margin-bottom: 14px; text-align: left; }
+.field label { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+.field input, .field select {
+  width: 100%; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--ios-border);
+  border-radius: 16px; padding: 13px 15px; color: #fff; font-size: 14.5px; font-family: inherit;
+}
+.field input:focus, .field select:focus { border-color: var(--ios-accent); background: rgba(255, 255, 255, 0.12); }
+
+/* iOS Widgets */
+.widget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
 .ios-widget {
-  background: var(--ios-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--ios-border);
-  border-radius: 22px;
-  padding: 14px 10px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease, background 0.2s ease;
+  background: var(--ios-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--ios-border); border-radius: 22px; padding: 14px 10px; text-align: center;
 }
-.ios-widget:active { transform: scale(0.95); background: var(--ios-glass-thick); }
-.ios-widget .val { font-size: 22px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; }
-.ios-widget .lbl { font-size: 10px; color: var(--text-sub); margin-top: 4px; font-weight: 600; text-transform: uppercase; }
+.ios-widget .val { font-size: 20px; font-weight: 800; font-family: var(--mono); }
+.ios-widget .lbl { font-size: 9.5px; color: var(--text-sub); margin-top: 4px; font-weight: 600; text-transform: uppercase; }
 
-/* Futuristic Search Bar */
-.search-container {
-  position: relative;
-  margin-bottom: 20px;
-}
+/* Search Bar */
+.search-container { position: relative; margin-bottom: 18px; }
 .search-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--ios-border);
-  border-radius: 18px;
-  padding: 14px 16px 14px 44px;
-  color: #fff;
-  font-size: 14px;
-  backdrop-filter: blur(15px);
-  transition: all 0.3s ease;
+  width: 100%; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--ios-border);
+  border-radius: 18px; padding: 13px 16px 13px 44px; color: #fff; font-size: 14px; backdrop-filter: blur(15px);
 }
-.search-input:focus {
-  border-color: var(--ios-accent);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 20px rgba(10, 132, 255, 0.2);
-}
-.search-icon-svg {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-sub);
-  pointer-events: none;
-}
+.search-input:focus { border-color: var(--ios-accent); background: rgba(255, 255, 255, 0.1); }
+.search-icon-svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); pointer-events: none; }
 
-/* iOS 27 Next-Gen Device Card */
+/* Device Cards */
 .card-flow { display: flex; flex-direction: column; gap: 14px; }
-
 .ios-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-  backdrop-filter: blur(30px) saturate(190%);
-  -webkit-backdrop-filter: blur(30px) saturate(190%);
-  border: 1px solid var(--ios-border);
-  border-radius: 26px;
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 1px solid var(--ios-border); border-radius: 26px; padding: 18px; position: relative;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  transform-style: preserve-3d;
 }
-
-.ios-card:active {
-  transform: scale(0.97) rotateX(2deg);
-  border-color: rgba(255,255,255,0.3);
-}
+.ios-card.expired { border-color: rgba(255, 69, 58, 0.5); }
 
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
 .card-sn { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--ios-accent); letter-spacing: 0.5px; }
 .card-sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; font-weight: 500; }
 
 .ios-tag {
-  padding: 5px 12px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  background: rgba(10, 132, 255, 0.15);
-  color: var(--ios-accent);
+  padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; background: rgba(10, 132, 255, 0.15); color: var(--ios-accent);
   border: 1px solid rgba(10, 132, 255, 0.3);
 }
+.ios-tag.kogon { color: var(--ios-purple); border-color: rgba(191,90,242,0.3); background: rgba(191,90,242,0.15); }
+.ios-tag.expired { color: var(--ios-red); border-color: rgba(255,69,58,0.3); background: rgba(255,69,58,0.15); }
 
-.card-actions-row { display: flex; gap: 8px; margin-top: 16px; }
-
+.card-actions-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .ios-btn {
-  flex: 1;
-  padding: 12px;
-  border-radius: 16px;
-  border: 1px solid var(--ios-border);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  flex: 1; padding: 12px; border-radius: 16px; border: 1px solid var(--ios-border);
+  background: rgba(255, 255, 255, 0.08); color: #fff; font-size: 12.5px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
 }
+.ios-btn-primary { background: linear-gradient(135deg, var(--ios-accent), #0056b3); border: none; box-shadow: 0 6px 20px var(--ios-accent-glow); }
+.ios-btn-danger { background: rgba(255, 69, 58, 0.15); border-color: rgba(255, 69, 58, 0.3); color: var(--ios-red); }
+.ios-btn-warn { background: rgba(255, 159, 10, 0.15); border-color: rgba(255, 159, 10, 0.3); color: var(--ios-orange); }
+.ios-btn:active { transform: scale(0.96); opacity: 0.8; }
 
-.ios-btn-primary {
-  background: linear-gradient(135deg, var(--ios-accent), #0056b3);
-  border: none;
-  box-shadow: 0 6px 20px var(--ios-accent-glow);
-}
-
-.ios-btn:active { transform: scale(0.94); opacity: 0.8; }
-
-/* Floating Liquid Dock (Bottom Nav) */
+/* Floating Dock */
 .dock-wrapper {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: calc(var(--app-max-width) - 32px);
-  z-index: 1000;
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  width: calc(100% - 28px); max-width: calc(var(--app-max-width) - 28px); z-index: 1000;
 }
-
 .ios-dock {
-  background: rgba(20, 20, 25, 0.7);
-  backdrop-filter: blur(35px) saturate(210%);
-  -webkit-backdrop-filter: blur(35px) saturate(210%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 32px;
-  padding: 8px;
-  display: flex;
-  justify-content: space-around;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: rgba(20, 20, 28, 0.75); backdrop-filter: blur(35px) saturate(210%); -webkit-backdrop-filter: blur(35px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 32px; padding: 6px 10px;
+  display: flex; justify-content: space-around; box-shadow: 0 25px 60px rgba(0,0,0,0.8);
 }
-
 .dock-item {
-  background: transparent;
-  border: none;
-  color: var(--text-sub);
-  padding: 10px 18px;
-  border-radius: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+  background: transparent; border: none; color: var(--text-sub); padding: 8px 14px;
+  border-radius: 20px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-size: 9.5px; font-weight: 600; cursor: pointer; position: relative;
+}
+.dock-item.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
+.dock-item .badge-cnt {
+  position: absolute; top: 2px; right: 8px; background: var(--ios-purple); color: #fff;
+  font-size: 9px; font-weight: 800; border-radius: 100px; padding: 1px 5px;
 }
 
-.dock-item.active {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.dock-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  width: 12px;
-  height: 3px;
-  border-radius: 100px;
-  background: var(--ios-accent);
-  box-shadow: 0 0 8px var(--ios-accent);
-}
-
-/* Native Bottom Sheet Modal */
+/* Bottom Sheet */
 .sheet-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  z-index: 2000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(12px);
+  z-index: 2500; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  display: flex; align-items: flex-end; justify-content: center;
 }
-
 .sheet-overlay.active { opacity: 1; pointer-events: auto; }
-
 .bottom-sheet {
-  background: rgba(25, 25, 30, 0.95);
-  backdrop-filter: blur(40px);
-  border: 1px solid var(--ios-border);
-  border-radius: 36px 36px 0 0;
-  width: 100%;
-  max-width: var(--app-max-width);
-  padding: 24px;
-  transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(22, 22, 28, 0.95); backdrop-filter: blur(40px);
+  border: 1px solid var(--ios-border); border-radius: 36px 36px 0 0;
+  width: 100%; max-width: var(--app-max-width); padding: 22px; max-height: 88vh; overflow-y: auto;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .sheet-overlay.active .bottom-sheet { transform: translateY(0); }
-.sheet-handle { width: 36px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 100px; margin: 0 auto 18px; }
+.sheet-handle { width: 38px; height: 5px; background: rgba(255, 255, 255, 0.25); border-radius: 100px; margin: 0 auto 16px; }
+
+/* Photo Upload Grid */
+.upload-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+.upload-box {
+  aspect-ratio: 1; border-radius: 18px; border: 1.5px dashed var(--ios-border);
+  background: rgba(255,255,255,0.04); display: flex; flex-direction: column; align-items: center;
+  justify-content: center; cursor: pointer; position: relative; overflow: hidden; text-align: center;
+}
+.upload-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.upload-box input { display: none; }
+
+/* Toast Notification */
+.toast {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 4000;
+  background: rgba(255,255,255,0.15); backdrop-filter: blur(25px); border: 1px solid var(--ios-border);
+  padding: 12px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; color: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
-<!-- iOS Dynamic Island Header -->
+<div class="toast" id="toast"></div>
+
+<!-- Login Modal -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div style="font-size:36px; margin-bottom:10px;">📦</div>
+    <h2 style="margin:0 0 6px; font-size:20px;">Sklad CRM Login</h2>
+    <p style="margin:0 0 20px; font-size:12px; color:var(--text-sub);">Apps Script orqali tizimga kiring</p>
+    
+    <div class="field"><label>Apps Script Web App URL</label><input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div class="field"><label>Login</label><input type="text" id="loginInput"></div>
+    <div class="field"><label>Parol</label><input type="password" id="passInput"></div>
+    
+    <button class="ios-btn ios-btn-primary" style="width:100%; padding:14px; margin-top:10px;" id="loginBtn" onclick="doLogin()">Kirish</button>
+  </div>
+</div>
+
+<!-- Header -->
 <div class="dynamic-island-wrapper">
   <div class="dynamic-island">
     <div class="island-brand">
       <div class="island-logo">📦</div>
       <div>
-        <div class="island-title">Sklad CRM Pro</div>
+        <div class="island-title" id="userName">Sklad Pro</div>
         <div class="island-status"><span class="status-dot"></span> Onlayn · Cloud Sync</div>
       </div>
     </div>
-    <div style="font-size:12px; font-weight:700; color:var(--text-sub);" id="userRole">Admin</div>
+    <button class="icon-btn-round" onclick="refreshData()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+    </button>
   </div>
 </div>
 
-<!-- Main App Viewport -->
+<!-- App Body -->
 <div class="app-viewport">
-  
-  <!-- Widgets -->
   <div class="widget-grid">
     <div class="ios-widget">
-      <div class="val" style="color:var(--ios-accent)" id="statSklad">42</div>
+      <div class="val" style="color:var(--ios-accent)" id="statSklad">0</div>
       <div class="lbl">Skladda</div>
     </div>
     <div class="ios-widget">
-      <div class="val" style="color:var(--ios-purple)" id="statMening">8</div>
+      <div class="val" style="color:var(--ios-purple)" id="statMening">0</div>
       <div class="lbl">Mening</div>
     </div>
     <div class="ios-widget">
-      <div class="val" style="color:var(--ios-green)" id="statChiqim">128</div>
+      <div class="val" style="color:var(--ios-green)" id="statChiqim">0</div>
       <div class="lbl">O'rnatilgan</div>
     </div>
   </div>
 
-  <!-- Search -->
   <div class="search-container">
     <svg class="search-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <input type="text" class="search-input" placeholder="S/N yoki model bo'yicha qidiruv...">
+    <input type="text" class="search-input" id="searchInput" oninput="renderCurrentTab()" placeholder="S/N bo'yicha qidirish...">
   </div>
 
-  <!-- Cards List -->
-  <div class="card-flow" id="mainCardsContainer">
-    
-    <!-- Sample Card 1 -->
-    <div class="ios-card" onclick="triggerHaptic()">
-      <div class="card-top">
-        <div>
-          <div class="card-sn">SN-88492019</div>
-          <div class="card-sub">HUAWEI HG8145V5 · GPON</div>
-        </div>
-        <span class="ios-tag">Buxoro</span>
-      </div>
-      <div class="card-actions-row">
-        <button class="ios-btn ios-btn-primary" onclick="openActionSheet('SN-88492019')">Olish</button>
-        <button class="ios-btn">Batafsil</button>
-      </div>
-    </div>
-
-    <!-- Sample Card 2 -->
-    <div class="ios-card" onclick="triggerHaptic()">
-      <div class="card-top">
-        <div>
-          <div class="card-sn">SN-77301924</div>
-          <div class="card-sub">ZTE F660 V8.0 · DualBand</div>
-        </div>
-        <span class="ios-tag" style="color:var(--ios-purple); border-color:rgba(191,90,242,0.3); background:rgba(191,90,242,0.15)">Kogon</span>
-      </div>
-      <div class="card-actions-row">
-        <button class="ios-btn ios-btn-primary" onclick="openActionSheet('SN-77301924')">Olish</button>
-        <button class="ios-btn">Batafsil</button>
-      </div>
-    </div>
-
+  <div class="card-flow" id="cardContainer">
+    <div style="text-align:center; padding:40px; color:var(--text-sub);">Ma'lumotlar yuklanmoqda...</div>
   </div>
 </div>
 
-<!-- Floating Liquid Dock -->
+<!-- Bottom Dock Navigation -->
 <div class="dock-wrapper">
   <div class="ios-dock">
-    <button class="dock-item active" onclick="switchTab(this)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+    <button class="dock-item active" id="dockSklad" onclick="setTab('sklad')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
       Sklad
     </button>
-    <button class="dock-item" onclick="switchTab(this)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.4 14.5 16 10 4 20"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
+    <button class="dock-item" id="dockMening" onclick="setTab('mening')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.4 14.5 16 10 4 20"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
       Mening
+      <span class="badge-cnt" id="cntMening" style="display:none">0</span>
     </button>
-    <button class="dock-item" onclick="switchTab(this)">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+    <button class="dock-item" id="dockChiqim" onclick="setTab('chiqim')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       Tarix
+    </button>
+    <button class="dock-item" id="dockSorov" onclick="setTab('sorov')" style="display:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      So'rovlar
+      <span class="badge-cnt" id="cntSorov" style="display:none">0</span>
     </button>
   </div>
 </div>
 
-<!-- Bottom Action Sheet Modal -->
-<div class="sheet-overlay" id="actionSheet" onclick="closeActionSheet(event)">
-  <div class="bottom-sheet">
-    <div class="sheet-handle"></div>
-    <h3 style="margin:0 0 6px; font-size:18px;" id="sheetTitle">Qurilmani olish</h3>
-    <p style="margin:0 0 20px; font-size:13px; color:var(--text-sub);">Qurilma muddatini va talabnoma ma'lumotlarini tasdiqlang</p>
-    
-    <button class="ios-btn ios-btn-primary" style="width:100%; padding:15px; margin-bottom:10px;" onclick="closeActionSheet()">Tasdiqlash va Olish</button>
-    <button class="ios-btn" style="width:100%; padding:15px; background:transparent; border:none;" onclick="closeActionSheet()">Bekor qilish</button>
-  </div>
+<!-- Modal Sheet -->
+<div class="sheet-overlay" id="sheetModal">
+  <div class="bottom-sheet" id="sheetContent"></div>
 </div>
 
 <script>
-  // Haptic Feedback Simulation (Agar telefon qo'llab-quvvatlasa)
-  function triggerHaptic() {
-    if (navigator.vibrate) {
-      navigator.vibrate(12);
-    }
+// API & Storage State
+var API_URL = localStorage.getItem('sklad_api_url') || '';
+var currentUser = JSON.parse(localStorage.getItem('sklad_user') || 'null');
+var db = { employees:[], sklad:[], kirim:[], chiqim:[], sorovlar:[], tugaganlar:[] };
+var activeTab = 'sklad';
+
+window.onload = function() {
+  if (API_URL) document.getElementById('apiUrlInput').value = API_URL;
+  if (currentUser) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('userName').innerText = currentUser.ISM + " (" + currentUser.tuman + ")";
+    if (currentUser.dostup === 'admin') document.getElementById('dockSorov').style.display = 'flex';
+    refreshData();
+  }
+};
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.innerText = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function apiCall(action, params, postData) {
+  var url = API_URL + (API_URL.indexOf('?') > -1 ? '&' : '?') + "action=" + action;
+  if (params) {
+    for (var k in params) url += "&" + k + "=" + encodeURIComponent(params[k]);
+  }
+  var options = { method: postData ? 'POST' : 'GET' };
+  if (postData) options.body = JSON.stringify(postData);
+  return fetch(url, options).then(function(r){ return r.json(); });
+}
+
+function doLogin() {
+  var url = document.getElementById('apiUrlInput').value.trim();
+  var log = document.getElementById('loginInput').value.trim();
+  var pas = document.getElementById('passInput').value.trim();
+  if (!url || !log || !pas) return showToast("Barcha maydonlarni to'ldiring");
+  
+  API_URL = url;
+  localStorage.setItem('sklad_api_url', API_URL);
+  
+  apiCall('bootstrap').then(function(res){
+    var user = (res.employees || []).find(function(u){ return u.LOGIN === log && u.PAROL === pas; });
+    if (!user) return showToast("Login yoki parol xato!");
+    currentUser = user;
+    localStorage.setItem('sklad_user', JSON.stringify(user));
+    location.reload();
+  }).catch(function(){ showToast("API bilan ulanishda xato"); });
+}
+
+function refreshData() {
+  apiCall('bootstrap').then(function(res){
+    db = res;
+    updateStats();
+    renderCurrentTab();
+  });
+}
+
+function updateStats() {
+  document.getElementById('statSklad').innerText = db.sklad.length;
+  var myKirim = db.kirim.filter(function(k){ return k.login === currentUser.LOGIN; });
+  document.getElementById('statMening').innerText = myKirim.length;
+  document.getElementById('statChiqim').innerText = db.chiqim.length;
+  
+  var cntM = document.getElementById('cntMening');
+  if (myKirim.length > 0) { cntM.innerText = myKirim.length; cntM.style.display = 'block'; } else cntM.style.display = 'none';
+
+  if (currentUser.dostup === 'admin') {
+    var pending = db.sorovlar.filter(function(s){ return s.holat === 'kutilmoqda'; });
+    var cntS = document.getElementById('cntSorov');
+    if (pending.length > 0) { cntS.innerText = pending.length; cntS.style.display = 'block'; } else cntS.style.display = 'none';
+  }
+}
+
+function setTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.dock-item').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('dock' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var html = '';
+
+  if (activeTab === 'sklad') {
+    var items = db.sklad.filter(function(i){ return (i["S/N"]||'').toLowerCase().includes(q) || (i.marka||'').toLowerCase().includes(q); });
+    items.forEach(function(item){
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + '</div></div><span class="ios-tag ' + item.tuman + '">' + item.tuman + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openOlishSheet(\'' + item["S/N"] + '\')">Olish</button></div></div>';
+    });
+  } else if (activeTab === 'mening') {
+    var items = db.kirim.filter(function(i){ return (currentUser.dostup==='admin' || i.login===currentUser.LOGIN) && ((i["S/N"]||'').toLowerCase().includes(q)); });
+    items.forEach(function(item){
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + '</div></div><span class="ios-tag">' + item.sana + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openChiqimSheet(\'' + item["S/N"] + '\')">O\'rnatdim</button><button class="ios-btn ios-btn-warn" onclick="openMuddatSheet(\'' + item["S/N"] + '\')">Muddat</button></div></div>';
+    });
+  } else if (activeTab === 'chiqim') {
+    var items = db.chiqim.filter(function(i){ return (i["S/N"]||'').toLowerCase().includes(q); });
+    items.forEach(function(item){
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + ' (' + item.Ism + ')</div></div><span class="ios-tag">' + item.sana + '</span></div></div>';
+    });
+  } else if (activeTab === 'sorov' && currentUser.dostup==='admin') {
+    db.sorovlar.forEach(function(s){
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + s.turi.toUpperCase() + ': ' + s.seria + '</div><div class="card-sub">Xodim: ' + s.Ism + ' (' + s.tuman + ')</div></div><span class="ios-tag">' + s.holat + '</span></div>';
+      if (s.holat === 'kutilmoqda') {
+        html += '<div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="processSorov(\'' + s.ID + '\', \'qabul\')">Qabul qilish</button><button class="ios-btn ios-btn-danger" onclick="processSorov(\'' + s.ID + '\', \'rad\')">Rad etish</button></div>';
+      }
+      html += '</div>';
+    });
   }
 
-  // Tab Switcher
-  function switchTab(el) {
-    triggerHaptic();
-    document.querySelectorAll('.dock-item').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-  }
+  document.getElementById('cardContainer').innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--text-sub);">Qurilmalar topilmadi</div>';
+}
 
-  // Bottom Sheet Controls
-  function openActionSheet(sn) {
-    triggerHaptic();
-    document.getElementById('sheetTitle').innerText = "Qurilma: " + sn;
-    document.getElementById('actionSheet').classList.add('active');
-  }
+// Actions Sheets
+function closeSheet() { document.getElementById('sheetModal').classList.remove('active'); }
 
-  function closeActionSheet(e) {
-    if (!e || e.target.classList.contains('sheet-overlay') || e.target.tagName === 'BUTTON') {
-      document.getElementById('actionSheet').classList.remove('active');
-    }
-  }
+function openOlishSheet(seria) {
+  var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">Qurilmani olish: ' + seria + '</h3>' +
+    '<div class="field"><label>Obyekt Manzili</label><input type="text" id="olishManzil"></div>' +
+    '<div class="field"><label>Muddat (Soat)</label><select id="olishMuddat"><option value="24">24 Soat (1 kun)</option><option value="48">48 Soat (2 kun)</option><option value="72">72 Soat (3 kun)</option></select></div>' +
+    '<button class="ios-btn ios-btn-primary" style="width:100%; padding:14px;" onclick="submitOlish(\'' + seria + '\')">Tasdiqlash va Olish</button>';
+  document.getElementById('sheetContent').innerHTML = html;
+  document.getElementById('sheetModal').classList.add('active');
+}
+
+function submitOlish(seria) {
+  var manzil = document.getElementById('olishManzil').value;
+  var muddat = document.getElementById('olishMuddat').value;
+  if (!manzil) return showToast("Manzilni kiriting");
+
+  apiCall('post', {}, {
+    action: 'olish', seria: seria, login: currentUser.LOGIN, ism: currentUser.ISM,
+    role: currentUser.dostup, tuman: currentUser.tuman, manzil: manzil, muddat_soat: muddat
+  }).then(function(res){
+    closeSheet();
+    if (res.success) { showToast("Qurilma olindi!"); refreshData(); }
+    else showToast(res.error || "Xatolik");
+  });
+}
+
+function openChiqimSheet(seria) {
+  var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">O\'rnatishni tasdiqlash: ' + seria + '</h3>' +
+    '<div class="field"><label>OLT</label><input type="text" id="chOLT"></div>' +
+    '<div class="field"><label>Port</label><input type="text" id="chPort"></div>' +
+    '<div class="field"><label>Masofa (m)</label><input type="text" id="chMasofa"></div>' +
+    '<button class="ios-btn ios-btn-primary" style="width:100%; padding:14px;" onclick="submitChiqim(\'' + seria + '\')">O\'rnatildi Deb Saqlash</button>';
+  document.getElementById('sheetContent').innerHTML = html;
+  document.getElementById('sheetModal').classList.add('active');
+}
+
+function submitChiqim(seria) {
+  var olt = document.getElementById('chOLT').value;
+  var port = document.getElementById('chPort').value;
+  var masofa = document.getElementById('chMasofa').value;
+
+  apiCall('post', {}, {
+    action: 'chiqim', seria: seria, olt: olt, port: port, masofa: masofa,
+    login: currentUser.LOGIN, ism: currentUser.ISM, tuman: currentUser.tuman
+  }).then(function(res){
+    closeSheet();
+    if (res.success) { showToast("O'rnatildi!"); refreshData(); }
+    else showToast(res.error || "Xatolik");
+  });
+}
+
+function openMuddatSheet(seria) {
+  var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">Muddat So\'rash: ' + seria + '</h3>' +
+    '<div class="field"><label>Qo\'shimcha Soat (Max 24)</label><input type="number" id="mSoat" value="12"></div>' +
+    '<div class="field"><label>Sabab</label><input type="text" id="mSabab"></div>' +
+    '<button class="ios-btn ios-btn-warn" style="width:100%; padding:14px;" onclick="submitMuddat(\'' + seria + '\')">So\'rov Yuborish</button>';
+  document.getElementById('sheetContent').innerHTML = html;
+  document.getElementById('sheetModal').classList.add('active');
+}
+
+function submitMuddat(seria) {
+  var soat = document.getElementById('mSoat').value;
+  var sabab = document.getElementById('mSabab').value;
+
+  apiCall('post', {}, {
+    action: 'sorov_yuborish', turi: 'muddat', seria: seria, login: currentUser.LOGIN,
+    ism: currentUser.ISM, tuman: currentUser.tuman, soat: soat, sabab: sabab
+  }).then(function(res){
+    closeSheet();
+    if (res.success) { showToast("So'rov yuborildi"); refreshData(); }
+  });
+}
+
+function processSorov(id, javob) {
+  apiCall('post', {}, { action: 'sorov_tasdiqlash', id: id, javob: javob }).then(function(res){
+    showToast("Javob saqlandi");
+    refreshData();
+  });
+}
 </script>
 </body>
 </html>
