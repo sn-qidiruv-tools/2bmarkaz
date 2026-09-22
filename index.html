@@ -150,6 +150,7 @@ body {
 .ios-btn-danger { background: rgba(255, 69, 58, 0.15); border-color: rgba(255, 69, 58, 0.3); color: var(--ios-red); }
 .ios-btn-warn { background: rgba(255, 159, 10, 0.15); border-color: rgba(255, 159, 10, 0.3); color: var(--ios-orange); }
 .ios-btn:active { transform: scale(0.96); opacity: 0.8; }
+.ios-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Floating Dock */
 .dock-wrapper {
@@ -194,6 +195,7 @@ body {
   aspect-ratio: 1; border-radius: 18px; border: 1.5px dashed var(--ios-border);
   background: rgba(255,255,255,0.04); display: flex; flex-direction: column; align-items: center;
   justify-content: center; cursor: pointer; position: relative; overflow: hidden; text-align: center;
+  font-size: 11px; color: var(--text-sub); padding: 8px;
 }
 .upload-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .upload-box input { display: none; }
@@ -201,9 +203,10 @@ body {
 /* Toast Notification */
 .toast {
   position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 4000;
-  background: rgba(255,255,255,0.15); backdrop-filter: blur(25px); border: 1px solid var(--ios-border);
+  background: rgba(255,255,255,0.18); backdrop-filter: blur(25px); border: 1px solid var(--ios-border);
   padding: 12px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; color: #fff;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  max-width: 90vw; text-align: center;
 }
 .toast.show { opacity: 1; }
 </style>
@@ -217,9 +220,12 @@ body {
   <div class="login-card">
     <div style="font-size:36px; margin-bottom:10px;">📦</div>
     <h2 style="margin:0 0 6px; font-size:20px;">Sklad CRM Login</h2>
-    <p style="margin:0 0 20px; font-size:12px; color:var(--text-sub);">Apps Script orqali tizimga kiring</p>
+    <p style="margin:0 0 20px; font-size:12px; color:var(--text-sub);">Google Apps Script orqali tizimga kiring</p>
     
-    <div class="field"><label>Apps Script Web App URL</label><input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div class="field">
+      <label>Web App URL</label>
+      <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
     <div class="field"><label>Login</label><input type="text" id="loginInput"></div>
     <div class="field"><label>Parol</label><input type="password" id="passInput"></div>
     
@@ -288,29 +294,29 @@ body {
     </button>
     <button class="dock-item" id="dockSorov" onclick="setTab('sorov')" style="display:none">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      So'rovlar
+      Xabarlar
       <span class="badge-cnt" id="cntSorov" style="display:none">0</span>
     </button>
   </div>
 </div>
 
 <!-- Modal Sheet -->
-<div class="sheet-overlay" id="sheetModal">
+<div class="sheet-overlay" id="sheetModal" onclick="closeSheet(event)">
   <div class="bottom-sheet" id="sheetContent"></div>
 </div>
 
 <script>
-// API & Storage State
 var API_URL = localStorage.getItem('sklad_api_url') || '';
 var currentUser = JSON.parse(localStorage.getItem('sklad_user') || 'null');
 var db = { employees:[], sklad:[], kirim:[], chiqim:[], sorovlar:[], tugaganlar:[] };
 var activeTab = 'sklad';
+var photoState = { talabnoma: '', photo1: '', photo2: '' };
 
 window.onload = function() {
   if (API_URL) document.getElementById('apiUrlInput').value = API_URL;
   if (currentUser) {
     document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('userName').innerText = currentUser.ISM + " (" + currentUser.tuman + ")";
+    document.getElementById('userName').innerText = currentUser.ISM;
     if (currentUser.dostup === 'admin') document.getElementById('dockSorov').style.display = 'flex';
     refreshData();
   }
@@ -319,58 +325,84 @@ window.onload = function() {
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.innerText = msg; t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
-function apiCall(action, params, postData) {
-  var url = API_URL + (API_URL.indexOf('?') > -1 ? '&' : '?') + "action=" + action;
-  if (params) {
-    for (var k in params) url += "&" + k + "=" + encodeURIComponent(params[k]);
-  }
-  var options = { method: postData ? 'POST' : 'GET' };
-  if (postData) options.body = JSON.stringify(postData);
-  return fetch(url, options).then(function(r){ return r.json(); });
+// Google Apps Script CORS xatolarini aylanib o'tuvchi so'rov yuboruvchi (no-cors / Form-data shim)
+function apiRequest(action, payload) {
+  return new Promise(function(resolve, reject) {
+    var url = API_URL + (API_URL.indexOf('?') > -1 ? '&' : '?') + "action=" + action + "&t=" + Date.now();
+    
+    if (!payload) {
+      fetch(url)
+        .then(function(r){ return r.json(); })
+        .then(resolve)
+        .catch(reject);
+    } else {
+      // POST so'rov Apps Script doPOST ga form-urlencoded yoki string JSON qilib uzatiladi
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r){ return r.json(); })
+      .then(resolve)
+      .catch(reject);
+    }
+  });
 }
 
 function doLogin() {
   var url = document.getElementById('apiUrlInput').value.trim();
   var log = document.getElementById('loginInput').value.trim();
   var pas = document.getElementById('passInput').value.trim();
-  if (!url || !log || !pas) return showToast("Barcha maydonlarni to'ldiring");
+  
+  if (!url || !log || !pas) return showToast("Barcha maydonlarni to'ldiring!");
   
   API_URL = url;
   localStorage.setItem('sklad_api_url', API_URL);
   
-  apiCall('bootstrap').then(function(res){
-    var user = (res.employees || []).find(function(u){ return u.LOGIN === log && u.PAROL === pas; });
-    if (!user) return showToast("Login yoki parol xato!");
-    currentUser = user;
-    localStorage.setItem('sklad_user', JSON.stringify(user));
-    location.reload();
-  }).catch(function(){ showToast("API bilan ulanishda xato"); });
+  showToast("Tekshirilmoqda...");
+  apiRequest('bootstrap')
+    .then(function(res){
+      var user = (res.employees || []).find(function(u){ 
+        return String(u.LOGIN).trim() === log && String(u.PAROL).trim() === pas; 
+      });
+      if (!user) return showToast("Login yoki parol xato!");
+      
+      currentUser = user;
+      localStorage.setItem('sklad_user', JSON.stringify(user));
+      location.reload();
+    })
+    .catch(function(err){
+      showToast("API manzil noto'g'ri yoki ulanishda xatolik!");
+    });
 }
 
 function refreshData() {
-  apiCall('bootstrap').then(function(res){
+  apiRequest('bootstrap').then(function(res){
     db = res;
     updateStats();
     renderCurrentTab();
-  });
+  }).catch(function(){ showToast("Ma'lumot yangilanmadi"); });
 }
 
 function updateStats() {
-  document.getElementById('statSklad').innerText = db.sklad.length;
-  var myKirim = db.kirim.filter(function(k){ return k.login === currentUser.LOGIN; });
+  document.getElementById('statSklad').innerText = db.sklad ? db.sklad.length : 0;
+  
+  var myKirim = (db.kirim || []).filter(function(k){ return k.login === currentUser.LOGIN; });
   document.getElementById('statMening').innerText = myKirim.length;
-  document.getElementById('statChiqim').innerText = db.chiqim.length;
+  document.getElementById('statChiqim').innerText = db.chiqim ? db.chiqim.length : 0;
   
   var cntM = document.getElementById('cntMening');
-  if (myKirim.length > 0) { cntM.innerText = myKirim.length; cntM.style.display = 'block'; } else cntM.style.display = 'none';
+  if (myKirim.length > 0) { cntM.innerText = myKirim.length; cntM.style.display = 'block'; } 
+  else cntM.style.display = 'none';
 
   if (currentUser.dostup === 'admin') {
-    var pending = db.sorovlar.filter(function(s){ return s.holat === 'kutilmoqda'; });
+    var pending = (db.sorovlar || []).filter(function(s){ return s.holat === 'kutilmoqda'; });
     var cntS = document.getElementById('cntSorov');
-    if (pending.length > 0) { cntS.innerText = pending.length; cntS.style.display = 'block'; } else cntS.style.display = 'none';
+    if (pending.length > 0) { cntS.innerText = pending.length; cntS.style.display = 'block'; } 
+    else cntS.style.display = 'none';
   }
 }
 
@@ -382,27 +414,31 @@ function setTab(tab) {
 }
 
 function renderCurrentTab() {
-  var q = document.getElementById('searchInput').value.toLowerCase();
+  var q = document.getElementById('searchInput').value.toLowerCase().trim();
   var html = '';
 
   if (activeTab === 'sklad') {
-    var items = db.sklad.filter(function(i){ return (i["S/N"]||'').toLowerCase().includes(q) || (i.marka||'').toLowerCase().includes(q); });
+    var items = (db.sklad || []).filter(function(i){ 
+      return (i["S/N"]||'').toLowerCase().includes(q) || (i.marka||'').toLowerCase().includes(q); 
+    });
     items.forEach(function(item){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + '</div></div><span class="ios-tag ' + item.tuman + '">' + item.tuman + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openOlishSheet(\'' + item["S/N"] + '\')">Olish</button></div></div>';
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + (item.marka||'Marka yo\'q') + '</div></div><span class="ios-tag ' + (item.tuman||'').toLowerCase() + '">' + item.tuman + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openOlishSheet(\'' + item["S/N"] + '\')">Olish</button></div></div>';
     });
   } else if (activeTab === 'mening') {
-    var items = db.kirim.filter(function(i){ return (currentUser.dostup==='admin' || i.login===currentUser.LOGIN) && ((i["S/N"]||'').toLowerCase().includes(q)); });
+    var items = (db.kirim || []).filter(function(i){ 
+      return (currentUser.dostup==='admin' || i.login===currentUser.LOGIN) && ((i["S/N"]||'').toLowerCase().includes(q)); 
+    });
     items.forEach(function(item){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + '</div></div><span class="ios-tag">' + item.sana + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openChiqimSheet(\'' + item["S/N"] + '\')">O\'rnatdim</button><button class="ios-btn ios-btn-warn" onclick="openMuddatSheet(\'' + item["S/N"] + '\')">Muddat</button></div></div>';
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + '</div></div><span class="ios-tag">' + (item.sana||'') + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openChiqimSheet(\'' + item["S/N"] + '\')">O\'rnatdim</button><button class="ios-btn ios-btn-warn" onclick="openMuddatSheet(\'' + item["S/N"] + '\')">+Muddat</button></div></div>';
     });
   } else if (activeTab === 'chiqim') {
-    var items = db.chiqim.filter(function(i){ return (i["S/N"]||'').toLowerCase().includes(q); });
+    var items = (db.chiqim || []).filter(function(i){ return (i["S/N"]||'').toLowerCase().includes(q); });
     items.forEach(function(item){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + ' (' + item.Ism + ')</div></div><span class="ios-tag">' + item.sana + '</span></div></div>';
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + ' (' + (item.Ism||'') + ')</div></div><span class="ios-tag">' + item.sana + '</span></div></div>';
     });
   } else if (activeTab === 'sorov' && currentUser.dostup==='admin') {
-    db.sorovlar.forEach(function(s){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + s.turi.toUpperCase() + ': ' + s.seria + '</div><div class="card-sub">Xodim: ' + s.Ism + ' (' + s.tuman + ')</div></div><span class="ios-tag">' + s.holat + '</span></div>';
+    (db.sorovlar || []).forEach(function(s){
+      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + (s.turi||'').toUpperCase() + ': ' + s.seria + '</div><div class="card-sub">Xodim: ' + s.Ism + ' (' + s.tuman + ')</div></div><span class="ios-tag">' + s.holat + '</span></div>';
       if (s.holat === 'kutilmoqda') {
         html += '<div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="processSorov(\'' + s.ID + '\', \'qabul\')">Qabul qilish</button><button class="ios-btn ios-btn-danger" onclick="processSorov(\'' + s.ID + '\', \'rad\')">Rad etish</button></div>';
       }
@@ -410,59 +446,104 @@ function renderCurrentTab() {
     });
   }
 
-  document.getElementById('cardContainer').innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--text-sub);">Qurilmalar topilmadi</div>';
+  document.getElementById('cardContainer').innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--text-sub);">Ma\'lumot topilmadi</div>';
 }
 
-// Actions Sheets
-function closeSheet() { document.getElementById('sheetModal').classList.remove('active'); }
+// Sheet & Actions
+function closeSheet(e) {
+  if (!e || e.target.classList.contains('sheet-overlay')) {
+    document.getElementById('sheetModal').classList.remove('active');
+  }
+}
+
+function handlePhotoSelect(e, key) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(evt) {
+    photoState[key] = evt.target.result;
+    document.getElementById('img_prev_' + key).src = evt.target.result;
+    document.getElementById('img_prev_' + key).style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
 
 function openOlishSheet(seria) {
+  photoState.talabnoma = '';
   var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">Qurilmani olish: ' + seria + '</h3>' +
     '<div class="field"><label>Obyekt Manzili</label><input type="text" id="olishManzil"></div>' +
     '<div class="field"><label>Muddat (Soat)</label><select id="olishMuddat"><option value="24">24 Soat (1 kun)</option><option value="48">48 Soat (2 kun)</option><option value="72">72 Soat (3 kun)</option></select></div>' +
-    '<button class="ios-btn ios-btn-primary" style="width:100%; padding:14px;" onclick="submitOlish(\'' + seria + '\')">Tasdiqlash va Olish</button>';
+    '<div class="field"><label>Talabnoma Rasmi (Ixtiyoriy)</label>' +
+    '<div class="upload-box" onclick="document.getElementById(\'file_talabnoma\').click()">' +
+    '<span>+ Rasm biriktirish</span><img id="img_prev_talabnoma" style="display:none">' +
+    '<input type="file" id="file_talabnoma" accept="image/*" onchange="handlePhotoSelect(event, \'talabnoma\')">' +
+    '</div></div>' +
+    '<button class="ios-btn ios-btn-primary" id="btnSubmitOlish" style="width:100%; padding:14px;" onclick="submitOlish(\'' + seria + '\')">Tasdiqlash va Olish</button>';
+  
   document.getElementById('sheetContent').innerHTML = html;
   document.getElementById('sheetModal').classList.add('active');
 }
 
 function submitOlish(seria) {
-  var manzil = document.getElementById('olishManzil').value;
+  var manzil = document.getElementById('olishManzil').value.trim();
   var muddat = document.getElementById('olishMuddat').value;
-  if (!manzil) return showToast("Manzilni kiriting");
+  if (!manzil) return showToast("Manzilni kiriting!");
 
-  apiCall('post', {}, {
+  var btn = document.getElementById('btnSubmitOlish');
+  btn.disabled = true; btn.innerText = "Yuborilmoqda...";
+
+  apiRequest('post', {
     action: 'olish', seria: seria, login: currentUser.LOGIN, ism: currentUser.ISM,
-    role: currentUser.dostup, tuman: currentUser.tuman, manzil: manzil, muddat_soat: muddat
+    role: currentUser.dostup, tuman: currentUser.tuman, manzil: manzil,
+    muddat_soat: muddat, photo_data_url: photoState.talabnoma
   }).then(function(res){
-    closeSheet();
-    if (res.success) { showToast("Qurilma olindi!"); refreshData(); }
-    else showToast(res.error || "Xatolik");
-  });
+    document.getElementById('sheetModal').classList.remove('active');
+    if (res.success) { showToast("Qurilma muvaffaqiyatli olindi!"); refreshData(); }
+    else showToast(res.error || "Xatolik yuz berdi");
+  }).catch(function(){ btn.disabled = false; showToast("Serverga bog'lanishda xato"); });
 }
 
 function openChiqimSheet(seria) {
+  photoState.photo1 = ''; photoState.photo2 = '';
   var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">O\'rnatishni tasdiqlash: ' + seria + '</h3>' +
     '<div class="field"><label>OLT</label><input type="text" id="chOLT"></div>' +
     '<div class="field"><label>Port</label><input type="text" id="chPort"></div>' +
     '<div class="field"><label>Masofa (m)</label><input type="text" id="chMasofa"></div>' +
-    '<button class="ios-btn ios-btn-primary" style="width:100%; padding:14px;" onclick="submitChiqim(\'' + seria + '\')">O\'rnatildi Deb Saqlash</button>';
+    '<div class="field"><label>O\'rnatish Rasmlari (Kamida 1 ta)</label>' +
+    '<div class="upload-grid">' +
+    '<div class="upload-box" onclick="document.getElementById(\'file_p1\').click()"><span>1-Rasm</span><img id="img_prev_photo1" style="display:none"><input type="file" id="file_p1" accept="image/*" onchange="handlePhotoSelect(event, \'photo1\')"></div>' +
+    '<div class="upload-box" onclick="document.getElementById(\'file_p2\').click()"><span>2-Rasm</span><img id="img_prev_photo2" style="display:none"><input type="file" id="file_p2" accept="image/*" onchange="handlePhotoSelect(event, \'photo2\')"></div>' +
+    '</div></div>' +
+    '<button class="ios-btn ios-btn-primary" id="btnSubmitChiqim" style="width:100%; padding:14px;" onclick="submitChiqim(\'' + seria + '\')">O\'rnatildi Deb Saqlash</button>';
+  
   document.getElementById('sheetContent').innerHTML = html;
   document.getElementById('sheetModal').classList.add('active');
 }
 
 function submitChiqim(seria) {
-  var olt = document.getElementById('chOLT').value;
-  var port = document.getElementById('chPort').value;
-  var masofa = document.getElementById('chMasofa').value;
+  var olt = document.getElementById('chOLT').value.trim();
+  var port = document.getElementById('chPort').value.trim();
+  var masofa = document.getElementById('chMasofa').value.trim();
+  
+  var photos = [];
+  if (photoState.photo1) photos.push(photoState.photo1);
+  if (photoState.photo2) photos.push(photoState.photo2);
+  
+  if (!olt || !port) return showToast("OLT va Portni kiriting!");
+  if (photos.length === 0) return showToast("Kamida 1 ta rasm yuklang!");
 
-  apiCall('post', {}, {
+  var btn = document.getElementById('btnSubmitChiqim');
+  btn.disabled = true; btn.innerText = "Saqlanmoqda...";
+
+  apiRequest('post', {
     action: 'chiqim', seria: seria, olt: olt, port: port, masofa: masofa,
-    login: currentUser.LOGIN, ism: currentUser.ISM, tuman: currentUser.tuman
+    login: currentUser.LOGIN, ism: currentUser.ISM, tuman: currentUser.tuman,
+    photos_data_urls: photos
   }).then(function(res){
-    closeSheet();
-    if (res.success) { showToast("O'rnatildi!"); refreshData(); }
+    document.getElementById('sheetModal').classList.remove('active');
+    if (res.success) { showToast("O'rnatildi va Telegramga yuborildi!"); refreshData(); }
     else showToast(res.error || "Xatolik");
-  });
+  }).catch(function(){ btn.disabled = false; showToast("Xatolik yuz berdi"); });
 }
 
 function openMuddatSheet(seria) {
@@ -476,20 +557,21 @@ function openMuddatSheet(seria) {
 
 function submitMuddat(seria) {
   var soat = document.getElementById('mSoat').value;
-  var sabab = document.getElementById('mSabab').value;
+  var sabab = document.getElementById('mSabab').value.trim();
 
-  apiCall('post', {}, {
+  apiRequest('post', {
     action: 'sorov_yuborish', turi: 'muddat', seria: seria, login: currentUser.LOGIN,
     ism: currentUser.ISM, tuman: currentUser.tuman, soat: soat, sabab: sabab
   }).then(function(res){
-    closeSheet();
-    if (res.success) { showToast("So'rov yuborildi"); refreshData(); }
+    document.getElementById('sheetModal').classList.remove('active');
+    if (res.success) { showToast("So'rov admin yuborildi"); refreshData(); }
+    else showToast(res.error || "Xatolik");
   });
 }
 
 function processSorov(id, javob) {
-  apiCall('post', {}, { action: 'sorov_tasdiqlash', id: id, javob: javob }).then(function(res){
-    showToast("Javob saqlandi");
+  apiRequest('post', { action: 'sorov_tasdiqlash', id: id, javob: javob }).then(function(res){
+    showToast("So'rov saqlandi");
     refreshData();
   });
 }
