@@ -48,7 +48,7 @@ body {
 }
 
 .dynamic-island {
-  background: rgba(15, 15, 22, 0.78);
+  background: rgba(15, 15, 22, 0.85);
   backdrop-filter: blur(30px) saturate(210%); -webkit-backdrop-filter: blur(30px) saturate(210%);
   border: 1px solid var(--ios-border); border-radius: 28px;
   padding: 10px 18px; display: flex; align-items: center; justify-content: space-between;
@@ -79,7 +79,7 @@ body {
   padding: 84px 16px 120px; min-height: 100vh;
 }
 
-/* Login Screen */
+/* Login Screen Overlay */
 .login-overlay {
   position: fixed; inset: 0; z-index: 3000;
   background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #000000 100%);
@@ -100,7 +100,7 @@ body {
 }
 .field input:focus, .field select:focus { border-color: var(--ios-accent); background: rgba(255, 255, 255, 0.12); }
 
-/* iOS Widgets */
+/* Widgets */
 .widget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
 .ios-widget {
   background: var(--ios-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -118,7 +118,7 @@ body {
 .search-input:focus { border-color: var(--ios-accent); background: rgba(255, 255, 255, 0.1); }
 .search-icon-svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); pointer-events: none; }
 
-/* Device Cards */
+/* Cards */
 .card-flow { display: flex; flex-direction: column; gap: 14px; }
 .ios-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
@@ -126,7 +126,6 @@ body {
   border: 1px solid var(--ios-border); border-radius: 26px; padding: 18px; position: relative;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
-.ios-card.expired { border-color: rgba(255, 69, 58, 0.5); }
 
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
 .card-sn { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--ios-accent); letter-spacing: 0.5px; }
@@ -138,7 +137,6 @@ body {
   border: 1px solid rgba(10, 132, 255, 0.3);
 }
 .ios-tag.kogon { color: var(--ios-purple); border-color: rgba(191,90,242,0.3); background: rgba(191,90,242,0.15); }
-.ios-tag.expired { color: var(--ios-red); border-color: rgba(255,69,58,0.3); background: rgba(255,69,58,0.15); }
 
 .card-actions-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .ios-btn {
@@ -173,7 +171,7 @@ body {
   font-size: 9px; font-weight: 800; border-radius: 100px; padding: 1px 5px;
 }
 
-/* Bottom Sheet */
+/* Sheet Modal */
 .sheet-overlay {
   position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(12px);
   z-index: 2500; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
@@ -189,18 +187,7 @@ body {
 .sheet-overlay.active .bottom-sheet { transform: translateY(0); }
 .sheet-handle { width: 38px; height: 5px; background: rgba(255, 255, 255, 0.25); border-radius: 100px; margin: 0 auto 16px; }
 
-/* Photo Upload Grid */
-.upload-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-.upload-box {
-  aspect-ratio: 1; border-radius: 18px; border: 1.5px dashed var(--ios-border);
-  background: rgba(255,255,255,0.04); display: flex; flex-direction: column; align-items: center;
-  justify-content: center; cursor: pointer; position: relative; overflow: hidden; text-align: center;
-  font-size: 11px; color: var(--text-sub); padding: 8px;
-}
-.upload-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.upload-box input { display: none; }
-
-/* Toast Notification */
+/* Toast */
 .toast {
   position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 4000;
   background: rgba(255,255,255,0.18); backdrop-filter: blur(25px); border: 1px solid var(--ios-border);
@@ -215,18 +202,18 @@ body {
 
 <div class="toast" id="toast"></div>
 
-<!-- Login Modal -->
+<!-- Login Screen Overlay -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <div style="font-size:36px; margin-bottom:10px;">📦</div>
     <h2 style="margin:0 0 6px; font-size:20px;">Sklad CRM Login</h2>
-    <p style="margin:0 0 20px; font-size:12px; color:var(--text-sub);">Google Apps Script orqali tizimga kiring</p>
+    <p style="margin:0 0 20px; font-size:12px; color:var(--text-sub);">Google Apps Script orqali kirish</p>
     
     <div class="field">
-      <label>Web App URL</label>
+      <label>Apps Script Web App URL</label>
       <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
     </div>
-    <div class="field"><label>Login</label><input type="text" id="loginInput"></div>
+    <div class="field"><label>Login</label><input type="text" id="loginInput" placeholder="Masalan: admin"></div>
     <div class="field"><label>Parol</label><input type="password" id="passInput"></div>
     
     <button class="ios-btn ios-btn-primary" style="width:100%; padding:14px; margin-top:10px;" id="loginBtn" onclick="doLogin()">Kirish</button>
@@ -243,13 +230,18 @@ body {
         <div class="island-status"><span class="status-dot"></span> Onlayn · Cloud Sync</div>
       </div>
     </div>
-    <button class="icon-btn-round" onclick="refreshData()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-    </button>
+    <div style="display:flex; gap:8px;">
+      <button class="icon-btn-round" onclick="refreshData()" title="Yangilash">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+      </button>
+      <button class="icon-btn-round" onclick="doLogout()" title="Chiqish" style="color:var(--ios-red);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- App Body -->
+<!-- App Viewport -->
 <div class="app-viewport">
   <div class="widget-grid">
     <div class="ios-widget">
@@ -272,11 +264,11 @@ body {
   </div>
 
   <div class="card-flow" id="cardContainer">
-    <div style="text-align:center; padding:40px; color:var(--text-sub);">Ma'lumotlar yuklanmoqda...</div>
+    <div style="text-align:center; padding:40px; color:var(--text-sub);">Tizimga kiring...</div>
   </div>
 </div>
 
-<!-- Bottom Dock Navigation -->
+<!-- Bottom Dock -->
 <div class="dock-wrapper">
   <div class="ios-dock">
     <button class="dock-item active" id="dockSklad" onclick="setTab('sklad')">
@@ -300,7 +292,7 @@ body {
   </div>
 </div>
 
-<!-- Modal Sheet -->
+<!-- Bottom Sheet -->
 <div class="sheet-overlay" id="sheetModal" onclick="closeSheet(event)">
   <div class="bottom-sheet" id="sheetContent"></div>
 </div>
@@ -310,15 +302,17 @@ var API_URL = localStorage.getItem('sklad_api_url') || '';
 var currentUser = JSON.parse(localStorage.getItem('sklad_user') || 'null');
 var db = { employees:[], sklad:[], kirim:[], chiqim:[], sorovlar:[], tugaganlar:[] };
 var activeTab = 'sklad';
-var photoState = { talabnoma: '', photo1: '', photo2: '' };
 
 window.onload = function() {
   if (API_URL) document.getElementById('apiUrlInput').value = API_URL;
-  if (currentUser) {
+  
+  if (currentUser && API_URL) {
     document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('userName').innerText = currentUser.ISM;
+    document.getElementById('userName').innerText = currentUser.ISM + " (" + currentUser.tuman + ")";
     if (currentUser.dostup === 'admin') document.getElementById('dockSorov').style.display = 'flex';
     refreshData();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'flex';
   }
 };
 
@@ -328,7 +322,7 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
-// Google Apps Script CORS xatolarini aylanib o'tuvchi so'rov yuboruvchi (no-cors / Form-data shim)
+// Google Apps Script bilan xavfsiz so'rov
 function apiRequest(action, payload) {
   return new Promise(function(resolve, reject) {
     var url = API_URL + (API_URL.indexOf('?') > -1 ? '&' : '?') + "action=" + action + "&t=" + Date.now();
@@ -339,7 +333,6 @@ function apiRequest(action, payload) {
         .then(resolve)
         .catch(reject);
     } else {
-      // POST so'rov Apps Script doPOST ga form-urlencoded yoki string JSON qilib uzatiladi
       fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -365,21 +358,38 @@ function doLogin() {
   showToast("Tekshirilmoqda...");
   apiRequest('bootstrap')
     .then(function(res){
-      var user = (res.employees || []).find(function(u){ 
+      if (!res.employees) {
+        return showToast("Javob o'qilmadi! URL to'g'riligini tekshiring.");
+      }
+      var user = res.employees.find(function(u){ 
         return String(u.LOGIN).trim() === log && String(u.PAROL).trim() === pas; 
       });
+      
       if (!user) return showToast("Login yoki parol xato!");
       
       currentUser = user;
       localStorage.setItem('sklad_user', JSON.stringify(user));
-      location.reload();
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('userName').innerText = currentUser.ISM + " (" + currentUser.tuman + ")";
+      if (currentUser.dostup === 'admin') document.getElementById('dockSorov').style.display = 'flex';
+      
+      db = res;
+      updateStats();
+      renderCurrentTab();
+      showToast("Xush kelibsiz!");
     })
     .catch(function(err){
-      showToast("API manzil noto'g'ri yoki ulanishda xatolik!");
+      showToast("API manzilga ulanib bo'lmadi!");
     });
 }
 
+function doLogout() {
+  localStorage.removeItem('sklad_user');
+  location.reload();
+}
+
 function refreshData() {
+  if (!API_URL) return;
   apiRequest('bootstrap').then(function(res){
     db = res;
     updateStats();
@@ -389,7 +399,6 @@ function refreshData() {
 
 function updateStats() {
   document.getElementById('statSklad').innerText = db.sklad ? db.sklad.length : 0;
-  
   var myKirim = (db.kirim || []).filter(function(k){ return k.login === currentUser.LOGIN; });
   document.getElementById('statMening').innerText = myKirim.length;
   document.getElementById('statChiqim').innerText = db.chiqim ? db.chiqim.length : 0;
@@ -446,38 +455,19 @@ function renderCurrentTab() {
     });
   }
 
-  document.getElementById('cardContainer').innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--text-sub);">Ma\'lumot topilmadi</div>';
+  document.getElementById('cardContainer').innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--text-sub);">Qurilmalar topilmadi</div>';
 }
 
-// Sheet & Actions
 function closeSheet(e) {
   if (!e || e.target.classList.contains('sheet-overlay')) {
     document.getElementById('sheetModal').classList.remove('active');
   }
 }
 
-function handlePhotoSelect(e, key) {
-  var file = e.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(evt) {
-    photoState[key] = evt.target.result;
-    document.getElementById('img_prev_' + key).src = evt.target.result;
-    document.getElementById('img_prev_' + key).style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
-
 function openOlishSheet(seria) {
-  photoState.talabnoma = '';
   var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">Qurilmani olish: ' + seria + '</h3>' +
     '<div class="field"><label>Obyekt Manzili</label><input type="text" id="olishManzil"></div>' +
     '<div class="field"><label>Muddat (Soat)</label><select id="olishMuddat"><option value="24">24 Soat (1 kun)</option><option value="48">48 Soat (2 kun)</option><option value="72">72 Soat (3 kun)</option></select></div>' +
-    '<div class="field"><label>Talabnoma Rasmi (Ixtiyoriy)</label>' +
-    '<div class="upload-box" onclick="document.getElementById(\'file_talabnoma\').click()">' +
-    '<span>+ Rasm biriktirish</span><img id="img_prev_talabnoma" style="display:none">' +
-    '<input type="file" id="file_talabnoma" accept="image/*" onchange="handlePhotoSelect(event, \'talabnoma\')">' +
-    '</div></div>' +
     '<button class="ios-btn ios-btn-primary" id="btnSubmitOlish" style="width:100%; padding:14px;" onclick="submitOlish(\'' + seria + '\')">Tasdiqlash va Olish</button>';
   
   document.getElementById('sheetContent').innerHTML = html;
@@ -495,7 +485,7 @@ function submitOlish(seria) {
   apiRequest('post', {
     action: 'olish', seria: seria, login: currentUser.LOGIN, ism: currentUser.ISM,
     role: currentUser.dostup, tuman: currentUser.tuman, manzil: manzil,
-    muddat_soat: muddat, photo_data_url: photoState.talabnoma
+    muddat_soat: muddat
   }).then(function(res){
     document.getElementById('sheetModal').classList.remove('active');
     if (res.success) { showToast("Qurilma muvaffaqiyatli olindi!"); refreshData(); }
@@ -504,16 +494,10 @@ function submitOlish(seria) {
 }
 
 function openChiqimSheet(seria) {
-  photoState.photo1 = ''; photoState.photo2 = '';
   var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">O\'rnatishni tasdiqlash: ' + seria + '</h3>' +
     '<div class="field"><label>OLT</label><input type="text" id="chOLT"></div>' +
     '<div class="field"><label>Port</label><input type="text" id="chPort"></div>' +
     '<div class="field"><label>Masofa (m)</label><input type="text" id="chMasofa"></div>' +
-    '<div class="field"><label>O\'rnatish Rasmlari (Kamida 1 ta)</label>' +
-    '<div class="upload-grid">' +
-    '<div class="upload-box" onclick="document.getElementById(\'file_p1\').click()"><span>1-Rasm</span><img id="img_prev_photo1" style="display:none"><input type="file" id="file_p1" accept="image/*" onchange="handlePhotoSelect(event, \'photo1\')"></div>' +
-    '<div class="upload-box" onclick="document.getElementById(\'file_p2\').click()"><span>2-Rasm</span><img id="img_prev_photo2" style="display:none"><input type="file" id="file_p2" accept="image/*" onchange="handlePhotoSelect(event, \'photo2\')"></div>' +
-    '</div></div>' +
     '<button class="ios-btn ios-btn-primary" id="btnSubmitChiqim" style="width:100%; padding:14px;" onclick="submitChiqim(\'' + seria + '\')">O\'rnatildi Deb Saqlash</button>';
   
   document.getElementById('sheetContent').innerHTML = html;
@@ -525,20 +509,14 @@ function submitChiqim(seria) {
   var port = document.getElementById('chPort').value.trim();
   var masofa = document.getElementById('chMasofa').value.trim();
   
-  var photos = [];
-  if (photoState.photo1) photos.push(photoState.photo1);
-  if (photoState.photo2) photos.push(photoState.photo2);
-  
   if (!olt || !port) return showToast("OLT va Portni kiriting!");
-  if (photos.length === 0) return showToast("Kamida 1 ta rasm yuklang!");
 
   var btn = document.getElementById('btnSubmitChiqim');
   btn.disabled = true; btn.innerText = "Saqlanmoqda...";
 
   apiRequest('post', {
     action: 'chiqim', seria: seria, olt: olt, port: port, masofa: masofa,
-    login: currentUser.LOGIN, ism: currentUser.ISM, tuman: currentUser.tuman,
-    photos_data_urls: photos
+    login: currentUser.LOGIN, ism: currentUser.ISM, tuman: currentUser.tuman
   }).then(function(res){
     document.getElementById('sheetModal').classList.remove('active');
     if (res.success) { showToast("O'rnatildi va Telegramga yuborildi!"); refreshData(); }
@@ -564,7 +542,7 @@ function submitMuddat(seria) {
     ism: currentUser.ISM, tuman: currentUser.tuman, soat: soat, sabab: sabab
   }).then(function(res){
     document.getElementById('sheetModal').classList.remove('active');
-    if (res.success) { showToast("So'rov admin yuborildi"); refreshData(); }
+    if (res.success) { showToast("So'rov adminga yuborildi"); refreshData(); }
     else showToast(res.error || "Xatolik");
   });
 }
