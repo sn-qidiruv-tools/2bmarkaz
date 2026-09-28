@@ -1,550 +1,1109 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sklad · iOS 27 Glass</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kabel Ombor Tizimi</title>
 <style>
-:root {
-  --ios-bg: #000000;
-  --ios-glass: rgba(255, 255, 255, 0.07);
-  --ios-glass-thick: rgba(255, 255, 255, 0.13);
-  --ios-border: rgba(255, 255, 255, 0.14);
-  --ios-accent: #0a84ff;
-  --ios-accent-glow: rgba(10, 132, 255, 0.35);
-  --ios-purple: #bf5af2;
-  --ios-green: #30d158;
-  --ios-orange: #ff9f0a;
-  --ios-red: #ff453a;
-  
-  --text-main: #ffffff;
-  --text-sub: rgba(235, 235, 245, 0.6);
-  --mono: 'JetBrains Mono', monospace;
-  --app-max-width: 430px;
+:root{
+  --navy:#0f1e3d; --navy-2:#16294f; --navy-3:#1e3a5f;
+  --blue:#2563eb; --blue-dark:#1d4ed8; --blue-light:#eff6ff;
+  --bg:#f4f6fb; --card:#ffffff; --border:#e6e9f0; --text:#1f2937; --muted:#6b7280;
+  --green:#22c55e; --yellow:#eab308; --orange:#f97316; --red:#ef4444;
+  --radius:14px; --shadow:0 2px 10px rgba(20,30,60,.06), 0 1px 2px rgba(20,30,60,.04);
 }
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:8px;height:8px;} ::-webkit-scrollbar-thumb{background:#c7cede;border-radius:8px;}
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-html, body { height: 100%; margin: 0; padding: 0; background: var(--ios-bg); color: var(--text-main); }
+/* ---------- LOADING ---------- */
+#loading-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;flex-direction:column;gap:14px;z-index:999;}
+.spinner{width:42px;height:42px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  display: flex;
-  justify-content: center;
-  background: radial-gradient(1200px 800px at 50% -20%, #1a1a36 0%, #000000 100%) fixed;
-  overflow-x: hidden;
-}
+/* ---------- AUTH SCREENS ---------- */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--navy-3));padding:20px;}
+.auth-card{background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+.auth-logo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--navy-3));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.auth-title{text-align:center;font-size:20px;font-weight:700;margin:0 0 4px;}
+.auth-sub{text-align:center;color:var(--muted);font-size:13px;margin:0 0 24px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;transition:.15s;background:#fbfcfe;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);background:#fff;}
+.btn{border:none;border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:.15s;}
+.btn-primary{background:var(--blue);color:#fff;width:100%;}
+.btn-primary:hover{background:var(--blue-dark);}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--blue);}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid var(--red);}
+.btn-ghost{background:transparent;color:var(--muted);}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px;}
+.auth-error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:14px;display:none;}
 
-.mono { font-family: var(--mono); }
+/* ---------- APP SHELL ---------- */
+#app-shell{display:none;min-height:100vh;}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:230px;background:linear-gradient(180deg,var(--navy),var(--navy-2));color:#cfd8ef;padding:20px 14px;display:flex;flex-direction:column;z-index:50;transition:.2s;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:6px 8px 22px;color:#fff;font-weight:700;font-size:15px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:#c7d0e8;text-decoration:none;font-size:13.6px;font-weight:500;cursor:pointer;margin-bottom:3px;}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-item.active{background:var(--blue);color:#fff;}
+.nav-icon{width:18px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);}
+.main{margin-left:230px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:30;}
+.topbar-title{font-size:17px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.lang-toggle{display:flex;background:var(--bg);border-radius:8px;padding:3px;}
+.lang-btn{border:none;background:transparent;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);}
+.lang-btn.active{background:#fff;color:var(--blue);box-shadow:var(--shadow);}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--bg);padding:6px 12px 6px 6px;border-radius:20px;font-size:13px;font-weight:600;position:relative;cursor:pointer;}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.user-menu{position:absolute;top:44px;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);min-width:170px;display:none;overflow:hidden;z-index:60;}
+.user-menu.open{display:block;}
+.user-menu button{width:100%;text-align:left;padding:10px 14px;border:none;background:none;font-size:13px;color:var(--text);}
+.user-menu button:hover{background:var(--bg);}
+#page-content{padding:22px 24px 60px;flex:1;}
+.page{display:none;}
+.page.active{display:block;}
 
-/* Dynamic Island Header */
-.dynamic-island-wrapper {
-  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-  width: calc(100% - 28px); max-width: calc(var(--app-max-width) - 28px);
-  z-index: 1000;
-}
+/* ---------- CARDS / GRID ---------- */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.stat-card .label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.stat-card .value{font-size:26px;font-weight:800;margin-top:6px;}
+.stat-card .icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:10px;}
+.section-card{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:18px;}
+.section-title{font-size:15px;font-weight:700;margin:0 0 14px;display:flex;align-items:center;justify-content:space-between;}
+.two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
+@media(max-width:900px){.two-col{grid-template-columns:1fr;}}
 
-.dynamic-island {
-  background: rgba(15, 15, 22, 0.85);
-  backdrop-filter: blur(30px) saturate(210%); -webkit-backdrop-filter: blur(30px) saturate(210%);
-  border: 1px solid var(--ios-border); border-radius: 28px;
-  padding: 10px 18px; display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
+.drum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+.drum-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:.15s;position:relative;}
+.drum-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(20,30,60,.1);}
+.drum-id{font-weight:700;font-size:13.5px;}
+.drum-type{font-size:11.5px;color:var(--muted);margin-bottom:10px;}
+.ring-wrap{position:relative;width:112px;height:112px;border-radius:50%;margin:4px 0 10px;}
+.ring-center{position:absolute;inset:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fdfefe,#eef1f6 70%);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 5px rgba(20,30,60,.15),inset 0 -2px 4px rgba(255,255,255,.6);}
+.ring-percent{font-size:16px;font-weight:800;position:relative;z-index:2;}
+.drum-meters{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;margin-top:8px;}
+.badge-good{background:#dcfce7;color:#15803d;}
+.badge-medium{background:#fef9c3;color:#854d0e;}
+.badge-low{background:#ffedd5;color:#c2410c;}
+.badge-critical{background:#fee2e2;color:#b91c1c;}
 
-.island-brand { display: flex; align-items: center; gap: 10px; }
-.island-logo {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--ios-accent), var(--ios-purple));
-  display: flex; align-items: center; justify-content: center; font-size: 15px;
-  box-shadow: 0 0 14px var(--ios-accent-glow);
-}
-.island-title { font-size: 13.5px; font-weight: 700; }
-.island-status { font-size: 10.5px; color: var(--ios-green); display: flex; align-items: center; gap: 4px; }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ios-green); box-shadow: 0 0 8px var(--ios-green); }
+.reel-svg{width:44px;height:44px;position:relative;z-index:1;}
 
-.icon-btn-round {
-  background: rgba(255,255,255,0.08); border: 1px solid var(--ios-border);
-  color: #fff; width: 34px; height: 34px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
-.icon-btn-round:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:9px 10px;background:var(--bg);color:var(--muted);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;}
+td{padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+.empty-state{text-align:center;color:var(--muted);padding:30px 10px;font-size:13.5px;}
 
-/* App Viewport */
-.app-viewport {
-  width: 100%; max-width: var(--app-max-width);
-  padding: 84px 16px 120px; min-height: 100vh;
-}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;justify-content:space-between;}
+.toolbar-left{display:flex;gap:10px;flex-wrap:wrap;}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;}
 
-/* Login Screen Overlay */
-.login-overlay {
-  position: fixed; inset: 0; z-index: 3000;
-  background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #000000 100%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
-}
-.login-card {
-  width: 100%; max-width: 360px;
-  background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
-  border: 1px solid var(--ios-border); border-radius: 32px; padding: 30px 24px; text-align: center;
-  box-shadow: 0 30px 70px rgba(0,0,0,0.8);
-}
+.usage-row{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px;}
+.usage-total{background:var(--blue-light);border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:700;color:var(--blue-dark);margin-top:8px;}
 
-.field { margin-bottom: 14px; text-align: left; }
-.field label { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
-.field input, .field select {
-  width: 100%; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--ios-border);
-  border-radius: 16px; padding: 13px 15px; color: #fff; font-size: 14.5px; font-family: inherit;
-}
-.field input:focus, .field select:focus { border-color: var(--ios-accent); background: rgba(255, 255, 255, 0.12); }
-
-/* Widgets */
-.widget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-.ios-widget {
-  background: var(--ios-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--ios-border); border-radius: 22px; padding: 14px 10px; text-align: center;
-}
-.ios-widget .val { font-size: 20px; font-weight: 800; font-family: var(--mono); }
-.ios-widget .lbl { font-size: 9.5px; color: var(--text-sub); margin-top: 4px; font-weight: 600; text-transform: uppercase; }
-
-/* Search Bar */
-.search-container { position: relative; margin-bottom: 18px; }
-.search-input {
-  width: 100%; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--ios-border);
-  border-radius: 18px; padding: 13px 16px 13px 44px; color: #fff; font-size: 14px; backdrop-filter: blur(15px);
-}
-.search-input:focus { border-color: var(--ios-accent); background: rgba(255, 255, 255, 0.1); }
-.search-icon-svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); pointer-events: none; }
-
-/* Cards */
-.card-flow { display: flex; flex-direction: column; gap: 14px; }
-.ios-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-  backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
-  border: 1px solid var(--ios-border); border-radius: 26px; padding: 18px; position: relative;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-.ios-card.expired { border-color: rgba(255, 69, 58, 0.5); }
-
-.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.card-sn { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--ios-accent); letter-spacing: 0.5px; }
-.card-sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; font-weight: 500; }
-
-.ios-tag {
-  padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700;
-  text-transform: uppercase; background: rgba(10, 132, 255, 0.15); color: var(--ios-accent);
-  border: 1px solid rgba(10, 132, 255, 0.3);
-}
-.ios-tag.kogon { color: var(--ios-purple); border-color: rgba(191,90,242,0.3); background: rgba(191,90,242,0.15); }
-
-.card-actions-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-.ios-btn {
-  flex: 1; padding: 12px; border-radius: 16px; border: 1px solid var(--ios-border);
-  background: rgba(255, 255, 255, 0.08); color: #fff; font-size: 12.5px; font-weight: 600;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.ios-btn-primary { background: linear-gradient(135deg, var(--ios-accent), #0056b3); border: none; box-shadow: 0 6px 20px var(--ios-accent-glow); }
-.ios-btn-danger { background: rgba(255, 69, 58, 0.15); border-color: rgba(255, 69, 58, 0.3); color: var(--ios-red); }
-.ios-btn-warn { background: rgba(255, 159, 10, 0.15); border-color: rgba(255, 159, 10, 0.3); color: var(--ios-orange); }
-.ios-btn:active { transform: scale(0.96); opacity: 0.8; }
-.ios-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* Floating Dock */
-.dock-wrapper {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  width: calc(100% - 28px); max-width: calc(var(--app-max-width) - 28px); z-index: 1000;
-}
-.ios-dock {
-  background: rgba(20, 20, 28, 0.75); backdrop-filter: blur(35px) saturate(210%); -webkit-backdrop-filter: blur(35px) saturate(210%);
-  border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 32px; padding: 6px 10px;
-  display: flex; justify-content: space-around; box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-}
-.dock-item {
-  background: transparent; border: none; color: var(--text-sub); padding: 8px 14px;
-  border-radius: 20px; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font-size: 9.5px; font-weight: 600; cursor: pointer; position: relative;
-}
-.dock-item.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
-.dock-item .badge-cnt {
-  position: absolute; top: 2px; right: 8px; background: var(--ios-purple); color: #fff;
-  font-size: 9px; font-weight: 800; border-radius: 100px; padding: 1px 5px;
-}
-
-/* Sheet Modal */
-.sheet-overlay {
-  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(12px);
-  z-index: 2500; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-  display: flex; align-items: flex-end; justify-content: center;
-}
-.sheet-overlay.active { opacity: 1; pointer-events: auto; }
-.bottom-sheet {
-  background: rgba(22, 22, 28, 0.95); backdrop-filter: blur(40px);
-  border: 1px solid var(--ios-border); border-radius: 36px 36px 0 0;
-  width: 100%; max-width: var(--app-max-width); padding: 22px; max-height: 88vh; overflow-y: auto;
-  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.sheet-overlay.active .bottom-sheet { transform: translateY(0); }
-.sheet-handle { width: 38px; height: 5px; background: rgba(255, 255, 255, 0.25); border-radius: 100px; margin: 0 auto 16px; }
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,15,30,.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
+.modal-box{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:24px;}
+.modal-box.wide{max-width:720px;}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.modal-head h3{margin:0;font-size:16.5px;}
+.close-x{border:none;background:var(--bg);width:30px;height:30px;border-radius:50%;font-size:15px;color:var(--muted);}
 
 /* Toast */
-.toast {
-  position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 4000;
-  background: rgba(255,255,255,0.18); backdrop-filter: blur(25px); border: 1px solid var(--ios-border);
-  padding: 12px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; color: #fff;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-  max-width: 90vw; text-align: center;
+#toast-root{position:fixed;bottom:20px;right:20px;z-index:400;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:12px 16px;border-radius:10px;color:#fff;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);min-width:220px;animation:slideIn .2s ease;}
+.toast-success{background:#16a34a;} .toast-error{background:#dc2626;} .toast-info{background:var(--navy-3);}
+@keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+.history-item{border-left:3px solid var(--blue);padding:8px 0 8px 12px;margin-bottom:8px;font-size:12.5px;}
+.history-item .h-top{font-weight:700;}
+.history-item .h-meta{color:var(--muted);font-size:11.5px;margin-top:2px;}
+
+@media(max-width:800px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .usage-row{grid-template-columns:1fr;}
 }
-.toast.show { opacity: 1; }
-</style>
+.mobile-menu-btn{display:none;border:none;background:var(--bg);width:36px;height:36px;border-radius:9px;font-size:16px;}
+@media(max-width:800px){.mobile-menu-btn{display:block;}}
+  </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
+<div id="loading-screen"><div class="spinner"></div><div id="loading-text">Yuklanmoqda...</div></div>
 
-<!-- Login Screen Overlay -->
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-card">
-    <div style="font-size:36px; margin-bottom:10px;">📦</div>
-    <h2 style="margin:0 0 6px; font-size:20px;">Sklad CRM Login</h2>
-    <p style="margin:0 0 20px; font-size:12px; color:var(--text-sub);">Google Apps Script orqali kirish</p>
-    
-    <div class="field"><label>Login</label><input type="text" id="loginInput" placeholder="Masalan: admin"></div>
-    <div class="field"><label>Parol</label><input type="password" id="passInput"></div>
-    
-    <button class="ios-btn ios-btn-primary" style="width:100%; padding:14px; margin-top:10px;" id="loginBtn" onclick="doLogin()">Kirish</button>
+<!-- FIRST-RUN ADMIN SETUP -->
+<div id="setup-screen" class="auth-wrap" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo">🔧</div>
+    <p class="auth-title">Birinchi admin yaratish</p>
+    <p class="auth-sub">Tizimda hali foydalanuvchi yo'q. Boshqaruvchi (Admin) hisobini yarating.</p>
+    <div class="auth-error" id="setup-error"></div>
+    <div class="field"><label>Login</label><input id="setup-login" placeholder="masalan: admin"></div>
+    <div class="field"><label>Parol (kamida 8 belgi)</label><input id="setup-password" type="password"></div>
+    <div class="field"><label>Parolni tasdiqlang</label><input id="setup-password2" type="password"></div>
+    <button class="btn btn-primary" id="setup-submit-btn" onclick="doFirstAdminSetup()">Admin yaratish</button>
   </div>
 </div>
 
-<!-- Header -->
-<div class="dynamic-island-wrapper">
-  <div class="dynamic-island">
-    <div class="island-brand">
-      <div class="island-logo">📦</div>
-      <div>
-        <div class="island-title" id="userName">Sklad Pro</div>
-        <div class="island-status"><span class="status-dot"></span> Onlayn · Cloud Sync</div>
+<!-- LOGIN -->
+<div id="login-screen" class="auth-wrap" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo">🔌</div>
+    <p class="auth-title">Kabel Ombor Tizimi</p>
+    <p class="auth-sub">Tizimga kirish uchun login va parolingizni kiriting</p>
+    <div class="auth-error" id="login-error"></div>
+    <div class="field"><label>Login</label><input id="login-login" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="field"><label>Parol</label><input id="login-password" type="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-primary" id="login-submit-btn" onclick="doLogin()">Kirish</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">🔌 <span>Kabel Ombor</span></div>
+    <div id="nav-list"></div>
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="doLogout()" style="width:100%;border:none;background:none;">
+        <span class="nav-icon">🚪</span><span data-t="logout">Chiqish</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div class="topbar-title" id="page-title-text">—</div>
+      </div>
+      <div class="topbar-right">
+        <div class="lang-toggle">
+          <button class="lang-btn" id="lang-uz" onclick="setLang('uz')">UZ</button>
+          <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">RU</button>
+        </div>
+        <div class="user-chip" onclick="document.getElementById('user-menu').classList.toggle('open')">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <span id="user-chip-name">—</span>
+          <div class="user-menu" id="user-menu">
+            <button onclick="openChangePasswordModal()">🔑 <span data-t="changePassword">Parolni o'zgartirish</span></button>
+            <button onclick="doLogout()">🚪 <span data-t="logout">Chiqish</span></button>
+          </div>
+        </div>
       </div>
     </div>
-    <div style="display:flex; gap:8px;">
-      <button class="icon-btn-round" onclick="refreshData()" title="Yangilash">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-      </button>
-      <button class="icon-btn-round" onclick="doLogout()" title="Chiqish" style="color:var(--ios-red);">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-      </button>
-    </div>
+
+    <main id="page-content">
+      <section class="page" id="page-dashboard"></section>
+      <section class="page" id="page-drums"></section>
+      <section class="page" id="page-cabletypes"></section>
+      <section class="page" id="page-usage"></section>
+      <section class="page" id="page-reports"></section>
+      <section class="page" id="page-users"></section>
+      <section class="page" id="page-settings"></section>
+    </main>
   </div>
 </div>
 
-<!-- App Viewport -->
-<div class="app-viewport">
-  <div class="widget-grid">
-    <div class="ios-widget">
-      <div class="val" style="color:var(--ios-accent)" id="statSklad">0</div>
-      <div class="lbl">Skladda</div>
-    </div>
-    <div class="ios-widget">
-      <div class="val" style="color:var(--ios-purple)" id="statMening">0</div>
-      <div class="lbl">Mening</div>
-    </div>
-    <div class="ios-widget">
-      <div class="val" style="color:var(--ios-green)" id="statChiqim">0</div>
-      <div class="lbl">O'rnatilgan</div>
-    </div>
-  </div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
 
-  <div class="search-container">
-    <svg class="search-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <input type="text" class="search-input" id="searchInput" oninput="renderCurrentTab()" placeholder="S/N bo'yicha qidirish...">
-  </div>
-
-  <div class="card-flow" id="cardContainer">
-    <div style="text-align:center; padding:40px; color:var(--text-sub);">Ma'lumotlar yuklanmoqda...</div>
-  </div>
-</div>
-
-<!-- Bottom Dock -->
-<div class="dock-wrapper">
-  <div class="ios-dock">
-    <button class="dock-item active" id="dockSklad" onclick="setTab('sklad')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
-      Sklad
-    </button>
-    <button class="dock-item" id="dockMening" onclick="setTab('mening')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.4 14.5 16 10 4 20"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
-      Mening
-      <span class="badge-cnt" id="cntMening" style="display:none">0</span>
-    </button>
-    <button class="dock-item" id="dockChiqim" onclick="setTab('chiqim')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-      Tarix
-    </button>
-    <button class="dock-item" id="dockSorov" onclick="setTab('sorov')" style="display:none">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Xabarlar
-      <span class="badge-cnt" id="cntSorov" style="display:none">0</span>
-    </button>
-  </div>
-</div>
-
-<!-- Bottom Sheet -->
-<div class="sheet-overlay" id="sheetModal" onclick="closeSheet(event)">
-  <div class="bottom-sheet" id="sheetContent"></div>
-</div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTjE4zHu_-UL4Lml-RFesU0TAh2HGvV951VM31LGIxk-gGS1ICulC1kJH-DzVr_l1mOg/exec";
-var currentUser = JSON.parse(localStorage.getItem('sklad_user') || 'null');
-var db = { employees:[], sklad:[], kirim:[], chiqim:[], sorovlar:[], tugaganlar:[] };
-var activeTab = 'sklad';
-
-window.onload = function() {
-  if (currentUser) {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('userName').innerText = currentUser.ism + " (" + currentUser.tuman + ")";
-    if (currentUser.role === 'admin') document.getElementById('dockSorov').style.display = 'flex';
-    refreshData();
-  } else {
-    document.getElementById('loginOverlay').style.display = 'flex';
-    // Standart foydalanuvchilar ro'yxatini yuklash
-    apiRequest('employees').then(function(res){ db.employees = res; });
-  }
+/* ============================================================
+   HOLAT (STATE) VA TARJIMALAR
+   ============================================================ */
+const STATE = {
+  token: localStorage.getItem('kabelombor_token') || null,
+  user: null,
+  lang: localStorage.getItem('kabelombor_lang') || 'uz',
+  page: 'dashboard',
+  drums: [],
+  cableTypes: [],
+  usageRows: [{ barabanId: '', metr: '' }],
+  reportFilters: {}
 };
 
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.innerText = msg; t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+const ROLES = { ADMIN: 'Admin', WAREHOUSE: 'Omborchi', VIEWER: 'Kuzatuvchi' };
+
+const T = {
+  uz: {
+    home:'Bosh sahifa', drums:'Barabanlar', cableTypes:'Kabel turlari', usageEntry:'Sarf hisobi',
+    reports:'Hisobotlar', users:'Foydalanuvchilar', settings:'Sozlamalar', logout:'Chiqish',
+    changePassword:"Parolni o'zgartirish",
+    totalRemaining:'Jami qolgan kabel', totalDrums:'Jami barabanlar', activeCableTypes:'Faol kabel turlari',
+    lowStock:'Kam qolgan barabanlar', recentUsage:'Oxirgi sarflar', dailyUsage:'Kunlik sarf (14 kun)',
+    usageByType:'Kabel turi bo\'yicha sarf', addDrum:'Baraban qo\'shish', recordUsage:'Sarf yozish',
+    save:'Saqlash', cancel:'Bekor qilish', close:'Yopish', edit:'Tahrirlash', details:'Batafsil',
+    searchPlaceholder:'Qidirish...', noData:'Ma\'lumot topilmadi', loading:'Yuklanmoqda...',
+    cableType:'Kabel turi', newCableType:'Yangi kabel turi', cableName:'Kabel nomi', description:'Tavsif',
+    drumId:'Baraban ID', drumNumber:'Baraban raqami', initialMeters:'Boshlang\'ich metr', remainingMeters:'Qolgan metr',
+    receivedDate:'Qabul sanasi', note:'Izoh', status:'Holat', percent:'Foiz', usedMeters:'Ishlatilgan',
+    workDate:'Ish sanasi', projectName:'Loyiha/ish nomi', employees:'Mas\'ul xodimlar (vergul bilan)',
+    address:'Manzil', latitude:'Kenglik (lat)', longitude:'Uzunlik (lng)', addDrumRow:'Baraban qatorini qo\'shish',
+    totalToUse:'Jami ishlatiladigan', submitUsage:'Sarfni saqlash', selectDrum:'Barabanni tanlang',
+    meters:'Metr', from:'Dan', to:'Gacha', employee:'Xodim', project:'Loyiha', exportExcel:'Excel yuklash',
+    filter:'Filtrlash', reset:'Tozalash', addUser:'Foydalanuvchi qo\'shish', login:'Login', password:'Parol',
+    role:'Rol', active:'Faol', inactive:'Faolsiz', createdAt:'Yaratilgan', lastLogin:'Oxirgi kirish',
+    lowStockThreshold:'Kam qolish chegarasi (%)', telegramTest:'Telegram ulanishini tekshirish',
+    telegramChatId:'Telegram Chat ID', updateChatId:'Yangilash', editHistory:'Tahrirlar tarixi',
+    usageHistory:'Sarf tarixi', correctionReason:'Tuzatish sababi', newRemaining:'Yangi qolgan metr',
+    saveCorrection:'Tuzatishni saqlash', good:'Yaxshi', medium:"O'rtacha", low:'Kam', critical:'Kritik',
+    active_:'Faol', finished:'Tugagan', by:'kim:', reason:'Sabab', old:'Eski', newV:'Yangi',
+    changePasswordTitle:"Parolni o'zgartirish", oldPassword:'Eski parol', newPassword:'Yangi parol',
+    telegramStatus:'Telegram holati', retry:'Qayta yuborish', deactivate:'Faolsizlantirish', activate:'Faollashtirish',
+    resetPassword:'Parolni tiklash', changeRole:"Rolni o'zgartirish",
+    dashTitle:'Bosh sahifa', drumsTitle:'Barabanlar', cableTypesTitle:'Kabel turlari', usageTitle:'Sarf hisobi',
+    reportsTitle:'Hisobotlar', usersTitle:'Foydalanuvchilar', settingsTitle:'Sozlamalar',
+    quickAddDrum:'Yangi baraban', quickUsage:'Sarf kiritish', all:'Barchasi'
+  },
+  ru: {
+    home:'Главная', drums:'Барабаны', cableTypes:'Типы кабеля', usageEntry:'Расход кабеля',
+    reports:'Отчёты', users:'Пользователи', settings:'Настройки', logout:'Выход',
+    changePassword:'Изменить пароль',
+    totalRemaining:'Всего осталось кабеля', totalDrums:'Всего барабанов', activeCableTypes:'Активных типов кабеля',
+    lowStock:'Барабаны с малым остатком', recentUsage:'Последние расходы', dailyUsage:'Расход по дням (14 дней)',
+    usageByType:'Расход по типу кабеля', addDrum:'Добавить барабан', recordUsage:'Записать расход',
+    save:'Сохранить', cancel:'Отмена', close:'Закрыть', edit:'Изменить', details:'Подробнее',
+    searchPlaceholder:'Поиск...', noData:'Данные не найдены', loading:'Загрузка...',
+    cableType:'Тип кабеля', newCableType:'Новый тип кабеля', cableName:'Название кабеля', description:'Описание',
+    drumId:'ID барабана', drumNumber:'Номер барабана', initialMeters:'Начальные метры', remainingMeters:'Остаток метров',
+    receivedDate:'Дата приёма', note:'Заметка', status:'Статус', percent:'Процент', usedMeters:'Использовано',
+    workDate:'Дата работы', projectName:'Название проекта/работы', employees:'Ответственные сотрудники (через запятую)',
+    address:'Адрес', latitude:'Широта (lat)', longitude:'Долгота (lng)', addDrumRow:'Добавить строку барабана',
+    totalToUse:'Всего будет использовано', submitUsage:'Сохранить расход', selectDrum:'Выберите барабан',
+    meters:'Метры', from:'С', to:'По', employee:'Сотрудник', project:'Проект', exportExcel:'Скачать Excel',
+    filter:'Фильтр', reset:'Сбросить', addUser:'Добавить пользователя', login:'Логин', password:'Пароль',
+    role:'Роль', active:'Активен', inactive:'Неактивен', createdAt:'Создан', lastLogin:'Последний вход',
+    lowStockThreshold:'Порог малого остатка (%)', telegramTest:'Проверить связь с Telegram',
+    telegramChatId:'Telegram Chat ID', updateChatId:'Обновить', editHistory:'История изменений',
+    usageHistory:'История расхода', correctionReason:'Причина исправления', newRemaining:'Новый остаток метров',
+    saveCorrection:'Сохранить исправление', good:'Хорошо', medium:'Средне', low:'Мало', critical:'Критично',
+    active_:'Активен', finished:'Завершён', by:'кто:', reason:'Причина', old:'Старое', newV:'Новое',
+    changePasswordTitle:'Изменить пароль', oldPassword:'Старый пароль', newPassword:'Новый пароль',
+    telegramStatus:'Статус Telegram', retry:'Повторить', deactivate:'Деактивировать', activate:'Активировать',
+    resetPassword:'Сбросить пароль', changeRole:'Изменить роль',
+    dashTitle:'Главная', drumsTitle:'Барабаны', cableTypesTitle:'Типы кабеля', usageTitle:'Расход кабеля',
+    reportsTitle:'Отчёты', usersTitle:'Пользователи', settingsTitle:'Настройки',
+    quickAddDrum:'Новый барабан', quickUsage:'Записать расход', all:'Все'
+  }
+};
+function t(key){ return (T[STATE.lang] && T[STATE.lang][key]) || key; }
+
+/* ============================================================
+   SERVER API (fetch orqali Apps Script Web App'ga so'rov) — Promise
+   ============================================================ */
+// Bu yerga Apps Script Web App deploy qilingandan keyingi /exec havolasini qo'ying
+const API_URL = 'BU_YERGA_APPS_SCRIPT_WEB_APP_EXEC_HAVOLASINI_QOYING';
+
+function call(fnName, args){
+  return fetch(API_URL, {
+    method: 'POST',
+    // MUHIM: Content-Type ni 'application/json' qilib QO'YMANG — aks holda
+    // brauzer CORS preflight (OPTIONS) so'rov yuboradi va Apps Script uni tushunmaydi.
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ fn: fnName, args: args || [] })
+  })
+  .then(function(res){
+    if (!res.ok) throw new Error('Server xatosi: HTTP ' + res.status);
+    return res.json();
+  })
+  .then(function(data){
+    if (!data.success) throw new Error(data.error || "Noma'lum xatolik");
+    return data.result;
+  });
+}
+function authCall(fnName, args){
+  args = args || [];
+  return call(fnName, [STATE.token].concat(args)).catch(function(err){
+    const msg = (err && err.message) || String(err);
+    if (msg.indexOf('SESSIYA_TUGAGAN') !== -1) {
+      toast(t('loading') === 'Загрузка...' ? 'Сессия истекла, войдите снова' : 'Sessiya tugagan, qaytadan kiring', 'error');
+      hardLogout();
+      throw err;
+    }
+    throw err;
+  });
 }
 
-function apiRequest(action, payload) {
-  return new Promise(function(resolve, reject) {
-    var url = APPS_SCRIPT_URL + (APPS_SCRIPT_URL.indexOf('?') > -1 ? '&' : '?') + "action=" + action + "&t=" + Date.now();
-    if (!payload) {
-      fetch(url)
-        .then(function(r){ return r.json(); })
-        .then(resolve)
-        .catch(reject);
+/* ============================================================
+   TOAST
+   ============================================================ */
+function toast(msg, type){
+  const root = document.getElementById('toast-root');
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + (type || 'info');
+  el.textContent = msg;
+  root.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 4200);
+}
+function showErr(elId, err){
+  const box = document.getElementById(elId);
+  box.textContent = (err && err.message) ? err.message : String(err);
+  box.style.display = 'block';
+}
+
+/* ============================================================
+   BOSHLANG'ICH YUKLASH
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', boot);
+
+function boot(){
+  if (STATE.token) {
+    call('checkSession', [STATE.token]).then(function(res){
+      if (res.valid) {
+        STATE.user = res.user;
+        enterApp();
+      } else {
+        localStorage.removeItem('kabelombor_token');
+        checkFirstRun();
+      }
+    }).catch(checkFirstRun);
+  } else {
+    checkFirstRun();
+  }
+}
+
+function checkFirstRun(){
+  call('isFirstRunSetup', []).then(function(isFirst){
+    document.getElementById('loading-screen').style.display = 'none';
+    if (isFirst) {
+      document.getElementById('setup-screen').style.display = 'flex';
     } else {
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(r){ return r.json(); })
-      .then(resolve)
-      .catch(reject);
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  }).catch(function(err){
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    showErr('login-error', err);
+  });
+}
+
+function doFirstAdminSetup(){
+  const login = document.getElementById('setup-login').value.trim();
+  const p1 = document.getElementById('setup-password').value;
+  const p2 = document.getElementById('setup-password2').value;
+  document.getElementById('setup-error').style.display = 'none';
+  if (p1 !== p2) { showErr('setup-error', {message:"Parollar mos emas."}); return; }
+  const btn = document.getElementById('setup-submit-btn'); btn.disabled = true;
+  call('createFirstAdmin', [login, p1]).then(function(){
+    toast('Admin yaratildi. Endi kiring.', 'success');
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('login-login').value = login;
+  }).catch(function(err){ showErr('setup-error', err); }).finally(function(){ btn.disabled = false; });
+}
+
+function doLogin(){
+  const login = document.getElementById('login-login').value.trim();
+  const pass = document.getElementById('login-password').value;
+  document.getElementById('login-error').style.display = 'none';
+  const btn = document.getElementById('login-submit-btn'); btn.disabled = true;
+  call('login', [login, pass]).then(function(res){
+    STATE.token = res.token;
+    STATE.user = res.user;
+    localStorage.setItem('kabelombor_token', res.token);
+    document.getElementById('login-screen').style.display = 'none';
+    enterApp();
+  }).catch(function(err){ showErr('login-error', err); }).finally(function(){ btn.disabled = false; });
+}
+
+function hardLogout(){
+  localStorage.removeItem('kabelombor_token');
+  STATE.token = null; STATE.user = null;
+  document.getElementById('app-shell').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+function doLogout(){
+  authCall('logout', []).finally(hardLogout);
+}
+
+/* ============================================================
+   ILOVAGA KIRISH
+   ============================================================ */
+function enterApp(){
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'block';
+
+  document.getElementById('user-chip-name').textContent = STATE.user.login;
+  document.getElementById('user-avatar').textContent = STATE.user.login.slice(0,2).toUpperCase();
+
+  buildNav();
+  setLang(STATE.lang, true);
+  navigate('dashboard');
+}
+
+function buildNav(){
+  const items = [
+    {key:'dashboard', icon:'🏠', label:'home', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'drums', icon:'🧵', label:'drums', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'cabletypes', icon:'🔌', label:'cableTypes', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'usage', icon:'📝', label:'usageEntry', roles:[ROLES.ADMIN,ROLES.WAREHOUSE]},
+    {key:'reports', icon:'📊', label:'reports', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'users', icon:'👥', label:'users', roles:[ROLES.ADMIN]},
+    {key:'settings', icon:'⚙️', label:'settings', roles:[ROLES.ADMIN]}
+  ];
+  const nav = document.getElementById('nav-list');
+  nav.innerHTML = '';
+  items.forEach(function(it){
+    if (it.roles.indexOf(STATE.user.role) === -1) return;
+    const a = document.createElement('div');
+    a.className = 'nav-item' + (STATE.page === it.key ? ' active' : '');
+    a.id = 'nav-' + it.key;
+    a.innerHTML = '<span class="nav-icon">' + it.icon + '</span><span data-t="' + it.label + '">' + t(it.label) + '</span>';
+    a.onclick = function(){ navigate(it.key); document.getElementById('sidebar').classList.remove('open'); };
+    nav.appendChild(a);
+  });
+}
+
+function setLang(lang, silent){
+  STATE.lang = lang;
+  localStorage.setItem('kabelombor_lang', lang);
+  document.getElementById('lang-uz').classList.toggle('active', lang === 'uz');
+  document.getElementById('lang-ru').classList.toggle('active', lang === 'ru');
+  document.querySelectorAll('[data-t]').forEach(function(el){
+    el.textContent = t(el.getAttribute('data-t'));
+  });
+  if (!silent) renderCurrentPage();
+}
+
+function navigate(page){
+  STATE.page = page;
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + page).classList.add('active');
+
+  const titles = { dashboard:'dashTitle', drums:'drumsTitle', cabletypes:'cableTypesTitle', usage:'usageTitle',
+    reports:'reportsTitle', users:'usersTitle', settings:'settingsTitle' };
+  document.getElementById('page-title-text').textContent = t(titles[page]);
+
+  renderCurrentPage();
+}
+
+function renderCurrentPage(){
+  const fns = { dashboard:renderDashboard, drums:renderDrumsPage, cabletypes:renderCableTypesPage,
+    usage:renderUsagePage, reports:renderReportsPage, users:renderUsersPage, settings:renderSettingsPage };
+  if (fns[STATE.page]) fns[STATE.page]();
+}
+
+/* ============================================================
+   YORDAMCHI: DRUM RING + KARTA HTML
+   ============================================================ */
+function levelColor(level){
+  return { good:'var(--green)', medium:'var(--yellow)', low:'var(--orange)', critical:'var(--red)' }[level] || 'var(--green)';
+}
+function levelLabel(level){
+  return { good:t('good'), medium:t('medium'), low:t('low'), critical:t('critical') }[level] || '';
+}
+function reelSvg(){
+  return '<svg class="reel-svg" viewBox="0 0 100 100">' +
+    '<defs><radialGradient id="reelGrad" cx="35%" cy="30%" r="75%">' +
+    '<stop offset="0%" stop-color="#9fb3d1"/>' +
+    '<stop offset="55%" stop-color="#5c7aa8"/><stop offset="100%" stop-color="#2c3f5e"/></radialGradient></defs>' +
+    '<circle cx="50" cy="50" r="46" fill="url(#reelGrad)"/>' +
+    '<circle cx="50" cy="50" r="46" fill="none" stroke="#1e3a5f" stroke-width="3"/>' +
+    '<circle cx="50" cy="50" r="30" fill="#e9edf5" stroke="#c3ccdd" stroke-width="2"/>' +
+    '<circle cx="50" cy="50" r="9" fill="#1e3a5f"/>' +
+    '<g stroke="#c3ccdd" stroke-width="2">' +
+    '<line x1="50" y1="20" x2="50" y2="35"/><line x1="50" y1="65" x2="50" y2="80"/>' +
+    '<line x1="20" y1="50" x2="35" y2="50"/><line x1="65" y1="50" x2="80" y2="50"/>' +
+    '</g></svg>';
+}
+function drumCardHtml(d){
+  const color = levelColor(d.level);
+  const ringStyle = 'background:conic-gradient(' + color + ' ' + Math.max(d.percent,0) + '%, #e5e9f1 0);';
+  return '<div class="drum-card" onclick="openDrumDetail(\'' + d.Baraban_ID + '\')">' +
+    '<div class="drum-id">' + d.Baraban_ID + '</div>' +
+    '<div class="drum-type">' + escapeHtml(d.Kabel_nomi) + (d.Baraban_raqami ? ' · #' + escapeHtml(d.Baraban_raqami) : '') + '</div>' +
+    '<div class="ring-wrap" style="' + ringStyle + '">' +
+      '<div class="ring-center">' + reelSvg() +
+        '<div style="position:absolute;bottom:-2px;background:#fff;border-radius:8px;padding:1px 6px;box-shadow:var(--shadow);">' +
+          '<span class="ring-percent" style="font-size:12px;">' + d.percent + '%</span></div>' +
+      '</div></div>' +
+    '<div class="drum-meters">' + d.Qolgan_metr + ' / ' + d.Boshlangich_metr + ' m</div>' +
+    '<span class="badge badge-' + d.level + '">' + levelLabel(d.level) + '</span>' +
+  '</div>';
+}
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtDate(v){
+  if (!v) return '-';
+  try { const d = new Date(v); if (isNaN(d)) return String(v); return d.toLocaleDateString(STATE.lang === 'ru' ? 'ru-RU' : 'uz-UZ'); }
+  catch(e){ return String(v); }
+}
+function fmtDateTime(v){
+  if (!v) return '-';
+  try { const d = new Date(v); if (isNaN(d)) return String(v); return d.toLocaleString(STATE.lang === 'ru' ? 'ru-RU' : 'uz-UZ'); }
+  catch(e){ return String(v); }
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard(){
+  const el = document.getElementById('page-dashboard');
+  el.innerHTML = '<div class="stat-grid" id="dash-stats"></div>' +
+    '<div class="two-col">' +
+      '<div class="section-card"><div class="section-title">' + t('dailyUsage') + '</div><canvas id="chart-daily" height="140"></canvas></div>' +
+      '<div class="section-card"><div class="section-title">' + t('usageByType') + '</div><canvas id="chart-type" height="140"></canvas></div>' +
+    '</div>' +
+    '<div class="two-col">' +
+      '<div class="section-card"><div class="section-title">' + t('recentUsage') + '</div><div id="dash-recent" class="table-wrap"></div></div>' +
+      '<div class="section-card"><div class="section-title">' + t('lowStock') + '</div><div id="dash-lowstock" class="drum-grid"></div></div>' +
+    '</div>';
+
+  authCall('getDashboardStats', []).then(function(s){
+    document.getElementById('dash-stats').innerHTML =
+      statCard('💧', t('totalRemaining'), s.totalRemaining + ' m', '#eff6ff', 'var(--blue)') +
+      statCard('🧵', t('totalDrums'), s.totalDrums, '#f0fdf4', 'var(--green)') +
+      statCard('🔌', t('activeCableTypes'), s.activeCableTypes, '#fef9c3', '#a16207') +
+      statCard('⚠️', t('lowStock'), s.lowStockCount, '#fee2e2', 'var(--red)');
+
+    const recentBody = s.recentUsage.length ? s.recentUsage.map(function(r){
+      return '<tr><td>' + fmtDate(r.Sana) + '</td><td>' + escapeHtml(r.Loyiha_nomi) + '</td><td>' + r.Baraban_ID + '</td><td>' + r.Sarflangan_metr + ' m</td></tr>';
+    }).join('') : '';
+    document.getElementById('dash-recent').innerHTML = s.recentUsage.length ?
+      ('<table><thead><tr><th>' + t('workDate') + '</th><th>' + t('project') + '</th><th>' + t('drumId') + '</th><th>' + t('meters') + '</th></tr></thead><tbody>' + recentBody + '</tbody></table>')
+      : '<div class="empty-state">' + t('noData') + '</div>';
+
+    document.getElementById('dash-lowstock').innerHTML = s.lowStockDrums.length ?
+      s.lowStockDrums.map(drumCardHtml).join('') : '<div class="empty-state">' + t('noData') + '</div>';
+
+    drawLineChart('chart-daily', s.dailyChart.labels, s.dailyChart.values);
+    drawBarChart('chart-type', s.byTypeChart.labels, s.byTypeChart.values);
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+function statCard(icon, label, value, bg, color){
+  return '<div class="stat-card"><div class="icon" style="background:' + bg + ';color:' + color + ';">' + icon + '</div>' +
+    '<div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+}
+
+/* ---- Oddiy canvas grafiklar (tashqi kutubxonasiz) ---- */
+function drawLineChart(canvasId, labels, values){
+  const c = document.getElementById(canvasId); if (!c) return;
+  const ctx = c.getContext('2d');
+  const w = c.width = c.clientWidth; const h = c.height = 150;
+  ctx.clearRect(0,0,w,h);
+  const max = Math.max.apply(null, values.concat([1])) * 1.15;
+  const padL = 30, padB = 20, padT = 10, padR = 10;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  ctx.strokeStyle = '#e6e9f0'; ctx.lineWidth = 1;
+  for (let i=0;i<=3;i++){ const y = padT + plotH - (plotH*i/3); ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke(); }
+  ctx.beginPath();
+  values.forEach(function(v,i){
+    const x = padL + (plotW * i/(Math.max(values.length-1,1)));
+    const y = padT + plotH - (v/max*plotH);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.4; ctx.stroke();
+  ctx.lineTo(padL+plotW, padT+plotH); ctx.lineTo(padL, padT+plotH); ctx.closePath();
+  ctx.fillStyle = 'rgba(37,99,235,.08)'; ctx.fill();
+  ctx.fillStyle = '#9aa4b8'; ctx.font = '10px sans-serif';
+  labels.forEach(function(l,i){
+    if (i % Math.ceil(labels.length/6) !== 0) return;
+    const x = padL + (plotW * i/(Math.max(labels.length-1,1)));
+    ctx.fillText(l.slice(5), x-12, h-4);
+  });
+}
+function drawBarChart(canvasId, labels, values){
+  const c = document.getElementById(canvasId); if (!c) return;
+  const ctx = c.getContext('2d');
+  const w = c.width = c.clientWidth; const h = c.height = 150;
+  ctx.clearRect(0,0,w,h);
+  if (!labels.length){ ctx.fillStyle = '#9aa4b8'; ctx.font='12px sans-serif'; ctx.fillText(t('noData'), 10, 30); return; }
+  const max = Math.max.apply(null, values.concat([1])) * 1.15;
+  const padL = 10, padB = 30, padT = 10;
+  const barW = (w - padL*2) / labels.length * 0.6;
+  const gap = (w - padL*2) / labels.length;
+  ctx.fillStyle = '#9aa4b8'; ctx.font = '10px sans-serif';
+  values.forEach(function(v,i){
+    const barH = (h-padT-padB) * (v/max);
+    const x = padL + gap*i + (gap-barW)/2;
+    const y = h - padB - barH;
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(x,y,barW,barH);
+    ctx.fillStyle = '#6b7280';
+    const lbl = String(labels[i]).length > 8 ? String(labels[i]).slice(0,8)+'…' : labels[i];
+    ctx.fillText(lbl, x, h-14);
+    ctx.fillText(String(v), x, y-4);
+  });
+}
+
+/* ============================================================
+   BARABANLAR SAHIFASI
+   ============================================================ */
+function renderDrumsPage(){
+  const el = document.getElementById('page-drums');
+  const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+  el.innerHTML =
+    '<div class="toolbar"><div class="toolbar-left">' +
+      '<input id="drum-search" placeholder="' + t('searchPlaceholder') + '" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;min-width:220px;" oninput="filterDrumCards()">' +
+    '</div>' + (canEdit ? '<button class="btn btn-primary" onclick="openAddDrumModal()">➕ ' + t('addDrum') + '</button>' : '') + '</div>' +
+    '<div class="drum-grid" id="drums-grid"></div>';
+
+  Promise.all([authCall('getDrums', []), authCall('getCableTypes', [])]).then(function(res){
+    STATE.drums = res[0]; STATE.cableTypes = res[1];
+    renderDrumsGrid(STATE.drums);
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+function renderDrumsGrid(drums){
+  const grid = document.getElementById('drums-grid');
+  grid.innerHTML = drums.length ? drums.map(drumCardHtml).join('') : '<div class="empty-state">' + t('noData') + '</div>';
+}
+function filterDrumCards(){
+  const q = document.getElementById('drum-search').value.toLowerCase();
+  const filtered = STATE.drums.filter(function(d){
+    return d.Baraban_ID.toLowerCase().indexOf(q)!==-1 || String(d.Kabel_nomi).toLowerCase().indexOf(q)!==-1 || String(d.Baraban_raqami).toLowerCase().indexOf(q)!==-1;
+  });
+  renderDrumsGrid(filtered);
+}
+
+function openAddDrumModal(){
+  const typeOptions = STATE.cableTypes.filter(function(c){return c.Faol===true||c.Faol==='TRUE'||c.Faol==='true';})
+    .map(function(c){ return '<option value="'+c.Kabel_turi_ID+'">'+escapeHtml(c.Kabel_nomi)+'</option>'; }).join('');
+  openModal(t('addDrum'), '' +
+    '<div class="field"><label>' + t('cableType') + '</label>' +
+      '<select id="ad-type"><option value="">-- ' + t('selectDrum') + ' --</option>' + typeOptions + '<option value="__new__">＋ ' + t('newCableType') + '</option></select></div>' +
+    '<div class="field" id="ad-newtype-wrap" style="display:none;"><label>' + t('newCableType') + '</label><input id="ad-newtype"></div>' +
+    '<div class="field"><label>' + t('drumNumber') + '</label><input id="ad-num"></div>' +
+    '<div class="field"><label>' + t('initialMeters') + '</label><input id="ad-initial" type="number" min="1"></div>' +
+    '<div class="field"><label>' + t('receivedDate') + '</label><input id="ad-date" type="date" value="' + new Date().toISOString().slice(0,10) + '"></div>' +
+    '<div class="field"><label>' + t('note') + '</label><textarea id="ad-note" rows="2"></textarea></div>' +
+    '<div class="auth-error" id="ad-error"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitAddDrum()">' + t('save') + '</button>'
+  );
+  document.getElementById('ad-type').addEventListener('change', function(){
+    document.getElementById('ad-newtype-wrap').style.display = this.value === '__new__' ? 'block' : 'none';
+  });
+}
+function submitAddDrum(){
+  const typeVal = document.getElementById('ad-type').value;
+  const payload = {
+    kabelTuriId: typeVal === '__new__' ? '' : typeVal,
+    newCableTypeName: typeVal === '__new__' ? document.getElementById('ad-newtype').value.trim() : '',
+    barabanRaqami: document.getElementById('ad-num').value.trim(),
+    boshlangichMetr: Number(document.getElementById('ad-initial').value),
+    qabulSanasi: document.getElementById('ad-date').value,
+    izoh: document.getElementById('ad-note').value.trim()
+  };
+  authCall('addDrum', [payload]).then(function(){
+    toast('OK', 'success'); closeModal(); renderDrumsPage();
+  }).catch(function(err){ showErr('ad-error', err); });
+}
+
+function openDrumDetail(drumId){
+  authCall('getDrumDetail', [drumId]).then(function(data){
+    const d = data.drum;
+    const color = levelColor(d.level);
+    const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+    let html = '<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;">' +
+      '<div class="ring-wrap" style="width:120px;height:120px;background:conic-gradient(' + color + ' ' + d.percent + '%, #e5e9f1 0);">' +
+        '<div class="ring-center" style="inset:12px;">' + reelSvg() + '</div></div>' +
+      '<div><div style="font-size:20px;font-weight:800;">' + d.percent + '%</div>' +
+      '<div style="color:var(--muted);font-size:13px;">' + d.Qolgan_metr + ' / ' + d.Boshlangich_metr + ' m</div>' +
+      '<span class="badge badge-' + d.level + '">' + levelLabel(d.level) + '</span></div></div>' +
+      '<div style="margin-top:16px;font-size:13.5px;line-height:1.9;">' +
+      '<div><b>' + t('cableType') + ':</b> ' + escapeHtml(d.Kabel_nomi) + '</div>' +
+      '<div><b>' + t('drumNumber') + ':</b> ' + escapeHtml(d.Baraban_raqami||'-') + '</div>' +
+      '<div><b>' + t('receivedDate') + ':</b> ' + fmtDate(d.Qabul_sanasi) + '</div>' +
+      '<div><b>' + t('note') + ':</b> ' + escapeHtml(d.Izoh||'-') + '</div></div>';
+
+    if (canEdit) {
+      html += '<div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="openCorrectDrumModal(\'' + d.Baraban_ID + '\',' + d.Qolgan_metr + ')">✏️ ' + t('edit') + '</button></div>';
+    }
+
+    html += '<div style="margin-top:18px;"><div class="section-title" style="font-size:13.5px;">' + t('usageHistory') + '</div>';
+    html += data.usageHistory.length ? ('<div class="table-wrap"><table><thead><tr><th>' + t('workDate') + '</th><th>' + t('project') + '</th><th>' + t('meters') + '</th><th>' + t('employees') + '</th></tr></thead><tbody>' +
+      data.usageHistory.map(function(u){ return '<tr><td>' + fmtDate(u.Sana) + '</td><td>' + escapeHtml(u.Loyiha_nomi) + '</td><td>' + u.Sarflangan_metr + ' m</td><td>' + escapeHtml(u.Masul_xodimlar) + '</td></tr>'; }).join('') +
+      '</tbody></table></div>') : '<div class="empty-state">' + t('noData') + '</div>';
+    html += '</div>';
+
+    html += '<div style="margin-top:18px;"><div class="section-title" style="font-size:13.5px;">' + t('editHistory') + '</div>';
+    html += data.editHistory.length ? data.editHistory.slice().reverse().map(function(h){
+      return '<div class="history-item"><div class="h-top">' + escapeHtml(h.amal) + '</div>' +
+        '<div class="h-meta">' + fmtDateTime(h.vaqt) + ' · ' + t('by') + ' ' + escapeHtml(h.user) + '</div>' +
+        (h.sabab ? '<div class="h-meta">' + t('reason') + ': ' + escapeHtml(h.sabab) + '</div>' : '') +
+        (h.eski ? '<div class="h-meta">' + t('old') + ': ' + JSON.stringify(h.eski) + ' → ' + t('newV') + ': ' + JSON.stringify(h.yangi) + '</div>' : '') +
+        '</div>';
+    }).join('') : '<div class="empty-state">' + t('noData') + '</div>';
+    html += '</div>';
+
+    openModal(d.Baraban_ID + ' — ' + escapeHtml(d.Kabel_nomi), html, true);
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+
+function openCorrectDrumModal(drumId, currentRemaining){
+  openModal(t('edit') + ' — ' + drumId, '' +
+    '<div class="field"><label>' + t('newRemaining') + '</label><input id="cd-new" type="number" value="' + currentRemaining + '"></div>' +
+    '<div class="field"><label>' + t('correctionReason') + '</label><textarea id="cd-reason" rows="2"></textarea></div>' +
+    '<div class="auth-error" id="cd-error"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitCorrectDrum(\'' + drumId + '\')">' + t('saveCorrection') + '</button>'
+  );
+}
+function submitCorrectDrum(drumId){
+  const val = Number(document.getElementById('cd-new').value);
+  const reason = document.getElementById('cd-reason').value.trim();
+  authCall('correctDrum', [drumId, val, reason]).then(function(){
+    toast('OK', 'success'); closeModal(); renderDrumsPage();
+  }).catch(function(err){ showErr('cd-error', err); });
+}
+
+/* ============================================================
+   KABEL TURLARI SAHIFASI
+   ============================================================ */
+function renderCableTypesPage(){
+  const el = document.getElementById('page-cabletypes');
+  const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+  el.innerHTML = '<div class="toolbar">' + (canEdit ? '<button class="btn btn-primary" onclick="openAddCableTypeModal()">➕ ' + t('newCableType') + '</button>' : '<div></div>') + '</div>' +
+    '<div class="section-card"><div class="table-wrap" id="ct-table"></div></div>';
+
+  authCall('getCableTypes', []).then(function(types){
+    STATE.cableTypes = types;
+    const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+    document.getElementById('ct-table').innerHTML = types.length ?
+      ('<table><thead><tr><th>ID</th><th>' + t('cableName') + '</th><th>' + t('description') + '</th><th>' + t('status') + '</th>' + (canEdit?'<th></th>':'') + '</tr></thead><tbody>' +
+      types.map(function(c){
+        const active = c.Faol===true||c.Faol==='TRUE'||c.Faol==='true';
+        return '<tr><td>' + c.Kabel_turi_ID + '</td><td>' + escapeHtml(c.Kabel_nomi) + '</td><td>' + escapeHtml(c.Tavsif||'-') + '</td>' +
+          '<td><span class="badge ' + (active?'badge-good':'badge-critical') + '">' + (active?t('active'):t('inactive')) + '</span></td>' +
+          (canEdit ? ('<td><button class="btn btn-ghost btn-sm" onclick="openEditCableTypeModal(\''+c.Kabel_turi_ID+'\',\''+encodeURIComponent(c.Kabel_nomi)+'\',\''+encodeURIComponent(c.Tavsif||'')+'\')">✏️</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="toggleCableType(\''+c.Kabel_turi_ID+'\',' + (!active) + ')">' + (active?'🚫':'✅') + '</button></td>') : '') +
+          '</tr>';
+      }).join('') + '</tbody></table>') : '<div class="empty-state">' + t('noData') + '</div>';
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+function openAddCableTypeModal(){
+  openModal(t('newCableType'), '' +
+    '<div class="field"><label>' + t('cableName') + '</label><input id="ct-name"></div>' +
+    '<div class="field"><label>' + t('description') + '</label><textarea id="ct-desc" rows="2"></textarea></div>' +
+    '<div class="auth-error" id="ct-error"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitAddCableType()">' + t('save') + '</button>'
+  );
+}
+function submitAddCableType(){
+  authCall('addCableType', [document.getElementById('ct-name').value.trim(), document.getElementById('ct-desc').value.trim()])
+    .then(function(){ toast('OK','success'); closeModal(); renderCableTypesPage(); })
+    .catch(function(err){ showErr('ct-error', err); });
+}
+function openEditCableTypeModal(id, nameEnc, descEnc){
+  const name = decodeURIComponent(nameEnc), desc = decodeURIComponent(descEnc);
+  openModal(t('edit'), '' +
+    '<div class="field"><label>' + t('cableName') + '</label><input id="ct-ename" value="' + escapeHtml(name) + '"></div>' +
+    '<div class="field"><label>' + t('description') + '</label><textarea id="ct-edesc" rows="2">' + escapeHtml(desc) + '</textarea></div>' +
+    '<div class="auth-error" id="ct-eerror"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitEditCableType(\'' + id + '\')">' + t('save') + '</button>'
+  );
+}
+function submitEditCableType(id){
+  authCall('updateCableType', [id, document.getElementById('ct-ename').value.trim(), document.getElementById('ct-edesc').value.trim()])
+    .then(function(){ toast('OK','success'); closeModal(); renderCableTypesPage(); })
+    .catch(function(err){ showErr('ct-eerror', err); });
+}
+function toggleCableType(id, active){
+  authCall('setCableTypeActive', [id, active]).then(function(){ renderCableTypesPage(); }).catch(function(err){ toast(err.message,'error'); });
+}
+
+/* ============================================================
+   SARF HISOBI (USAGE) SAHIFASI
+   ============================================================ */
+function renderUsagePage(){
+  const el = document.getElementById('page-usage');
+  el.innerHTML = '<div class="section-card" style="max-width:640px;">' +
+    '<div class="field"><label>' + t('workDate') + '</label><input id="us-date" type="date" value="' + new Date().toISOString().slice(0,10) + '"></div>' +
+    '<div class="field"><label>' + t('projectName') + '</label><input id="us-project"></div>' +
+    '<div class="field"><label>' + t('employees') + '</label><input id="us-employees"></div>' +
+    '<div class="field"><label>' + t('address') + '</label><input id="us-address"></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+      '<div class="field"><label>' + t('latitude') + '</label><input id="us-lat" type="text" placeholder="41.31"></div>' +
+      '<div class="field"><label>' + t('longitude') + '</label><input id="us-lng" type="text" placeholder="69.24"></div>' +
+    '</div>' +
+    '<div class="field"><label>' + t('note') + '</label><textarea id="us-note" rows="2"></textarea></div>' +
+    '<div style="font-weight:700;font-size:13px;margin:14px 0 6px;">' + t('drums') + '</div>' +
+    '<div id="us-rows"></div>' +
+    '<button class="btn btn-outline btn-sm" onclick="addUsageRow()">➕ ' + t('addDrumRow') + '</button>' +
+    '<div class="usage-total" id="us-total">' + t('totalToUse') + ': 0 m</div>' +
+    '<div class="auth-error" id="us-error"></div>' +
+    '<button class="btn btn-primary" id="us-submit-btn" style="width:100%;margin-top:12px;" onclick="submitUsage()">💾 ' + t('submitUsage') + '</button>' +
+  '</div>';
+
+  authCall('getDrums', []).then(function(drums){
+    STATE.drums = drums.filter(function(d){ return d.Qolgan_metr > 0; });
+    STATE.usageRows = [{ barabanId:'', metr:'' }];
+    renderUsageRows();
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+function drumOptionsHtml(selected){
+  return '<option value="">-- ' + t('selectDrum') + ' --</option>' + STATE.drums.map(function(d){
+    return '<option value="' + d.Baraban_ID + '" ' + (d.Baraban_ID===selected?'selected':'') + '>' + d.Baraban_ID + ' — ' + escapeHtml(d.Kabel_nomi) + ' (' + d.Qolgan_metr + ' m)</option>';
+  }).join('');
+}
+function renderUsageRows(){
+  const wrap = document.getElementById('us-rows');
+  wrap.innerHTML = STATE.usageRows.map(function(row, i){
+    return '<div class="usage-row">' +
+      '<div class="field" style="margin:0;"><select onchange="STATE.usageRows[' + i + '].barabanId=this.value;calcUsageTotal();">' + drumOptionsHtml(row.barabanId) + '</select></div>' +
+      '<div class="field" style="margin:0;"><input type="number" min="1" placeholder="' + t('meters') + '" value="' + row.metr + '" oninput="STATE.usageRows[' + i + '].metr=this.value;calcUsageTotal();"></div>' +
+      '<button class="btn btn-ghost btn-sm" onclick="removeUsageRow(' + i + ')">✕</button>' +
+    '</div>';
+  }).join('');
+  calcUsageTotal();
+}
+function addUsageRow(){ STATE.usageRows.push({barabanId:'',metr:''}); renderUsageRows(); }
+function removeUsageRow(i){ if (STATE.usageRows.length>1){ STATE.usageRows.splice(i,1); renderUsageRows(); } }
+function calcUsageTotal(){
+  const total = STATE.usageRows.reduce(function(s,r){ return s + (Number(r.metr)||0); }, 0);
+  document.getElementById('us-total').textContent = t('totalToUse') + ': ' + total + ' m';
+}
+let usageSubmitLock = false;
+function submitUsage(){
+  if (usageSubmitLock) return;
+  document.getElementById('us-error').style.display = 'none';
+  const items = STATE.usageRows.filter(function(r){ return r.barabanId && Number(r.metr) > 0; })
+    .map(function(r){ return { barabanId:r.barabanId, metr:Number(r.metr) }; });
+  const payload = {
+    sana: document.getElementById('us-date').value,
+    loyihaNomi: document.getElementById('us-project').value.trim(),
+    masulXodimlar: document.getElementById('us-employees').value.trim(),
+    manzil: document.getElementById('us-address').value.trim(),
+    latitude: document.getElementById('us-lat').value.trim(),
+    longitude: document.getElementById('us-lng').value.trim(),
+    izoh: document.getElementById('us-note').value.trim(),
+    items: items,
+    clientRequestId: 'req-' + Date.now() + '-' + Math.random().toString(36).slice(2)
+  };
+  usageSubmitLock = true;
+  document.getElementById('us-submit-btn').disabled = true;
+  authCall('saveUsage', [payload]).then(function(res){
+    toast('✅ ' + res.totalMeters + ' m ' + (STATE.lang==='ru'?'сохранено':'saqlandi'), 'success');
+    renderUsagePage();
+  }).catch(function(err){ showErr('us-error', err); }).finally(function(){
+    usageSubmitLock = false;
+    const btn = document.getElementById('us-submit-btn'); if (btn) btn.disabled = false;
+  });
+}
+
+/* ============================================================
+   HISOBOTLAR SAHIFASI
+   ============================================================ */
+function renderReportsPage(){
+  const el = document.getElementById('page-reports');
+  el.innerHTML =
+    '<div class="section-card">' +
+      '<div class="filter-grid">' +
+        '<div class="field" style="margin:0;"><label>' + t('from') + '</label><input id="rf-from" type="date"></div>' +
+        '<div class="field" style="margin:0;"><label>' + t('to') + '</label><input id="rf-to" type="date"></div>' +
+        '<div class="field" style="margin:0;"><label>' + t('project') + '</label><input id="rf-project"></div>' +
+        '<div class="field" style="margin:0;"><label>' + t('employee') + '</label><input id="rf-employee"></div>' +
+        '<div class="field" style="margin:0;"><label>' + t('cableType') + '</label><select id="rf-type"><option value="">' + t('all') + '</option></select></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" onclick="applyReportFilters()">🔍 ' + t('filter') + '</button>' +
+      '<button class="btn btn-ghost btn-sm" onclick="resetReportFilters()">' + t('reset') + '</button>' +
+      '<button class="btn btn-outline btn-sm" onclick="exportReport()" id="rf-export">⬇️ ' + t('exportExcel') + '</button></div>' +
+    '</div>' +
+    '<div class="stat-grid" id="rp-stats"></div>' +
+    '<div class="section-card"><div class="section-title">' + t('recentUsage') + '</div><div class="table-wrap" id="rp-table"></div></div>';
+
+  authCall('getCableTypes', []).then(function(types){
+    const sel = document.getElementById('rf-type');
+    types.forEach(function(c){ sel.innerHTML += '<option value="' + c.Kabel_turi_ID + '">' + escapeHtml(c.Kabel_nomi) + '</option>'; });
+  });
+  loadReportData({});
+}
+function applyReportFilters(){
+  STATE.reportFilters = {
+    dateFrom: document.getElementById('rf-from').value || null,
+    dateTo: document.getElementById('rf-to').value || null,
+    project: document.getElementById('rf-project').value.trim() || null,
+    employee: document.getElementById('rf-employee').value.trim() || null,
+    cableTypeId: document.getElementById('rf-type').value || null
+  };
+  loadReportData(STATE.reportFilters);
+}
+function resetReportFilters(){
+  document.getElementById('rf-from').value = '';
+  document.getElementById('rf-to').value = '';
+  document.getElementById('rf-project').value = '';
+  document.getElementById('rf-employee').value = '';
+  document.getElementById('rf-type').value = '';
+  STATE.reportFilters = {};
+  loadReportData({});
+}
+function loadReportData(filters){
+  authCall('getReportAggregates', [filters]).then(function(data){
+    document.getElementById('rp-stats').innerHTML =
+      statCard('➕', t('totalToUse'), data.totalMeters + ' m', '#eff6ff', 'var(--blue)') +
+      statCard('💧', t('totalRemaining'), data.totalRemainingAll + ' m', '#f0fdf4', 'var(--green)') +
+      statCard('📋', t('recordUsage'), data.rows.length, '#fef9c3', '#a16207');
+
+    document.getElementById('rp-table').innerHTML = data.rows.length ?
+      ('<table><thead><tr><th>' + t('workDate') + '</th><th>ID</th><th>' + t('project') + '</th><th>' + t('employees') + '</th><th>' + t('drumId') + '</th><th>' + t('cableType') + '</th><th>' + t('meters') + '</th><th>' + t('telegramStatus') + '</th></tr></thead><tbody>' +
+      data.rows.map(function(r){
+        const okStatus = r.Telegram_holati === 'Yuborildi';
+        return '<tr><td>' + fmtDate(r.Sana) + '</td><td>' + r.Ish_ID + '</td><td>' + escapeHtml(r.Loyiha_nomi) + '</td><td>' + escapeHtml(r.Masul_xodimlar) + '</td>' +
+          '<td>' + r.Baraban_ID + '</td><td>' + escapeHtml(r.Kabel_nomi) + '</td><td>' + r.Sarflangan_metr + ' m</td>' +
+          '<td><span class="badge ' + (okStatus?'badge-good':'badge-critical') + '">' + escapeHtml(String(r.Telegram_holati||'-')) + '</span>' +
+          (!okStatus ? ' <button class="btn btn-ghost btn-sm" onclick="retryTelegram(\''+r.Sarf_ID+'\')">🔄</button>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table>') : '<div class="empty-state">' + t('noData') + '</div>';
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+function retryTelegram(sarfId){
+  authCall('retryUsageTelegram', [sarfId]).then(function(){ toast('OK','success'); loadReportData(STATE.reportFilters); }).catch(function(err){ toast(err.message,'error'); });
+}
+function exportReport(){
+  const btn = document.getElementById('rf-export'); btn.disabled = true; btn.textContent = '⏳ ...';
+  authCall('exportReportXlsx', [STATE.reportFilters]).then(function(res){
+    const byteChars = atob(res.base64);
+    const byteNumbers = new Array(byteChars.length);
+    for (let i=0;i<byteChars.length;i++) byteNumbers[i] = byteChars.charCodeAt(i);
+    const blob = new Blob([new Uint8Array(byteNumbers)], { type: res.mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = res.filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }).catch(function(err){ toast(err.message, 'error'); }).finally(function(){
+    btn.disabled = false; btn.textContent = '⬇️ ' + t('exportExcel');
+  });
+}
+
+/* ============================================================
+   FOYDALANUVCHILAR SAHIFASI (Admin)
+   ============================================================ */
+function renderUsersPage(){
+  const el = document.getElementById('page-users');
+  el.innerHTML = '<div class="toolbar"><button class="btn btn-primary" onclick="openAddUserModal()">➕ ' + t('addUser') + '</button></div>' +
+    '<div class="section-card"><div class="table-wrap" id="u-table"></div></div>';
+  loadUsersTable();
+}
+function loadUsersTable(){
+  authCall('getUsers', []).then(function(users){
+    document.getElementById('u-table').innerHTML = '<table><thead><tr><th>' + t('login') + '</th><th>' + t('role') + '</th><th>' + t('status') + '</th><th>' + t('lastLogin') + '</th><th></th></tr></thead><tbody>' +
+      users.map(function(u){
+        const active = u.Faol===true||u.Faol==='TRUE'||u.Faol==='true';
+        return '<tr><td>' + escapeHtml(u.Login) + '</td>' +
+          '<td><select onchange="changeRole(\'' + u.User_ID + '\', this.value)">' +
+            ['Admin','Omborchi','Kuzatuvchi'].map(function(r){ return '<option value="'+r+'" '+(r===u.Rol?'selected':'')+'>'+r+'</option>'; }).join('') + '</select></td>' +
+          '<td><span class="badge ' + (active?'badge-good':'badge-critical') + '">' + (active?t('active'):t('inactive')) + '</span></td>' +
+          '<td>' + fmtDateTime(u.Oxirgi_kirish) + '</td>' +
+          '<td>' +
+            '<button class="btn btn-ghost btn-sm" onclick="toggleUserActive(\''+u.User_ID+'\',' + (!active) + ')">' + (active?'🚫':'✅') + '</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="openResetPasswordModal(\''+u.User_ID+'\')">🔑</button>' +
+          '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }).catch(function(err){ toast(err.message, 'error'); });
+}
+function openAddUserModal(){
+  openModal(t('addUser'), '' +
+    '<div class="field"><label>' + t('login') + '</label><input id="au-login"></div>' +
+    '<div class="field"><label>' + t('password') + '</label><input id="au-pass" type="password"></div>' +
+    '<div class="field"><label>' + t('role') + '</label><select id="au-role"><option value="Kuzatuvchi">Kuzatuvchi</option><option value="Omborchi">Omborchi</option><option value="Admin">Admin</option></select></div>' +
+    '<div class="auth-error" id="au-error"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitAddUser()">' + t('save') + '</button>'
+  );
+}
+function submitAddUser(){
+  authCall('addUser', [document.getElementById('au-login').value.trim(), document.getElementById('au-pass').value, document.getElementById('au-role').value])
+    .then(function(){ toast('OK','success'); closeModal(); loadUsersTable(); })
+    .catch(function(err){ showErr('au-error', err); });
+}
+function changeRole(userId, role){
+  authCall('setUserRole', [userId, role]).then(function(){ toast('OK','success'); }).catch(function(err){ toast(err.message,'error'); loadUsersTable(); });
+}
+function toggleUserActive(userId, active){
+  authCall('setUserActive', [userId, active]).then(function(){ loadUsersTable(); }).catch(function(err){ toast(err.message,'error'); });
+}
+function openResetPasswordModal(userId){
+  openModal(t('resetPassword'), '' +
+    '<div class="field"><label>' + t('newPassword') + '</label><input id="rp-pass" type="password"></div>' +
+    '<div class="auth-error" id="rp-error"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitResetPassword(\'' + userId + '\')">' + t('save') + '</button>'
+  );
+}
+function submitResetPassword(userId){
+  authCall('resetUserPassword', [userId, document.getElementById('rp-pass').value])
+    .then(function(){ toast('OK','success'); closeModal(); })
+    .catch(function(err){ showErr('rp-error', err); });
+}
+function openChangePasswordModal(){
+  openModal(t('changePasswordTitle'), '' +
+    '<div class="field"><label>' + t('oldPassword') + '</label><input id="cp-old" type="password"></div>' +
+    '<div class="field"><label>' + t('newPassword') + '</label><input id="cp-new" type="password"></div>' +
+    '<div class="auth-error" id="cp-error"></div>' +
+    '<button class="btn btn-primary" style="width:100%;" onclick="submitChangePassword()">' + t('save') + '</button>'
+  );
+}
+function submitChangePassword(){
+  authCall('changeMyPassword', [document.getElementById('cp-old').value, document.getElementById('cp-new').value])
+    .then(function(){ toast('OK','success'); closeModal(); })
+    .catch(function(err){ showErr('cp-error', err); });
+}
+
+/* ============================================================
+   SOZLAMALAR SAHIFASI (Admin)
+   ============================================================ */
+function renderSettingsPage(){
+  const el = document.getElementById('page-settings');
+  el.innerHTML = '<div class="section-card" style="max-width:480px;">' +
+    '<div class="field"><label>' + t('lowStockThreshold') + '</label><input id="st-threshold" type="number" min="1" max="99"></div>' +
+    '<button class="btn btn-primary btn-sm" onclick="submitThreshold()">' + t('save') + '</button>' +
+    '<hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">' +
+    '<div class="field"><label>' + t('telegramChatId') + '</label><input id="st-chatid"></div>' +
+    '<button class="btn btn-primary btn-sm" onclick="submitChatId()">' + t('updateChatId') + '</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="testTelegram()">📨 ' + t('telegramTest') + '</button>' +
+    '<div class="auth-error" id="st-error"></div>' +
+    '<div id="st-msg" style="margin-top:10px;font-size:13px;color:var(--muted);"></div>' +
+  '</div>';
+  authCall('getSettings', []).then(function(s){
+    document.getElementById('st-threshold').value = s.lowStockPercent;
+    document.getElementById('st-chatid').value = s.telegramChatId;
+    if (!s.hasTelegramToken) {
+      document.getElementById('st-msg').innerHTML = '⚠️ TELEGRAM_BOT_TOKEN Script Properties\'da topilmadi.';
     }
   });
 }
-
-function doLogin() {
-  var log = document.getElementById('loginInput').value.trim();
-  var pas = document.getElementById('passInput').value.trim();
-  if (!log || !pas) return showToast("Login va parolni kiriting!");
-  
-  showToast("Tekshirilmoqda...");
-  
-  var checkLogin = function(empList) {
-    var user = empList.find(function(u){ 
-      return String(u.LOGIN).trim().toLowerCase() === log.toLowerCase() && String(u.PAROL).trim() === pas; 
-    });
-    if (!user) return showToast("Login yoki parol xato!");
-    
-    currentUser = {
-      ism: user.ISM,
-      login: user.LOGIN,
-      tuman: (user.tuman || '').trim(),
-      role: (user.dostup || 'xodim').trim().toLowerCase()
-    };
-    localStorage.setItem('sklad_user', JSON.stringify(currentUser));
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('userName').innerText = currentUser.ism + " (" + currentUser.tuman + ")";
-    if (currentUser.role === 'admin') document.getElementById('dockSorov').style.display = 'flex';
-    
-    refreshData();
-    showToast("Xush kelibsiz!");
-  };
-
-  if (db.employees && db.employees.length > 0) {
-    checkLogin(db.employees);
-  } else {
-    apiRequest('bootstrap').then(function(res){
-      db = res;
-      checkLogin(res.employees || []);
-    }).catch(function(){ showToast("API ga ulanib bo'lmadi"); });
-  }
+function submitThreshold(){
+  authCall('updateLowStockThreshold', [Number(document.getElementById('st-threshold').value)])
+    .then(function(){ toast('OK','success'); }).catch(function(err){ showErr('st-error', err); });
+}
+function submitChatId(){
+  authCall('updateTelegramChatId', [document.getElementById('st-chatid').value.trim()])
+    .then(function(){ toast('OK','success'); }).catch(function(err){ showErr('st-error', err); });
+}
+function testTelegram(){
+  authCall('testTelegramConnection', []).then(function(res){
+    toast(res.ok ? '✅ OK' : ('❌ ' + res.error), res.ok ? 'success' : 'error');
+  }).catch(function(err){ toast(err.message, 'error'); });
 }
 
-function doLogout() {
-  localStorage.removeItem('sklad_user');
-  location.reload();
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal(title, bodyHtml, wide){
+  document.getElementById('modal-root').innerHTML =
+    '<div class="modal-overlay" onclick="if(event.target===this)closeModal();">' +
+      '<div class="modal-box' + (wide?' wide':'') + '">' +
+        '<div class="modal-head"><h3>' + title + '</h3><button class="close-x" onclick="closeModal()">✕</button></div>' +
+        bodyHtml +
+      '</div></div>';
 }
+function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
 
-function refreshData() {
-  apiRequest('bootstrap').then(function(res){
-    db = res;
-    updateStats();
-    renderCurrentTab();
-  }).catch(function(){ showToast("Ma'lumotlar yangilanmadi"); });
-}
-
-function updateStats() {
-  document.getElementById('statSklad').innerText = db.sklad ? db.sklad.length : 0;
-  var myKirim = (db.kirim || []).filter(function(k){ return String(k.login).toLowerCase() === String(currentUser.login).toLowerCase(); });
-  document.getElementById('statMening').innerText = myKirim.length;
-  document.getElementById('statChiqim').innerText = db.chiqim ? db.chiqim.length : 0;
-  
-  var cntM = document.getElementById('cntMening');
-  if (myKirim.length > 0) { cntM.innerText = myKirim.length; cntM.style.display = 'block'; } 
-  else cntM.style.display = 'none';
-
-  if (currentUser.role === 'admin') {
-    var pending = (db.sorovlar || []).filter(function(s){ return s.holat === 'kutilmoqda'; });
-    var cntS = document.getElementById('cntSorov');
-    if (pending.length > 0) { cntS.innerText = pending.length; cntS.style.display = 'block'; } 
-    else cntS.style.display = 'none';
-  }
-}
-
-function setTab(tab) {
-  activeTab = tab;
-  document.querySelectorAll('.dock-item').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById('dock' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  renderCurrentTab();
-}
-
-function renderCurrentTab() {
-  var q = document.getElementById('searchInput').value.toLowerCase().trim();
-  var html = '';
-
-  if (activeTab === 'sklad') {
-    var items = (db.sklad || []).filter(function(i){ 
-      return (i["S/N"]||'').toLowerCase().includes(q) || (i.marka||'').toLowerCase().includes(q); 
-    });
-    items.forEach(function(item){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + (item.marka||'Marka yo\'q') + '</div></div><span class="ios-tag ' + (item.tuman||'').toLowerCase() + '">' + item.tuman + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openOlishSheet(\'' + item["S/N"] + '\')">Olish</button></div></div>';
-    });
-  } else if (activeTab === 'mening') {
-    var items = (db.kirim || []).filter(function(i){ 
-      return (currentUser.role==='admin' || String(i.login).toLowerCase()===String(currentUser.login).toLowerCase()) && ((i["S/N"]||'').toLowerCase().includes(q)); 
-    });
-    items.forEach(function(item){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + '</div></div><span class="ios-tag">' + (item.sana||'') + '</span></div><div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="openChiqimSheet(\'' + item["S/N"] + '\')">O\'rnatdim</button><button class="ios-btn ios-btn-warn" onclick="openMuddatSheet(\'' + item["S/N"] + '\')">+Muddat</button></div></div>';
-    });
-  } else if (activeTab === 'chiqim') {
-    var items = (db.chiqim || []).filter(function(i){ return (i["S/N"]||'').toLowerCase().includes(q); });
-    items.forEach(function(item){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + item["S/N"] + '</div><div class="card-sub">' + item.marka + ' · ' + item.manzil + ' (' + (item.Ism||'') + ')</div></div><span class="ios-tag">' + item.sana + '</span></div></div>';
-    });
-  } else if (activeTab === 'sorov' && currentUser.role==='admin') {
-    (db.sorovlar || []).forEach(function(s){
-      html += '<div class="ios-card"><div class="card-top"><div><div class="card-sn">' + (s.turi||'').toUpperCase() + ': ' + s.seria + '</div><div class="card-sub">Xodim: ' + s.Ism + ' (' + s.tuman + ')</div></div><span class="ios-tag">' + s.holat + '</span></div>';
-      if (s.holat === 'kutilmoqda') {
-        html += '<div class="card-actions-row"><button class="ios-btn ios-btn-primary" onclick="processSorov(\'' + s.ID + '\', \'qabul\')">Qabul qilish</button><button class="ios-btn ios-btn-danger" onclick="processSorov(\'' + s.ID + '\', \'rad\')">Rad etish</button></div>';
-      }
-      html += '</div>';
-    });
-  }
-
-  document.getElementById('cardContainer').innerHTML = html || '<div style="text-align:center; padding:40px; color:var(--text-sub);">Qurilmalar topilmadi</div>';
-}
-
-function closeSheet(e) {
-  if (!e || e.target.classList.contains('sheet-overlay')) {
-    document.getElementById('sheetModal').classList.remove('active');
-  }
-}
-
-function openOlishSheet(seria) {
-  var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">Qurilmani olish: ' + seria + '</h3>' +
-    '<div class="field"><label>Obyekt Manzili</label><input type="text" id="olishManzil"></div>' +
-    '<div class="field"><label>Muddat (Soat)</label><select id="olishMuddat"><option value="24">24 Soat (1 kun)</option><option value="48">48 Soat (2 kun)</option><option value="72">72 Soat (3 kun)</option></select></div>' +
-    '<button class="ios-btn ios-btn-primary" id="btnSubmitOlish" style="width:100%; padding:14px;" onclick="submitOlish(\'' + seria + '\')">Tasdiqlash va Olish</button>';
-  
-  document.getElementById('sheetContent').innerHTML = html;
-  document.getElementById('sheetModal').classList.add('active');
-}
-
-function submitOlish(seria) {
-  var manzil = document.getElementById('olishManzil').value.trim();
-  var muddat = document.getElementById('olishMuddat').value;
-  if (!manzil) return showToast("Manzilni kiriting!");
-
-  var btn = document.getElementById('btnSubmitOlish');
-  btn.disabled = true; btn.innerText = "Yuborilmoqda...";
-
-  apiRequest('post', {
-    action: 'olish', seria: seria, login: currentUser.login, ism: currentUser.ism,
-    role: currentUser.role, tuman: currentUser.tuman, manzil: manzil, muddat_soat: muddat
-  }).then(function(res){
-    document.getElementById('sheetModal').classList.remove('active');
-    if (res.success) { showToast("Qurilma muvaffaqiyatli olindi!"); refreshData(); }
-    else showToast(res.error || "Xatolik yuz berdi");
-  }).catch(function(){ btn.disabled = false; showToast("Serverga bog'lanishda xato"); });
-}
-
-function openChiqimSheet(seria) {
-  var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">O\'rnatishni tasdiqlash: ' + seria + '</h3>' +
-    '<div class="field"><label>OLT</label><input type="text" id="chOLT"></div>' +
-    '<div class="field"><label>Port</label><input type="text" id="chPort"></div>' +
-    '<div class="field"><label>Masofa (m)</label><input type="text" id="chMasofa"></div>' +
-    '<button class="ios-btn ios-btn-primary" id="btnSubmitChiqim" style="width:100%; padding:14px;" onclick="submitChiqim(\'' + seria + '\')">O\'rnatildi Deb Saqlash</button>';
-  
-  document.getElementById('sheetContent').innerHTML = html;
-  document.getElementById('sheetModal').classList.add('active');
-}
-
-function submitChiqim(seria) {
-  var olt = document.getElementById('chOLT').value.trim();
-  var port = document.getElementById('chPort').value.trim();
-  var masofa = document.getElementById('chMasofa').value.trim();
-  
-  if (!olt || !port) return showToast("OLT va Portni kiriting!");
-
-  var btn = document.getElementById('btnSubmitChiqim');
-  btn.disabled = true; btn.innerText = "Saqlanmoqda...";
-
-  apiRequest('post', {
-    action: 'chiqim', seria: seria, olt: olt, port: port, masofa: masofa,
-    login: currentUser.login, ism: currentUser.ism, tuman: currentUser.tuman
-  }).then(function(res){
-    document.getElementById('sheetModal').classList.remove('active');
-    if (res.success) { showToast("O'rnatildi va Telegramga yuborildi!"); refreshData(); }
-    else showToast(res.error || "Xatolik");
-  }).catch(function(){ btn.disabled = false; showToast("Xatolik yuz berdi"); });
-}
-
-function openMuddatSheet(seria) {
-  var html = '<div class="sheet-handle"></div><h3 style="margin:0 0 14px;">Muddat So\'rash: ' + seria + '</h3>' +
-    '<div class="field"><label>Qo\'shimcha Soat (Max 24)</label><input type="number" id="mSoat" value="12"></div>' +
-    '<div class="field"><label>Sabab</label><input type="text" id="mSabab"></div>' +
-    '<button class="ios-btn ios-btn-warn" style="width:100%; padding:14px;" onclick="submitMuddat(\'' + seria + '\')">So\'rov Yuborish</button>';
-  document.getElementById('sheetContent').innerHTML = html;
-  document.getElementById('sheetModal').classList.add('active');
-}
-
-function submitMuddat(seria) {
-  var soat = document.getElementById('mSoat').value;
-  var sabab = document.getElementById('mSabab').value.trim();
-
-  apiRequest('post', {
-    action: 'sorov_yuborish', turi: 'muddat', seria: seria, login: currentUser.login,
-    ism: currentUser.ism, tuman: currentUser.tuman, soat: soat, sabab: sabab
-  }).then(function(res){
-    document.getElementById('sheetModal').classList.remove('active');
-    if (res.success) { showToast("So'rov adminga yuborildi"); refreshData(); }
-    else showToast(res.error || "Xatolik");
-  });
-}
-
-function processSorov(id, javob) {
-  apiRequest('post', { action: 'sorov_tasdiqlash', id: id, javob: javob }).then(function(res){
-    showToast("So'rov saqlandi");
-    refreshData();
-  });
-}
 </script>
 </body>
 </html>
