@@ -7,14 +7,14 @@
 <title>Kabel Ombor Tizimi</title>
 <style>
 :root{
-  --navy:#0f1e3d; --navy-2:#16294f; --navy-3:#1e3a5f;
-  --blue:#2563eb; --blue-dark:#1d4ed8; --blue-light:#eff6ff;
-  --bg:#f4f6fb; --card:#ffffff; --border:#e6e9f0; --text:#1f2937; --muted:#6b7280;
+  --navy:#101c35; --navy-2:#152743; --navy-3:#1b3560;
+  --blue:#3b6cf0; --blue-dark:#2d57d6; --blue-light:#eaf1ff;
+  --bg:#eef2f9; --card:#ffffff; --border:#e7ecf5; --text:#1c2537; --muted:#7c879b;
   --green:#22c55e; --yellow:#eab308; --orange:#f97316; --red:#ef4444;
-  --radius:14px; --shadow:0 2px 10px rgba(20,30,60,.06), 0 1px 2px rgba(20,30,60,.04);
+  --radius:16px; --shadow:0 6px 22px rgba(20,35,75,.06), 0 1px 3px rgba(20,35,75,.05);
 }
 *{box-sizing:border-box;}
-body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+body{margin:0;font-family:'Segoe UI',-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);letter-spacing:-.01em;}
 button{font-family:inherit;cursor:pointer;}
 input,select,textarea{font-family:inherit;}
 ::-webkit-scrollbar{width:8px;height:8px;} ::-webkit-scrollbar-thumb{background:#c7cede;border-radius:8px;}
@@ -25,84 +25,126 @@ input,select,textarea{font-family:inherit;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ---------- AUTH SCREENS ---------- */
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--navy-3));padding:20px;}
-.auth-card{background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
-.auth-logo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--navy-3));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
-.auth-title{text-align:center;font-size:20px;font-weight:700;margin:0 0 4px;}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 20%,#1b3560,#0d1730 65%);padding:20px;}
+.auth-card{background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 24px 70px rgba(0,0,0,.4);}
+.auth-logo{width:56px;height:56px;border-radius:15px;background:linear-gradient(135deg,var(--blue),var(--navy-3));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;}
+.auth-title{text-align:center;font-size:20px;font-weight:800;margin:0 0 4px;}
 .auth-sub{text-align:center;color:var(--muted);font-size:13px;margin:0 0 24px;}
 .field{margin-bottom:14px;}
-.field label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;transition:.15s;background:#fbfcfe;}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:11px;font-size:14px;outline:none;transition:.15s;background:#fbfcfe;}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);background:#fff;}
-.btn{border:none;border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:.15s;}
-.btn-primary{background:var(--blue);color:#fff;width:100%;}
-.btn-primary:hover{background:var(--blue-dark);}
-.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
-.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--blue);}
-.btn-danger{background:#fff;color:var(--red);border:1.5px solid var(--red);}
+.btn{border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:.15s;}
+.btn-primary{background:linear-gradient(100deg,var(--blue),var(--blue-dark));color:#fff;width:100%;box-shadow:0 6px 16px rgba(59,108,240,.28);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 9px 20px rgba(59,108,240,.34);}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid #cfdcf7;}
+.btn-outline:hover{background:var(--blue-light);}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid #fbd5d5;}
 .btn-ghost{background:transparent;color:var(--muted);}
-.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px;}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:9px;}
 .auth-error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:14px;display:none;}
 
 /* ---------- APP SHELL ---------- */
 #app-shell{display:none;min-height:100vh;}
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:230px;background:linear-gradient(180deg,var(--navy),var(--navy-2));color:#cfd8ef;padding:20px 14px;display:flex;flex-direction:column;z-index:50;transition:.2s;}
-.sidebar-logo{display:flex;align-items:center;gap:10px;padding:6px 8px 22px;color:#fff;font-weight:700;font-size:15px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;}
-.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:#c7d0e8;text-decoration:none;font-size:13.6px;font-weight:500;cursor:pointer;margin-bottom:3px;}
-.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
-.nav-item.active{background:var(--blue);color:#fff;}
-.nav-icon{width:18px;text-align:center;}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:250px;background:linear-gradient(175deg,#101c35 0%,#132444 55%,#193256 100%);color:#c7d0e8;padding:22px 15px;display:flex;flex-direction:column;z-index:50;transition:.2s;}
+.sidebar-logo{display:flex;align-items:center;gap:11px;padding:4px 6px 22px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sidebar-logo-icon{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#3b6cf0,#274ec2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(50,90,220,.4);}
+.sidebar-logo-text{line-height:1.25;}
+.sidebar-logo-text b{color:#fff;font-size:14.5px;display:block;font-weight:800;}
+.sidebar-logo-text span{color:#8b98b8;font-size:11px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10.5px 12px;border-radius:11px;color:#b7c2dd;text-decoration:none;font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:3px;transition:.15s;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.nav-item.active{background:linear-gradient(100deg,#3b6cf0,#2d57d6);color:#fff;box-shadow:0 6px 16px rgba(45,87,214,.35);}
+.nav-icon{width:19px;text-align:center;font-size:14.5px;}
 .sidebar-footer{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);}
-.main{margin-left:230px;min-height:100vh;display:flex;flex-direction:column;}
-.topbar{height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:30;}
-.topbar-title{font-size:17px;font-weight:700;}
-.topbar-right{display:flex;align-items:center;gap:10px;}
-.lang-toggle{display:flex;background:var(--bg);border-radius:8px;padding:3px;}
-.lang-btn{border:none;background:transparent;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);}
-.lang-btn.active{background:#fff;color:var(--blue);box-shadow:var(--shadow);}
-.user-chip{display:flex;align-items:center;gap:8px;background:var(--bg);padding:6px 12px 6px 6px;border-radius:20px;font-size:13px;font-weight:600;position:relative;cursor:pointer;}
-.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
-.user-menu{position:absolute;top:44px;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);min-width:170px;display:none;overflow:hidden;z-index:60;}
+.lang-row{display:flex;background:rgba(255,255,255,.06);border-radius:11px;padding:3px;margin-bottom:10px;}
+.lang-btn{flex:1;border:none;background:transparent;padding:7px 10px;border-radius:8px;font-size:11.5px;font-weight:700;color:#8b98b8;}
+.lang-btn.active{background:rgba(255,255,255,.14);color:#fff;}
+.profile-row{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:11px;cursor:pointer;position:relative;}
+.profile-row:hover{background:rgba(255,255,255,.06);}
+.profile-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b6cf0,#274ec2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.profile-text b{display:block;font-size:12.5px;color:#fff;font-weight:700;}
+.profile-text span{font-size:10.5px;color:#8b98b8;}
+.profile-menu{position:absolute;bottom:52px;left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.25);overflow:hidden;display:none;}
+.profile-menu.open{display:block;}
+.profile-menu button{width:100%;text-align:left;padding:11px 14px;border:none;background:none;font-size:12.5px;color:var(--text);font-weight:600;}
+.profile-menu button:hover{background:var(--bg);}
+
+.main{margin-left:250px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{padding:26px 32px 6px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.topbar-title{font-size:22px;font-weight:800;color:#141d33;letter-spacing:-.03em;}
+.topbar-sub{color:var(--muted);font-size:13px;margin-top:4px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-right-inner{display:flex;align-items:center;gap:12px;}
+.bell-btn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:var(--shadow);}
+.bell-dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid #fff;display:none;}
+.bell-dot.show{display:block;}
+.mobile-menu-btn{display:none;border:none;background:#fff;border:1px solid var(--border);width:38px;height:38px;border-radius:10px;font-size:16px;box-shadow:var(--shadow);}
+.user-chip{display:flex;align-items:center;gap:9px;background:#fff;padding:6px 14px 6px 6px;border-radius:24px;font-size:13px;font-weight:700;position:relative;cursor:pointer;border:1px solid var(--border);box-shadow:var(--shadow);}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--navy-3));color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;}
+.user-menu{position:absolute;top:48px;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);min-width:180px;display:none;overflow:hidden;z-index:60;}
 .user-menu.open{display:block;}
-.user-menu button{width:100%;text-align:left;padding:10px 14px;border:none;background:none;font-size:13px;color:var(--text);}
+.user-menu button{width:100%;text-align:left;padding:10px 14px;border:none;background:none;font-size:13px;color:var(--text);font-weight:600;}
 .user-menu button:hover{background:var(--bg);}
-#page-content{padding:22px 24px 60px;flex:1;}
+.topbar-datetime{font-size:11.5px;color:var(--muted);text-align:right;margin-top:6px;}
+
+#page-content{padding:16px 32px 56px;flex:1;max-width:1560px;width:100%;}
 .page{display:none;}
 .page.active{display:block;}
 
 /* ---------- CARDS / GRID ---------- */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
-.stat-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);}
-.stat-card .label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
-.stat-card .value{font-size:26px;font-weight:800;margin-top:6px;}
-.stat-card .icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:10px;}
-.section-card{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:18px;}
-.section-title{font-size:15px;font-weight:700;margin:0 0 14px;display:flex;align-items:center;justify-content:space-between;}
-.two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
-@media(max-width:900px){.two-col{grid-template-columns:1fr;}}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.stat-card .label{font-size:12.5px;color:var(--muted);font-weight:700;}
+.stat-card .value{font-size:25px;font-weight:800;margin-top:6px;letter-spacing:-.03em;}
+.stat-card .delta{font-size:11.5px;color:var(--muted);margin-top:5px;}
+.stat-card .delta.up{color:#16a34a;font-weight:700;}
+.stat-card .icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:11px;}
+.section-card{background:var(--card);border-radius:var(--radius);padding:19px 21px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:18px;}
+.section-title{font-size:14.5px;font-weight:800;margin:0 0 15px;display:flex;align-items:center;justify-content:space-between;color:#182238;}
+.section-title .link{font-size:12px;color:var(--blue);font-weight:700;cursor:pointer;}
+.dash-top-grid{display:grid;grid-template-columns:2fr 1.05fr;gap:18px;margin-bottom:18px;align-items:start;}
+.dash-chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;}
+@media(max-width:1150px){.dash-top-grid,.dash-chart-grid{grid-template-columns:1fr;} .stat-grid{grid-template-columns:repeat(2,1fr);}}
 
-.drum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
-.drum-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:.15s;position:relative;}
-.drum-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(20,30,60,.1);}
-.drum-id{font-weight:700;font-size:13.5px;}
-.drum-type{font-size:11.5px;color:var(--muted);margin-bottom:10px;}
-.ring-wrap{position:relative;width:112px;height:112px;border-radius:50%;margin:4px 0 10px;}
-.ring-center{position:absolute;inset:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fdfefe,#eef1f6 70%);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 5px rgba(20,30,60,.15),inset 0 -2px 4px rgba(255,255,255,.6);}
-.ring-percent{font-size:16px;font-weight:800;position:relative;z-index:2;}
-.drum-meters{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.drum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;}
+.drum-card{background:var(--card);border-radius:14px;padding:15px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:.15s;position:relative;}
+.drum-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(20,35,75,.11);}
+.drum-status-dot{position:absolute;top:13px;right:13px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.03);}
+.drum-id{font-weight:800;font-size:13px;}
+.drum-type{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;}
+.ring-wrap{position:relative;width:104px;height:104px;border-radius:50%;margin:2px 0 9px;}
+.ring-center{position:absolute;inset:9px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(20,35,75,.13);}
+.ring-percent-wrap{position:absolute;bottom:-3px;background:#fff;border-radius:20px;padding:2px 9px;box-shadow:0 3px 8px rgba(20,35,75,.16);border:1px solid var(--border);}
+.ring-percent{font-size:12.5px;font-weight:800;}
+.drum-meters-row{font-size:11px;color:var(--muted);margin-top:1px;line-height:1.65;}
+.drum-meters-row b{color:var(--text);font-weight:700;}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;margin-top:8px;}
 .badge-good{background:#dcfce7;color:#15803d;}
 .badge-medium{background:#fef9c3;color:#854d0e;}
 .badge-low{background:#ffedd5;color:#c2410c;}
 .badge-critical{background:#fee2e2;color:#b91c1c;}
+.dot-good{background:var(--green);} .dot-medium{background:var(--yellow);} .dot-low{background:var(--orange);} .dot-critical{background:var(--red);}
 
-.reel-svg{width:44px;height:44px;position:relative;z-index:1;}
+.reel-svg{width:42px;height:42px;position:relative;z-index:1;}
+
+.list-rows{display:flex;flex-direction:column;gap:2px;}
+.list-row{display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid #f0f2f7;cursor:default;}
+.list-row:last-child{border-bottom:none;}
+.list-row .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.list-row .rtext{flex:1;min-width:0;}
+.list-row .rtext b{display:block;font-size:12.8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-row .rtext span{font-size:11px;color:var(--muted);}
+.list-row .rval{font-size:12px;font-weight:800;color:var(--text);white-space:nowrap;}
+.list-row .chev{color:#c3ccdd;font-size:15px;}
 
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{text-align:left;padding:9px 10px;background:var(--bg);color:var(--muted);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;}
-td{padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+th{text-align:left;padding:9px 10px;background:#f7f9fc;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;}
+td{padding:10px;border-bottom:1px solid var(--border);white-space:nowrap;}
 tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#f9fafd;}
 .empty-state{text-align:center;color:var(--muted);padding:30px 10px;font-size:13.5px;}
 
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;justify-content:space-between;}
@@ -110,19 +152,23 @@ tr:last-child td{border-bottom:none;}
 .filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;}
 
 .usage-row{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px;}
-.usage-total{background:var(--blue-light);border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:14px;font-weight:700;color:var(--blue-dark);margin-top:8px;}
+.usage-total{background:var(--blue-light);border:1px solid #cfe0fb;border-radius:11px;padding:12px 14px;font-size:14px;font-weight:800;color:var(--blue-dark);margin-top:8px;}
+
+.range-toggle{display:flex;background:var(--bg);border-radius:9px;padding:3px;gap:2px;}
+.range-btn{border:none;background:transparent;padding:6px 11px;border-radius:7px;font-size:11.5px;font-weight:700;color:var(--muted);}
+.range-btn.active{background:#fff;color:var(--blue);box-shadow:0 2px 6px rgba(20,35,75,.1);}
 
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(10,15,30,.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
-.modal-box{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:24px;}
+.modal-box{background:#fff;border-radius:18px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:24px;box-shadow:0 24px 70px rgba(8,20,43,.3);}
 .modal-box.wide{max-width:720px;}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-.modal-head h3{margin:0;font-size:16.5px;}
+.modal-head h3{margin:0;font-size:16.5px;font-weight:800;}
 .close-x{border:none;background:var(--bg);width:30px;height:30px;border-radius:50%;font-size:15px;color:var(--muted);}
 
 /* Toast */
 #toast-root{position:fixed;bottom:20px;right:20px;z-index:400;display:flex;flex-direction:column;gap:8px;}
-.toast{padding:12px 16px;border-radius:10px;color:#fff;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);min-width:220px;animation:slideIn .2s ease;}
+.toast{padding:12px 16px;border-radius:11px;color:#fff;font-size:13.5px;font-weight:700;box-shadow:var(--shadow);min-width:220px;animation:slideIn .2s ease;}
 .toast-success{background:#16a34a;} .toast-error{background:#dc2626;} .toast-info{background:var(--navy-3);}
 @keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 
@@ -130,63 +176,23 @@ tr:last-child td{border-bottom:none;}
 .history-item .h-top{font-weight:700;}
 .history-item .h-meta{color:var(--muted);font-size:11.5px;margin-top:2px;}
 
+.donut-legend{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+.donut-legend-row{display:flex;align-items:center;gap:9px;font-size:12.5px;}
+.donut-legend-row .dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+.donut-legend-row b{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.donut-legend-row .pct{color:var(--muted);font-weight:700;width:38px;text-align:right;}
+.donut-legend-row .mtr{color:var(--muted);width:64px;text-align:right;}
+
 @media(max-width:800px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;}
   .usage-row{grid-template-columns:1fr;}
+  .topbar{padding:18px 16px 4px;}
+  #page-content{padding:12px 16px 40px;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .mobile-menu-btn{display:block;}
 }
-.mobile-menu-btn{display:none;border:none;background:var(--bg);width:36px;height:36px;border-radius:9px;font-size:16px;}
-@media(max-width:800px){.mobile-menu-btn{display:block;}}
-  
-
-/* ===== Professional dashboard refresh ===== */
-:root{--navy:#101d38;--navy-2:#152849;--navy-3:#1b3761;--blue:#3268e8;--blue-dark:#2456cb;--bg:#f3f6fb;--border:#e8edf5;--radius:17px;--shadow:0 8px 28px rgba(18,38,75,.055),0 1px 3px rgba(18,38,75,.04)}
-body{background:#f3f6fb;color:#18243b;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;letter-spacing:-.01em}
-.sidebar{width:258px;padding:25px 16px;background:linear-gradient(165deg,#101c35 0%,#142747 60%,#1b3760 100%);box-shadow:8px 0 30px rgba(12,28,57,.08)}
-.sidebar-logo{font-size:16px;letter-spacing:.01em;padding:8px 10px 25px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.12)}
-.sidebar-logo:first-letter{color:#73a1ff}
-.nav-item{padding:12px 14px;border-radius:11px;font-size:13.5px;margin-bottom:6px;transition:background .18s,transform .18s}
-.nav-item:hover{background:rgba(255,255,255,.095);transform:translateX(2px)}
-.nav-item.active{background:linear-gradient(100deg,#3978f6,#2e63dd);box-shadow:0 7px 18px rgba(35,93,220,.27);color:#fff}
-.nav-icon{width:21px;font-size:15px}
-.main{margin-left:258px}
-.topbar{height:76px;padding:0 34px;background:rgba(255,255,255,.94);border-bottom:1px solid #e9eef6;box-shadow:0 3px 16px rgba(24,44,80,.025);backdrop-filter:blur(12px)}
-.topbar-title{font-size:18px;font-weight:750;color:#17243d}
-#page-content{padding:30px 34px 56px;max-width:1680px;width:100%;margin:0 auto}
-.dashboard-welcome{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:27px 30px;margin-bottom:23px;border-radius:20px;background:linear-gradient(110deg,#fff 0%,#f8faff 60%,#edf4ff 100%);border:1px solid #e3ebf8;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.dashboard-welcome:after{content:"";position:absolute;width:230px;height:230px;border:34px solid rgba(65,119,230,.055);border-radius:50%;right:24%;top:-150px;pointer-events:none}
-.welcome-kicker{font-size:10px;font-weight:800;letter-spacing:.14em;color:#5275b7;margin-bottom:10px}
-.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#27bd7c;margin-left:5px;box-shadow:0 0 0 4px rgba(39,189,124,.12);vertical-align:1px}
-.dashboard-welcome h1{font-size:25px;line-height:1.2;margin:0 0 7px;color:#14223b;font-weight:800;letter-spacing:-.04em}
-.dashboard-welcome p{margin:0;color:#748198;font-size:13px}
-.welcome-actions{display:flex;gap:10px;align-items:center;position:relative;z-index:1;flex-wrap:wrap}
-.quick-action{width:auto!important;min-height:42px;padding:11px 16px;border-radius:11px;font-size:12.5px;box-shadow:none}
-.quick-action span{font-size:17px;line-height:10px}
-.stat-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin-bottom:22px}
-.stat-card{padding:20px 21px;border:1px solid #e8edf5;border-radius:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:135px}
-.stat-card .icon{width:40px;height:40px;border-radius:12px;margin-bottom:13px}
-.stat-card .label{font-size:10.5px;letter-spacing:.055em;color:#7a879c}
-.stat-card .value{font-size:27px;letter-spacing:-.04em;color:#17243c;margin-top:7px}
-.two-col{gap:19px;margin-bottom:19px}
-.section-card{padding:22px 23px;border-radius:16px;border:1px solid #e8edf5;box-shadow:var(--shadow);margin-bottom:0;min-width:0}
-.section-title{font-size:14px;font-weight:750;color:#1b2942;margin-bottom:17px}
-.section-title:after{content:"";display:block}
-.table-wrap{border-radius:10px}
-table{font-size:12.5px}
-th{background:#f6f8fc;color:#7b879a;font-size:10px;letter-spacing:.06em;padding:12px 13px;border-bottom:1px solid #e9eef5}
-td{padding:13px;border-bottom:1px solid #eef1f6;color:#35435b}
-tbody tr:hover{background:#f8faff}
-.btn{border-radius:10px;font-weight:700;transition:transform .15s,box-shadow .15s,background .15s}
-.btn-primary{background:linear-gradient(100deg,#3978f6,#2e63dd);box-shadow:0 5px 13px rgba(48,103,229,.18)}
-.btn-primary:hover{background:linear-gradient(100deg,#2e6eea,#2456cb);transform:translateY(-1px);box-shadow:0 8px 17px rgba(48,103,229,.24)}
-.btn-outline{border:1px solid #d6e1f4;color:#315fc1;background:#fff}
-.btn-outline:hover{background:#f2f6ff;border-color:#b9cef4}
-.field input,.field select,.field textarea{border-radius:10px;border-color:#dfe6f0;padding:11px 13px}
-.modal-box{border-radius:18px;box-shadow:0 24px 70px rgba(8,20,43,.25)}
-@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#page-content{padding:24px}}
-@media(max-width:700px){.sidebar{width:260px}.main{margin-left:0}.topbar{height:64px;padding:0 16px}#page-content{padding:18px 14px 38px}.dashboard-welcome{align-items:flex-start;flex-direction:column;padding:22px 20px}.dashboard-welcome h1{font-size:22px}.welcome-actions{width:100%}.quick-action{flex:1}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.stat-card{padding:15px;min-height:120px}.stat-card .value{font-size:23px}.section-card{padding:17px 15px}.two-col{grid-template-columns:1fr;gap:13px}}
-@media(max-width:390px){.stat-grid{grid-template-columns:1fr}.welcome-actions{flex-direction:column;align-items:stretch}}
 </style>
 </head>
 <body>
@@ -223,35 +229,52 @@ tbody tr:hover{background:#f8faff}
 <!-- APP SHELL -->
 <div id="app-shell">
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">🔌 <span>Kabel Ombor</span></div>
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🧵</div>
+      <div class="sidebar-logo-text"><b>Ombor</b><span>Kabel hisobi</span></div>
+    </div>
     <div id="nav-list"></div>
     <div class="sidebar-footer">
-      <button class="nav-item" onclick="doLogout()" style="width:100%;border:none;background:none;">
-        <span class="nav-icon">🚪</span><span data-t="logout">Chiqish</span>
-      </button>
+      <div class="lang-row">
+        <button class="lang-btn" id="lang-uz" onclick="setLang('uz')">O'zbek</button>
+        <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">Русский</button>
+      </div>
+      <div class="profile-row" onclick="document.getElementById('sidebar-profile-menu').classList.toggle('open')">
+        <div class="profile-avatar" id="sb-avatar">?</div>
+        <div class="profile-text"><b id="sb-name">—</b><span id="sb-role">—</span></div>
+        <div class="profile-menu" id="sidebar-profile-menu">
+          <button onclick="openChangePasswordModal()">🔑 <span data-t="changePassword">Parolni o'zgartirish</span></button>
+          <button onclick="doLogout()">🚪 <span data-t="logout">Chiqish</span></button>
+        </div>
+      </div>
     </div>
   </aside>
 
   <div class="main">
     <div class="topbar">
-      <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
         <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-        <div class="topbar-title" id="page-title-text">—</div>
+        <div>
+          <div class="topbar-title" id="page-title-text">—</div>
+          <div class="topbar-sub" id="page-subtitle-text"></div>
+        </div>
       </div>
       <div class="topbar-right">
-        <div class="lang-toggle">
-          <button class="lang-btn" id="lang-uz" onclick="setLang('uz')">UZ</button>
-          <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">RU</button>
-        </div>
-        <div class="user-chip" onclick="document.getElementById('user-menu').classList.toggle('open')">
-          <div class="user-avatar" id="user-avatar">?</div>
-          <span id="user-chip-name">—</span>
-          <div class="user-menu" id="user-menu">
-            <button onclick="openChangePasswordModal()">🔑 <span data-t="changePassword">Parolni o'zgartirish</span></button>
-            <button onclick="doLogout()">🚪 <span data-t="logout">Chiqish</span></button>
+        <div class="topbar-right-inner">
+          <button class="bell-btn" onclick="navigate('drums')">🔔<span class="bell-dot" id="bell-dot"></span></button>
+          <div class="user-chip" onclick="document.getElementById('user-menu').classList.toggle('open')">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <span id="user-chip-name">—</span>
+            <div class="user-menu" id="user-menu">
+              <button onclick="openChangePasswordModal()">🔑 <span data-t="changePassword">Parolni o'zgartirish</span></button>
+              <button onclick="doLogout()">🚪 <span data-t="logout">Chiqish</span></button>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div style="text-align:right;padding:0 32px;">
+      <div class="topbar-datetime" id="topbar-datetime">—</div>
     </div>
 
     <main id="page-content">
@@ -269,12 +292,11 @@ tbody tr:hover{background:#f8faff}
 <div id="modal-root"></div>
 <div id="toast-root"></div>
 
-
 <script>
 /* ============================================================
    HOLAT (STATE) VA TARJIMALAR
    ============================================================ */
-const STATE = {
+var STATE = {
   token: localStorage.getItem('kabelombor_token') || null,
   user: null,
   lang: localStorage.getItem('kabelombor_lang') || 'uz',
@@ -282,48 +304,72 @@ const STATE = {
   drums: [],
   cableTypes: [],
   usageRows: [{ barabanId: '', metr: '' }],
-  reportFilters: {}
+  reportFilters: {},
+  chartRangeDays: 30,
+  lowStockCount: 0
 };
 
-const ROLES = { ADMIN: 'Admin', WAREHOUSE: 'Omborchi', VIEWER: 'Kuzatuvchi' };
+var ROLES = { ADMIN: 'Admin', WAREHOUSE: 'Omborchi', VIEWER: 'Kuzatuvchi' };
 
-const T = {
+var ROLE_LABELS = {
+  uz: { Admin: 'Administrator', Omborchi: 'Omborchi', Kuzatuvchi: 'Kuzatuvchi' },
+  ru: { Admin: 'Администратор', Omborchi: 'Складовщик', Kuzatuvchi: 'Наблюдатель' }
+};
+
+var T = {
   uz: {
     home:'Bosh sahifa', drums:'Barabanlar', cableTypes:'Kabel turlari', usageEntry:'Sarf hisobi',
     reports:'Hisobotlar', users:'Foydalanuvchilar', settings:'Sozlamalar', logout:'Chiqish',
     changePassword:"Parolni o'zgartirish",
-    totalRemaining:'Jami qolgan kabel', totalDrums:'Jami barabanlar', activeCableTypes:'Faol kabel turlari',
-    lowStock:'Kam qolgan barabanlar', recentUsage:'Oxirgi sarflar', dailyUsage:'Kunlik sarf (14 kun)',
-    usageByType:'Kabel turi bo\'yicha sarf', addDrum:'Baraban qo\'shish', recordUsage:'Sarf yozish',
+    subDashboard:'Ombordagi kabel qoldiqlari va so\u2019nggi ishlar',
+    subDrums:'Barcha kabel barabanlarining joriy holati',
+    subCableTypes:'Omborda ishlatiladigan kabel turlari ro\u2019yxati',
+    subUsage:'Yangi kabel sarfini qayd eting',
+    subReports:'Filtrlash va Excel eksport',
+    subUsers:'Tizim foydalanuvchilarini boshqarish',
+    subSettings:'Ombor va Telegram sozlamalari',
+    totalRemaining:'Jami kabel qoldig\u2019i', totalDrums:'Barabanlar soni', activeCableTypes:'Kabel turlari',
+    lowStock:'Kam qoldiq barabanlar', recentUsage:'So\u2019nggi kabel tortish ishlari', dailyUsage:'Sarf va qoldiq grafigi',
+    usageByType:'Kabel turlari bo\u2019yicha sarf', addDrum:'Baraban qo\u2019shish', recordUsage:'Sarf yozish',
     save:'Saqlash', cancel:'Bekor qilish', close:'Yopish', edit:'Tahrirlash', details:'Batafsil',
-    searchPlaceholder:'Qidirish...', noData:'Ma\'lumot topilmadi', loading:'Yuklanmoqda...',
+    searchPlaceholder:'Qidirish...', noData:'Ma\u2019lumot topilmadi', loading:'Yuklanmoqda...',
     cableType:'Kabel turi', newCableType:'Yangi kabel turi', cableName:'Kabel nomi', description:'Tavsif',
-    drumId:'Baraban ID', drumNumber:'Baraban raqami', initialMeters:'Boshlang\'ich metr', remainingMeters:'Qolgan metr',
+    drumId:'Baraban ID', drumNumber:'Baraban raqami', initialMeters:'Boshlang\u2019ich metr', remainingMeters:'Qolgan metr',
     receivedDate:'Qabul sanasi', note:'Izoh', status:'Holat', percent:'Foiz', usedMeters:'Ishlatilgan',
-    workDate:'Ish sanasi', projectName:'Loyiha/ish nomi', employees:'Mas\'ul xodimlar (vergul bilan)',
-    address:'Manzil', latitude:'Kenglik (lat)', longitude:'Uzunlik (lng)', addDrumRow:'Baraban qatorini qo\'shish',
+    workDate:'Ish sanasi', projectName:'Loyiha/ish nomi', employees:'Mas\u2019ul xodimlar (vergul bilan)',
+    address:'Manzil', latitude:'Kenglik (lat)', longitude:'Uzunlik (lng)', addDrumRow:'Baraban qatorini qo\u2019shish',
     totalToUse:'Jami ishlatiladigan', submitUsage:'Sarfni saqlash', selectDrum:'Barabanni tanlang',
     meters:'Metr', from:'Dan', to:'Gacha', employee:'Xodim', project:'Loyiha', exportExcel:'Excel yuklash',
-    filter:'Filtrlash', reset:'Tozalash', addUser:'Foydalanuvchi qo\'shish', login:'Login', password:'Parol',
+    filter:'Filtrlash', reset:'Tozalash', addUser:'Foydalanuvchi qo\u2019shish', login:'Login', password:'Parol',
     role:'Rol', active:'Faol', inactive:'Faolsiz', createdAt:'Yaratilgan', lastLogin:'Oxirgi kirish',
     lowStockThreshold:'Kam qolish chegarasi (%)', telegramTest:'Telegram ulanishini tekshirish',
     telegramChatId:'Telegram Chat ID', updateChatId:'Yangilash', editHistory:'Tahrirlar tarixi',
     usageHistory:'Sarf tarixi', correctionReason:'Tuzatish sababi', newRemaining:'Yangi qolgan metr',
     saveCorrection:'Tuzatishni saqlash', good:'Yaxshi', medium:"O'rtacha", low:'Kam', critical:'Kritik',
-    active_:'Faol', finished:'Tugagan', by:'kim:', reason:'Sabab', old:'Eski', newV:'Yangi',
+    reason:'Sabab', old:'Eski', newV:'Yangi', by:'kim:',
     changePasswordTitle:"Parolni o'zgartirish", oldPassword:'Eski parol', newPassword:'Yangi parol',
-    telegramStatus:'Telegram holati', retry:'Qayta yuborish', deactivate:'Faolsizlantirish', activate:'Faollashtirish',
-    resetPassword:'Parolni tiklash', changeRole:"Rolni o'zgartirish",
+    telegramStatus:'Telegram holati', deactivate:'Faolsizlantirish', activate:'Faollashtirish',
+    resetPassword:'Parolni tiklash',
     dashTitle:'Bosh sahifa', drumsTitle:'Barabanlar', cableTypesTitle:'Kabel turlari', usageTitle:'Sarf hisobi',
     reportsTitle:'Hisobotlar', usersTitle:'Foydalanuvchilar', settingsTitle:'Sozlamalar',
-    quickAddDrum:'Yangi baraban', quickUsage:'Sarf kiritish', all:'Barchasi'
+    all:'Barchasi', viewAll:'Barchasini ko\u2019rish', activeOf:'faol', ofTotal:'jami turdan',
+    capacity:'Jami sig\u2019im', belowThreshold:'chegaradan past', drumsWord:'baraban',
+    dailySpend:'Kunlik sarf (m)', cumulativeSpend:'Jami sarf (kumulyativ)',
+    range7:'7 kun', range30:'30 kun', range90:'90 kun'
   },
   ru: {
     home:'Главная', drums:'Барабаны', cableTypes:'Типы кабеля', usageEntry:'Расход кабеля',
     reports:'Отчёты', users:'Пользователи', settings:'Настройки', logout:'Выход',
     changePassword:'Изменить пароль',
-    totalRemaining:'Всего осталось кабеля', totalDrums:'Всего барабанов', activeCableTypes:'Активных типов кабеля',
-    lowStock:'Барабаны с малым остатком', recentUsage:'Последние расходы', dailyUsage:'Расход по дням (14 дней)',
+    subDashboard:'Остатки кабеля и последние работы на складе',
+    subDrums:'Текущее состояние всех барабанов кабеля',
+    subCableTypes:'Список типов кабеля, используемых на складе',
+    subUsage:'Записать новый расход кабеля',
+    subReports:'Фильтрация и экспорт в Excel',
+    subUsers:'Управление пользователями системы',
+    subSettings:'Настройки склада и Telegram',
+    totalRemaining:'Всего осталось кабеля', totalDrums:'Барабанов', activeCableTypes:'Типов кабеля',
+    lowStock:'Барабаны с малым остатком', recentUsage:'Последние работы по расходу', dailyUsage:'Расход и остаток',
     usageByType:'Расход по типу кабеля', addDrum:'Добавить барабан', recordUsage:'Записать расход',
     save:'Сохранить', cancel:'Отмена', close:'Закрыть', edit:'Изменить', details:'Подробнее',
     searchPlaceholder:'Поиск...', noData:'Данные не найдены', loading:'Загрузка...',
@@ -340,28 +386,28 @@ const T = {
     telegramChatId:'Telegram Chat ID', updateChatId:'Обновить', editHistory:'История изменений',
     usageHistory:'История расхода', correctionReason:'Причина исправления', newRemaining:'Новый остаток метров',
     saveCorrection:'Сохранить исправление', good:'Хорошо', medium:'Средне', low:'Мало', critical:'Критично',
-    active_:'Активен', finished:'Завершён', by:'кто:', reason:'Причина', old:'Старое', newV:'Новое',
+    reason:'Причина', old:'Старое', newV:'Новое', by:'кто:',
     changePasswordTitle:'Изменить пароль', oldPassword:'Старый пароль', newPassword:'Новый пароль',
-    telegramStatus:'Статус Telegram', retry:'Повторить', deactivate:'Деактивировать', activate:'Активировать',
-    resetPassword:'Сбросить пароль', changeRole:'Изменить роль',
+    telegramStatus:'Статус Telegram', deactivate:'Деактивировать', activate:'Активировать',
+    resetPassword:'Сбросить пароль',
     dashTitle:'Главная', drumsTitle:'Барабаны', cableTypesTitle:'Типы кабеля', usageTitle:'Расход кабеля',
     reportsTitle:'Отчёты', usersTitle:'Пользователи', settingsTitle:'Настройки',
-    quickAddDrum:'Новый барабан', quickUsage:'Записать расход', all:'Все'
+    all:'Все', viewAll:'Показать все', activeOf:'активны', ofTotal:'из всех типов',
+    capacity:'Общая ёмкость', belowThreshold:'ниже порога', drumsWord:'барабанов',
+    dailySpend:'Расход по дням (м)', cumulativeSpend:'Общий расход (накопительно)',
+    range7:'7 дн', range30:'30 дн', range90:'90 дн'
   }
 };
 function t(key){ return (T[STATE.lang] && T[STATE.lang][key]) || key; }
 
 /* ============================================================
-   SERVER API (fetch orqali Apps Script Web App'ga so'rov) — Promise
+   SERVER API (fetch orqali Apps Script Web App'ga so'rov)
    ============================================================ */
-// Bu yerga Apps Script Web App deploy qilingandan keyingi /exec havolasini qo'ying
-const API_URL = 'https://script.google.com/macros/s/AKfycbx8_JvMuVR2PwGjaAbWZJzFarK_kxpZQQ28bGLwzR-Kr8OyztTb9mE0-pWvJEBEMCE8/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbx8_JvMuVR2PwGjaAbWZJzFarK_kxpZQQ28bGLwzR-Kr8OyztTb9mE0-pWvJEBEMCE8/exec';
 
 function call(fnName, args){
   return fetch(API_URL, {
     method: 'POST',
-    // MUHIM: Content-Type ni 'application/json' qilib QO'YMANG — aks holda
-    // brauzer CORS preflight (OPTIONS) so'rov yuboradi va Apps Script uni tushunmaydi.
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ fn: fnName, args: args || [] })
   })
@@ -370,16 +416,16 @@ function call(fnName, args){
     return res.json();
   })
   .then(function(data){
-    if (!data.success) throw new Error(data.error || "Noma'lum xatolik");
+    if (!data.success) throw new Error(data.error || 'Nomalum xatolik');
     return data.result;
   });
 }
 function authCall(fnName, args){
   args = args || [];
   return call(fnName, [STATE.token].concat(args)).catch(function(err){
-    const msg = (err && err.message) || String(err);
+    var msg = (err && err.message) || String(err);
     if (msg.indexOf('SESSIYA_TUGAGAN') !== -1) {
-      toast(t('loading') === 'Загрузка...' ? 'Сессия истекла, войдите снова' : 'Sessiya tugagan, qaytadan kiring', 'error');
+      toast(STATE.lang === 'ru' ? 'Сессия истекла, войдите снова' : 'Sessiya tugagan, qaytadan kiring', 'error');
       hardLogout();
       throw err;
     }
@@ -391,15 +437,15 @@ function authCall(fnName, args){
    TOAST
    ============================================================ */
 function toast(msg, type){
-  const root = document.getElementById('toast-root');
-  const el = document.createElement('div');
+  var root = document.getElementById('toast-root');
+  var el = document.createElement('div');
   el.className = 'toast toast-' + (type || 'info');
   el.textContent = msg;
   root.appendChild(el);
   setTimeout(function(){ el.remove(); }, 4200);
 }
 function showErr(elId, err){
-  const box = document.getElementById(elId);
+  var box = document.getElementById(elId);
   box.textContent = (err && err.message) ? err.message : String(err);
   box.style.display = 'block';
 }
@@ -441,12 +487,12 @@ function checkFirstRun(){
 }
 
 function doFirstAdminSetup(){
-  const login = document.getElementById('setup-login').value.trim();
-  const p1 = document.getElementById('setup-password').value;
-  const p2 = document.getElementById('setup-password2').value;
+  var login = document.getElementById('setup-login').value.trim();
+  var p1 = document.getElementById('setup-password').value;
+  var p2 = document.getElementById('setup-password2').value;
   document.getElementById('setup-error').style.display = 'none';
-  if (p1 !== p2) { showErr('setup-error', {message:"Parollar mos emas."}); return; }
-  const btn = document.getElementById('setup-submit-btn'); btn.disabled = true;
+  if (p1 !== p2) { showErr('setup-error', {message:'Parollar mos emas.'}); return; }
+  var btn = document.getElementById('setup-submit-btn'); btn.disabled = true;
   call('createFirstAdmin', [login, p1]).then(function(){
     toast('Admin yaratildi. Endi kiring.', 'success');
     document.getElementById('setup-screen').style.display = 'none';
@@ -456,10 +502,10 @@ function doFirstAdminSetup(){
 }
 
 function doLogin(){
-  const login = document.getElementById('login-login').value.trim();
-  const pass = document.getElementById('login-password').value;
+  var login = document.getElementById('login-login').value.trim();
+  var pass = document.getElementById('login-password').value;
   document.getElementById('login-error').style.display = 'none';
-  const btn = document.getElementById('login-submit-btn'); btn.disabled = true;
+  var btn = document.getElementById('login-submit-btn'); btn.disabled = true;
   call('login', [login, pass]).then(function(res){
     STATE.token = res.token;
     STATE.user = res.user;
@@ -488,29 +534,48 @@ function enterApp(){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
 
+  var initials = STATE.user.login.slice(0,2).toUpperCase();
   document.getElementById('user-chip-name').textContent = STATE.user.login;
-  document.getElementById('user-avatar').textContent = STATE.user.login.slice(0,2).toUpperCase();
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('sb-avatar').textContent = initials;
+  document.getElementById('sb-name').textContent = STATE.user.login;
+  var roleLabels = ROLE_LABELS[STATE.lang] || ROLE_LABELS.uz;
+  document.getElementById('sb-role').textContent = roleLabels[STATE.user.role] || STATE.user.role;
 
   buildNav();
   setLang(STATE.lang, true);
   navigate('dashboard');
+  startClock();
+}
+
+function startClock(){
+  function tick(){
+    var d = new Date();
+    var pad = function(n){ return n < 10 ? '0' + n : n; };
+    var dateStr = pad(d.getDate()) + '.' + pad(d.getMonth()+1) + '.' + d.getFullYear();
+    var timeStr = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    var el = document.getElementById('topbar-datetime');
+    if (el) el.textContent = dateStr + '  ' + timeStr;
+  }
+  tick();
+  setInterval(tick, 30000);
 }
 
 function buildNav(){
-  const items = [
-    {key:'dashboard', icon:'🏠', label:'home', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
-    {key:'drums', icon:'🧵', label:'drums', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
-    {key:'cabletypes', icon:'🔌', label:'cableTypes', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
-    {key:'usage', icon:'📝', label:'usageEntry', roles:[ROLES.ADMIN,ROLES.WAREHOUSE]},
-    {key:'reports', icon:'📊', label:'reports', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
-    {key:'users', icon:'👥', label:'users', roles:[ROLES.ADMIN]},
-    {key:'settings', icon:'⚙️', label:'settings', roles:[ROLES.ADMIN]}
+  var items = [
+    {key:'dashboard', icon:'\ud83c\udfe0', label:'home', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'drums', icon:'\ud83e\uddf5', label:'drums', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'cabletypes', icon:'\ud83d\udd0c', label:'cableTypes', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'usage', icon:'\ud83d\udcdd', label:'usageEntry', roles:[ROLES.ADMIN,ROLES.WAREHOUSE]},
+    {key:'reports', icon:'\ud83d\udcca', label:'reports', roles:[ROLES.ADMIN,ROLES.WAREHOUSE,ROLES.VIEWER]},
+    {key:'users', icon:'\ud83d\udc65', label:'users', roles:[ROLES.ADMIN]},
+    {key:'settings', icon:'\u2699\ufe0f', label:'settings', roles:[ROLES.ADMIN]}
   ];
-  const nav = document.getElementById('nav-list');
+  var nav = document.getElementById('nav-list');
   nav.innerHTML = '';
   items.forEach(function(it){
     if (it.roles.indexOf(STATE.user.role) === -1) return;
-    const a = document.createElement('div');
+    var a = document.createElement('div');
     a.className = 'nav-item' + (STATE.page === it.key ? ' active' : '');
     a.id = 'nav-' + it.key;
     a.innerHTML = '<span class="nav-icon">' + it.icon + '</span><span data-t="' + it.label + '">' + t(it.label) + '</span>';
@@ -527,66 +592,98 @@ function setLang(lang, silent){
   document.querySelectorAll('[data-t]').forEach(function(el){
     el.textContent = t(el.getAttribute('data-t'));
   });
+  if (STATE.user) {
+    var roleLabels = ROLE_LABELS[STATE.lang] || ROLE_LABELS.uz;
+    var roleEl = document.getElementById('sb-role');
+    if (roleEl) roleEl.textContent = roleLabels[STATE.user.role] || STATE.user.role;
+  }
   if (!silent) renderCurrentPage();
 }
+
+var PAGE_SUBTITLES = {
+  dashboard:'subDashboard', drums:'subDrums', cabletypes:'subCableTypes', usage:'subUsage',
+  reports:'subReports', users:'subUsers', settings:'subSettings'
+};
+var PAGE_TITLES = {
+  dashboard:'dashTitle', drums:'drumsTitle', cabletypes:'cableTypesTitle', usage:'usageTitle',
+  reports:'reportsTitle', users:'usersTitle', settings:'settingsTitle'
+};
 
 function navigate(page){
   STATE.page = page;
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
-  const navEl = document.getElementById('nav-' + page);
+  var navEl = document.getElementById('nav-' + page);
   if (navEl) navEl.classList.add('active');
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-' + page).classList.add('active');
 
-  const titles = { dashboard:'dashTitle', drums:'drumsTitle', cabletypes:'cableTypesTitle', usage:'usageTitle',
-    reports:'reportsTitle', users:'usersTitle', settings:'settingsTitle' };
-  document.getElementById('page-title-text').textContent = t(titles[page]);
+  document.getElementById('page-title-text').textContent = t(PAGE_TITLES[page]);
+  document.getElementById('page-subtitle-text').textContent = t(PAGE_SUBTITLES[page]);
 
   renderCurrentPage();
 }
 
 function renderCurrentPage(){
-  const fns = { dashboard:renderDashboard, drums:renderDrumsPage, cabletypes:renderCableTypesPage,
+  var fns = { dashboard:renderDashboard, drums:renderDrumsPage, cabletypes:renderCableTypesPage,
     usage:renderUsagePage, reports:renderReportsPage, users:renderUsersPage, settings:renderSettingsPage };
   if (fns[STATE.page]) fns[STATE.page]();
 }
 
 /* ============================================================
-   YORDAMCHI: DRUM RING + KARTA HTML
+   YORDAMCHI: RANGLAR, REEL SVG, DRUM KARTA
    ============================================================ */
+var WIRE_PALETTE = ['#3b82f6', '#64748b', '#111827', '#e5e7eb', '#ef4444', '#22c55e', '#a855f7', '#f59e0b'];
+function wireColorForType(name){
+  var s = String(name || '');
+  var sum = 0;
+  for (var i = 0; i < s.length; i++) sum += s.charCodeAt(i);
+  return WIRE_PALETTE[sum % WIRE_PALETTE.length];
+}
 function levelColor(level){
   return { good:'var(--green)', medium:'var(--yellow)', low:'var(--orange)', critical:'var(--red)' }[level] || 'var(--green)';
+}
+function levelDotClass(level){
+  return 'dot-' + (level || 'good');
 }
 function levelLabel(level){
   return { good:t('good'), medium:t('medium'), low:t('low'), critical:t('critical') }[level] || '';
 }
-function reelSvg(){
+function reelSvg(wireColor){
+  wireColor = wireColor || '#3b82f6';
   return '<svg class="reel-svg" viewBox="0 0 100 100">' +
-    '<defs><radialGradient id="reelGrad" cx="35%" cy="30%" r="75%">' +
-    '<stop offset="0%" stop-color="#9fb3d1"/>' +
-    '<stop offset="55%" stop-color="#5c7aa8"/><stop offset="100%" stop-color="#2c3f5e"/></radialGradient></defs>' +
-    '<circle cx="50" cy="50" r="46" fill="url(#reelGrad)"/>' +
-    '<circle cx="50" cy="50" r="46" fill="none" stroke="#1e3a5f" stroke-width="3"/>' +
-    '<circle cx="50" cy="50" r="30" fill="#e9edf5" stroke="#c3ccdd" stroke-width="2"/>' +
-    '<circle cx="50" cy="50" r="9" fill="#1e3a5f"/>' +
-    '<g stroke="#c3ccdd" stroke-width="2">' +
-    '<line x1="50" y1="20" x2="50" y2="35"/><line x1="50" y1="65" x2="50" y2="80"/>' +
-    '<line x1="20" y1="50" x2="35" y2="50"/><line x1="65" y1="50" x2="80" y2="50"/>' +
-    '</g></svg>';
+    '<defs>' +
+      '<radialGradient id="flangeGrad" cx="35%" cy="30%" r="75%">' +
+        '<stop offset="0%" stop-color="#f0d9b5"/><stop offset="60%" stop-color="#d9a066"/><stop offset="100%" stop-color="#b5794a"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="wireGrad" cx="35%" cy="30%" r="75%">' +
+        '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="100%" stop-color="' + wireColor + '" stop-opacity="0"/>' +
+      '</radialGradient>' +
+    '</defs>' +
+    '<circle cx="50" cy="50" r="44" fill="url(#flangeGrad)" stroke="#a9713f" stroke-width="2"/>' +
+    '<circle cx="50" cy="50" r="30" fill="' + wireColor + '"/>' +
+    '<circle cx="50" cy="50" r="30" fill="url(#wireGrad)"/>' +
+    '<g stroke="rgba(0,0,0,.14)" stroke-width="1.4" fill="none">' +
+      '<circle cx="50" cy="50" r="24"/><circle cx="50" cy="50" r="18"/><circle cx="50" cy="50" r="12"/>' +
+    '</g>' +
+    '<circle cx="50" cy="50" r="7" fill="#22314e"/>' +
+    '<circle cx="50" cy="18" r="3" fill="#a9713f"/><circle cx="50" cy="82" r="3" fill="#a9713f"/>' +
+    '<circle cx="18" cy="50" r="3" fill="#a9713f"/><circle cx="82" cy="50" r="3" fill="#a9713f"/>' +
+  '</svg>';
 }
 function drumCardHtml(d){
-  const color = levelColor(d.level);
-  const ringStyle = 'background:conic-gradient(' + color + ' ' + Math.max(d.percent,0) + '%, #e5e9f1 0);';
+  var color = levelColor(d.level);
+  var wire = wireColorForType(d.Kabel_nomi);
+  var ringStyle = 'background:conic-gradient(' + color + ' ' + Math.max(d.percent,0) + '%, #e9edf5 0);';
   return '<div class="drum-card" onclick="openDrumDetail(\'' + d.Baraban_ID + '\')">' +
+    '<span class="drum-status-dot ' + levelDotClass(d.level) + '"></span>' +
     '<div class="drum-id">' + d.Baraban_ID + '</div>' +
-    '<div class="drum-type">' + escapeHtml(d.Kabel_nomi) + (d.Baraban_raqami ? ' · #' + escapeHtml(d.Baraban_raqami) : '') + '</div>' +
+    '<div class="drum-type">' + escapeHtml(d.Kabel_nomi) + (d.Baraban_raqami ? ' \u00b7 #' + escapeHtml(d.Baraban_raqami) : '') + '</div>' +
     '<div class="ring-wrap" style="' + ringStyle + '">' +
-      '<div class="ring-center">' + reelSvg() +
-        '<div style="position:absolute;bottom:-2px;background:#fff;border-radius:8px;padding:1px 6px;box-shadow:var(--shadow);">' +
-          '<span class="ring-percent" style="font-size:12px;">' + d.percent + '%</span></div>' +
-      '</div></div>' +
-    '<div class="drum-meters">' + d.Qolgan_metr + ' / ' + d.Boshlangich_metr + ' m</div>' +
-    '<span class="badge badge-' + d.level + '">' + levelLabel(d.level) + '</span>' +
+      '<div class="ring-center">' + reelSvg(wire) + '</div>' +
+      '<div class="ring-percent-wrap"><span class="ring-percent">' + d.percent + '%</span></div>' +
+    '</div>' +
+    '<div class="drum-meters-row">' + t('remainingMeters') + ': <b>' + d.Qolgan_metr + ' m</b></div>' +
+    '<div class="drum-meters-row">' + t('initialMeters') + ': <b>' + d.Boshlangich_metr + ' m</b></div>' +
   '</div>';
 }
 function escapeHtml(s){
@@ -594,12 +691,12 @@ function escapeHtml(s){
 }
 function fmtDate(v){
   if (!v) return '-';
-  try { const d = new Date(v); if (isNaN(d)) return String(v); return d.toLocaleDateString(STATE.lang === 'ru' ? 'ru-RU' : 'uz-UZ'); }
+  try { var d = new Date(v); if (isNaN(d)) return String(v); return d.toLocaleDateString(STATE.lang === 'ru' ? 'ru-RU' : 'uz-UZ'); }
   catch(e){ return String(v); }
 }
 function fmtDateTime(v){
   if (!v) return '-';
-  try { const d = new Date(v); if (isNaN(d)) return String(v); return d.toLocaleString(STATE.lang === 'ru' ? 'ru-RU' : 'uz-UZ'); }
+  try { var d = new Date(v); if (isNaN(d)) return String(v); return d.toLocaleString(STATE.lang === 'ru' ? 'ru-RU' : 'uz-UZ'); }
   catch(e){ return String(v); }
 }
 
@@ -607,111 +704,206 @@ function fmtDateTime(v){
    DASHBOARD
    ============================================================ */
 function renderDashboard(){
-  const el = document.getElementById('page-dashboard');
-  el.innerHTML = '<div class="dashboard-welcome">' +
-    '<div><div class="welcome-kicker">OMBOR BOSHQARUVI <span class="live-dot"></span></div>' +
-    '<h1>Assalomu alaykum!</h1><p>Kabel barabanlari va ombor harakatini bir joydan kuzating.</p></div>' +
-    '<div class="welcome-actions">' +
-    '<button class="btn btn-primary quick-action" onclick="navigate(\'drums\');setTimeout(openAddDrumModal,0)"><span>＋</span> Baraban qo'shish</button>' +
-    '<button class="btn btn-outline quick-action" onclick="navigate(\'usage\')"><span>↗</span> Sarf kiritish</button>' +
-    '</div></div>' +
+  var el = document.getElementById('page-dashboard');
+  el.innerHTML =
     '<div class="stat-grid" id="dash-stats"></div>' +
-    '<div class="two-col">' +
-      '<div class="section-card"><div class="section-title">' + t('dailyUsage') + '</div><canvas id="chart-daily" height="140"></canvas></div>' +
-      '<div class="section-card"><div class="section-title">' + t('usageByType') + '</div><canvas id="chart-type" height="140"></canvas></div>' +
+    '<div class="dash-top-grid">' +
+      '<div class="section-card">' +
+        '<div class="section-title">' + t('drums') + ' <span class="link" onclick="navigate(\'drums\')">' + t('viewAll') + ' \u2192</span></div>' +
+        '<div class="drum-grid" id="dash-drums"></div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="section-card">' +
+          '<div class="section-title">\ud83d\udd14 ' + t('lowStock') + '</div>' +
+          '<div class="list-rows" id="dash-lowstock"></div>' +
+        '</div>' +
+        '<div class="section-card">' +
+          '<div class="section-title">\ud83d\udd53 ' + t('recentUsage') + '</div>' +
+          '<div class="list-rows" id="dash-recent"></div>' +
+        '</div>' +
+      '</div>' +
     '</div>' +
-    '<div class="two-col">' +
-      '<div class="section-card"><div class="section-title">' + t('recentUsage') + '</div><div id="dash-recent" class="table-wrap"></div></div>' +
-      '<div class="section-card"><div class="section-title">' + t('lowStock') + '</div><div id="dash-lowstock" class="drum-grid"></div></div>' +
+    '<div class="dash-chart-grid">' +
+      '<div class="section-card">' +
+        '<div class="section-title">' + t('dailyUsage') +
+          '<span class="range-toggle" id="range-toggle">' +
+            '<button class="range-btn" data-range="7">' + t('range7') + '</button>' +
+            '<button class="range-btn" data-range="30">' + t('range30') + '</button>' +
+            '<button class="range-btn" data-range="90">' + t('range90') + '</button>' +
+          '</span>' +
+        '</div>' +
+        '<canvas id="chart-daily" height="150"></canvas>' +
+      '</div>' +
+      '<div class="section-card">' +
+        '<div class="section-title">' + t('usageByType') + '</div>' +
+        '<canvas id="chart-donut" height="150"></canvas>' +
+        '<div class="donut-legend" id="donut-legend"></div>' +
+      '</div>' +
     '</div>';
 
-  authCall('getDashboardStats', []).then(function(s){
+  var toggle = document.getElementById('range-toggle');
+  toggle.querySelectorAll('.range-btn').forEach(function(btn){
+    btn.classList.toggle('active', Number(btn.getAttribute('data-range')) === STATE.chartRangeDays);
+    btn.onclick = function(){
+      STATE.chartRangeDays = Number(btn.getAttribute('data-range'));
+      toggle.querySelectorAll('.range-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      loadDashboardData();
+    };
+  });
+
+  loadDashboardData();
+}
+
+function loadDashboardData(){
+  authCall('getDashboardStats', [STATE.chartRangeDays]).then(function(s){
+    STATE.lowStockCount = s.lowStockCount;
+    var bellDot = document.getElementById('bell-dot');
+    if (bellDot) bellDot.classList.toggle('show', s.lowStockCount > 0);
+
     document.getElementById('dash-stats').innerHTML =
-      statCard('💧', t('totalRemaining'), s.totalRemaining + ' m', '#eff6ff', 'var(--blue)') +
-      statCard('🧵', t('totalDrums'), s.totalDrums, '#f0fdf4', 'var(--green)') +
-      statCard('🔌', t('activeCableTypes'), s.activeCableTypes, '#fef9c3', '#a16207') +
-      statCard('⚠️', t('lowStock'), s.lowStockCount, '#fee2e2', 'var(--red)');
+      statCard('\ud83d\udca7', t('totalRemaining'), s.totalRemaining + ' m', '#eaf1ff', 'var(--blue)', t('capacity') + ': ' + s.totalCapacity + ' m') +
+      statCard('\ud83e\uddf5', t('totalDrums'), s.totalDrums, '#f0fdf4', 'var(--green)', s.activeDrums + ' ' + t('activeOf')) +
+      statCard('\ud83d\udd0c', t('activeCableTypes'), s.activeCableTypes, '#fef9c3', '#a16207', s.totalCableTypes + ' ' + t('ofTotal')) +
+      statCard('\u26a0\ufe0f', t('lowStock'), s.lowStockCount, '#fee2e2', 'var(--red)', s.lowStockThreshold + '% ' + t('belowThreshold'));
 
-    const recentBody = s.recentUsage.length ? s.recentUsage.map(function(r){
-      return '<tr><td>' + fmtDate(r.Sana) + '</td><td>' + escapeHtml(r.Loyiha_nomi) + '</td><td>' + r.Baraban_ID + '</td><td>' + r.Sarflangan_metr + ' m</td></tr>';
-    }).join('') : '';
-    document.getElementById('dash-recent').innerHTML = s.recentUsage.length ?
-      ('<table><thead><tr><th>' + t('workDate') + '</th><th>' + t('project') + '</th><th>' + t('drumId') + '</th><th>' + t('meters') + '</th></tr></thead><tbody>' + recentBody + '</tbody></table>')
-      : '<div class="empty-state">' + t('noData') + '</div>';
+    var lowHtml = s.lowStockDrums.length ? s.lowStockDrums.map(function(d){
+      return '<div class="list-row" style="cursor:pointer;" onclick="openDrumDetail(\'' + d.Baraban_ID + '\')">' +
+        '<span class="dot ' + levelDotClass(d.level) + '"></span>' +
+        '<div class="rtext"><b>' + d.Baraban_ID + ' (' + escapeHtml(d.Kabel_nomi) + ')</b><span>' + d.percent + '% ' + t('remainingMeters').toLowerCase() + '</span></div>' +
+        '<span class="rval">' + d.Qolgan_metr + ' m</span><span class="chev">\u203a</span></div>';
+    }).join('') : '<div class="empty-state">' + t('noData') + '</div>';
+    document.getElementById('dash-lowstock').innerHTML = lowHtml;
 
-    document.getElementById('dash-lowstock').innerHTML = s.lowStockDrums.length ?
-      s.lowStockDrums.map(drumCardHtml).join('') : '<div class="empty-state">' + t('noData') + '</div>';
+    var recentHtml = s.recentUsage.length ? s.recentUsage.map(function(r){
+      return '<div class="list-row">' +
+        '<span class="dot" style="background:var(--blue);"></span>' +
+        '<div class="rtext"><b>' + escapeHtml(r.Loyiha_nomi) + '</b><span>' + fmtDate(r.Sana) + ' \u00b7 ' + r.drumCount + ' ' + t('drumsWord') + '</span></div>' +
+        '<span class="rval">' + r.totalMeters + ' m</span><span class="chev">\u203a</span></div>';
+    }).join('') : '<div class="empty-state">' + t('noData') + '</div>';
+    document.getElementById('dash-recent').innerHTML = recentHtml;
 
-    drawLineChart('chart-daily', s.dailyChart.labels, s.dailyChart.values);
-    drawBarChart('chart-type', s.byTypeChart.labels, s.byTypeChart.values);
+    drawComboChart('chart-daily', s.dailyChart.labels, s.dailyChart.values, s.dailyChart.cumulative);
+    drawDonutChart('chart-donut', 'donut-legend', s.byTypeChart.labels, s.byTypeChart.values);
+  }).catch(function(err){ toast(err.message, 'error'); });
+
+  authCall('getDrums', []).then(function(drums){
+    STATE.drums = drums;
+    var top = drums.slice(0, 5);
+    document.getElementById('dash-drums').innerHTML = top.length ? top.map(drumCardHtml).join('') : '<div class="empty-state">' + t('noData') + '</div>';
   }).catch(function(err){ toast(err.message, 'error'); });
 }
-function statCard(icon, label, value, bg, color){
+
+function statCard(icon, label, value, bg, color, deltaText){
   return '<div class="stat-card"><div class="icon" style="background:' + bg + ';color:' + color + ';">' + icon + '</div>' +
-    '<div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+    '<div class="label">' + label + '</div><div class="value">' + value + '</div>' +
+    '<div class="delta">' + deltaText + '</div></div>';
 }
 
-/* ---- Oddiy canvas grafiklar (tashqi kutubxonasiz) ---- */
-function drawLineChart(canvasId, labels, values){
-  const c = document.getElementById(canvasId); if (!c) return;
-  const ctx = c.getContext('2d');
-  const w = c.width = c.clientWidth; const h = c.height = 150;
+/* ---- Combo chart: kunlik ustunlar + kumulyativ chiziq ---- */
+function drawComboChart(canvasId, labels, values, cumulative){
+  var c = document.getElementById(canvasId); if (!c) return;
+  var ctx = c.getContext('2d');
+  var w = c.width = c.clientWidth; var h = c.height = 190;
   ctx.clearRect(0,0,w,h);
-  const max = Math.max.apply(null, values.concat([1])) * 1.15;
-  const padL = 30, padB = 20, padT = 10, padR = 10;
-  const plotW = w - padL - padR, plotH = h - padT - padB;
-  ctx.strokeStyle = '#e6e9f0'; ctx.lineWidth = 1;
-  for (let i=0;i<=3;i++){ const y = padT + plotH - (plotH*i/3); ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y); ctx.stroke(); }
+  var maxBar = Math.max.apply(null, values.concat([1])) * 1.2;
+  var maxLine = Math.max.apply(null, cumulative.concat([1])) * 1.05;
+  var padL = 34, padB = 22, padT = 14, padR = 10;
+  var plotW = w - padL - padR, plotH = h - padT - padB;
+
+  ctx.strokeStyle = '#eef1f7'; ctx.lineWidth = 1;
+  for (var i=0;i<=3;i++){ var yy = padT + plotH - (plotH*i/3); ctx.beginPath(); ctx.moveTo(padL,yy); ctx.lineTo(w-padR,yy); ctx.stroke(); }
+
+  var n = values.length;
+  var slot = plotW / n;
+  var barW = Math.max(3, slot * 0.5);
+
+  ctx.fillStyle = '#3b6cf0';
+  values.forEach(function(v, i){
+    var barH = (v / maxBar) * plotH;
+    var x = padL + slot*i + (slot - barW)/2;
+    var y = padT + plotH - barH;
+    ctx.fillRect(x, y, barW, Math.max(barH,1));
+  });
+
   ctx.beginPath();
-  values.forEach(function(v,i){
-    const x = padL + (plotW * i/(Math.max(values.length-1,1)));
-    const y = padT + plotH - (v/max*plotH);
+  cumulative.forEach(function(v, i){
+    var x = padL + slot*i + slot/2;
+    var y = padT + plotH - (v/maxLine*plotH);
     if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
-  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.4; ctx.stroke();
-  ctx.lineTo(padL+plotW, padT+plotH); ctx.lineTo(padL, padT+plotH); ctx.closePath();
-  ctx.fillStyle = 'rgba(37,99,235,.08)'; ctx.fill();
+  ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 2.2; ctx.stroke();
+  cumulative.forEach(function(v, i){
+    var x = padL + slot*i + slot/2;
+    var y = padT + plotH - (v/maxLine*plotH);
+    ctx.beginPath(); ctx.arc(x,y,2.4,0,Math.PI*2); ctx.fillStyle = '#16a34a'; ctx.fill();
+  });
+
   ctx.fillStyle = '#9aa4b8'; ctx.font = '10px sans-serif';
+  var step = Math.ceil(n/6);
   labels.forEach(function(l,i){
-    if (i % Math.ceil(labels.length/6) !== 0) return;
-    const x = padL + (plotW * i/(Math.max(labels.length-1,1)));
-    ctx.fillText(l.slice(5), x-12, h-4);
+    if (i % step !== 0) return;
+    var x = padL + slot*i + slot/2;
+    ctx.fillText(l.slice(5), x-12, h-6);
   });
 }
-function drawBarChart(canvasId, labels, values){
-  const c = document.getElementById(canvasId); if (!c) return;
-  const ctx = c.getContext('2d');
-  const w = c.width = c.clientWidth; const h = c.height = 150;
+
+/* ---- Donut chart + legend ---- */
+function drawDonutChart(canvasId, legendId, labels, values){
+  var c = document.getElementById(canvasId); if (!c) return;
+  var ctx = c.getContext('2d');
+  var w = c.width = c.clientWidth; var h = c.height = 190;
   ctx.clearRect(0,0,w,h);
-  if (!labels.length){ ctx.fillStyle = '#9aa4b8'; ctx.font='12px sans-serif'; ctx.fillText(t('noData'), 10, 30); return; }
-  const max = Math.max.apply(null, values.concat([1])) * 1.15;
-  const padL = 10, padB = 30, padT = 10;
-  const barW = (w - padL*2) / labels.length * 0.6;
-  const gap = (w - padL*2) / labels.length;
-  ctx.fillStyle = '#9aa4b8'; ctx.font = '10px sans-serif';
-  values.forEach(function(v,i){
-    const barH = (h-padT-padB) * (v/max);
-    const x = padL + gap*i + (gap-barW)/2;
-    const y = h - padB - barH;
-    ctx.fillStyle = '#2563eb';
-    ctx.fillRect(x,y,barW,barH);
-    ctx.fillStyle = '#6b7280';
-    const lbl = String(labels[i]).length > 8 ? String(labels[i]).slice(0,8)+'…' : labels[i];
-    ctx.fillText(lbl, x, h-14);
-    ctx.fillText(String(v), x, y-4);
+  var total = values.reduce(function(s,v){ return s+v; }, 0);
+  var cx = w/2, cy = h/2, rOuter = Math.min(w,h)/2 - 8, rInner = rOuter * 0.58;
+  var colors = ['#3b6cf0','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
+
+  if (total <= 0) {
+    ctx.fillStyle = '#9aa4b8'; ctx.font = '12px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(t('noData'), cx, cy);
+    ctx.textAlign='left';
+    document.getElementById(legendId).innerHTML = '';
+    return;
+  }
+
+  var start = -Math.PI/2;
+  labels.forEach(function(l, i){
+    var frac = values[i] / total;
+    var end = start + frac * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx, cy, rOuter, start, end);
+    ctx.closePath();
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fill();
+    start = end;
   });
+  ctx.beginPath(); ctx.arc(cx,cy,rInner,0,Math.PI*2); ctx.fillStyle = '#ffffff'; ctx.fill();
+
+  ctx.fillStyle = '#1c2537'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(total + ' m', cx, cy + 5);
+  ctx.font = '10px sans-serif'; ctx.fillStyle = '#9aa4b8';
+  ctx.fillText(t('totalToUse'), cx, cy - 10);
+  ctx.textAlign = 'left';
+
+  var legend = document.getElementById(legendId);
+  legend.innerHTML = labels.map(function(l, i){
+    var pct = Math.round(values[i]/total*100);
+    return '<div class="donut-legend-row"><span class="dot" style="background:' + colors[i%colors.length] + ';"></span>' +
+      '<b>' + escapeHtml(l) + '</b><span class="pct">' + pct + '%</span><span class="mtr">' + values[i] + ' m</span></div>';
+  }).join('');
 }
 
 /* ============================================================
    BARABANLAR SAHIFASI
    ============================================================ */
 function renderDrumsPage(){
-  const el = document.getElementById('page-drums');
-  const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+  var el = document.getElementById('page-drums');
+  var canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
   el.innerHTML =
     '<div class="toolbar"><div class="toolbar-left">' +
-      '<input id="drum-search" placeholder="' + t('searchPlaceholder') + '" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;min-width:220px;" oninput="filterDrumCards()">' +
-    '</div>' + (canEdit ? '<button class="btn btn-primary" onclick="openAddDrumModal()">➕ ' + t('addDrum') + '</button>' : '') + '</div>' +
+      '<input id="drum-search" placeholder="' + t('searchPlaceholder') + '" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:11px;min-width:220px;" oninput="filterDrumCards()">' +
+    '</div>' + (canEdit ? '<button class="btn btn-primary" style="width:auto;" onclick="openAddDrumModal()">\u2795 ' + t('addDrum') + '</button>' : '') + '</div>' +
     '<div class="drum-grid" id="drums-grid"></div>';
 
   Promise.all([authCall('getDrums', []), authCall('getCableTypes', [])]).then(function(res){
@@ -720,38 +912,38 @@ function renderDrumsPage(){
   }).catch(function(err){ toast(err.message, 'error'); });
 }
 function renderDrumsGrid(drums){
-  const grid = document.getElementById('drums-grid');
+  var grid = document.getElementById('drums-grid');
   grid.innerHTML = drums.length ? drums.map(drumCardHtml).join('') : '<div class="empty-state">' + t('noData') + '</div>';
 }
 function filterDrumCards(){
-  const q = document.getElementById('drum-search').value.toLowerCase();
-  const filtered = STATE.drums.filter(function(d){
+  var q = document.getElementById('drum-search').value.toLowerCase();
+  var filtered = STATE.drums.filter(function(d){
     return d.Baraban_ID.toLowerCase().indexOf(q)!==-1 || String(d.Kabel_nomi).toLowerCase().indexOf(q)!==-1 || String(d.Baraban_raqami).toLowerCase().indexOf(q)!==-1;
   });
   renderDrumsGrid(filtered);
 }
 
 function openAddDrumModal(){
-  const typeOptions = STATE.cableTypes.filter(function(c){return c.Faol===true||c.Faol==='TRUE'||c.Faol==='true';})
+  var typeOptions = STATE.cableTypes.filter(function(c){return c.Faol===true||c.Faol==='TRUE'||c.Faol==='true';})
     .map(function(c){ return '<option value="'+c.Kabel_turi_ID+'">'+escapeHtml(c.Kabel_nomi)+'</option>'; }).join('');
   openModal(t('addDrum'), '' +
     '<div class="field"><label>' + t('cableType') + '</label>' +
-      '<select id="ad-type"><option value="">-- ' + t('selectDrum') + ' --</option>' + typeOptions + '<option value="__new__">＋ ' + t('newCableType') + '</option></select></div>' +
+      '<select id="ad-type"><option value="">-- ' + t('selectDrum') + ' --</option>' + typeOptions + '<option value="__new__">\uff0b ' + t('newCableType') + '</option></select></div>' +
     '<div class="field" id="ad-newtype-wrap" style="display:none;"><label>' + t('newCableType') + '</label><input id="ad-newtype"></div>' +
     '<div class="field"><label>' + t('drumNumber') + '</label><input id="ad-num"></div>' +
     '<div class="field"><label>' + t('initialMeters') + '</label><input id="ad-initial" type="number" min="1"></div>' +
     '<div class="field"><label>' + t('receivedDate') + '</label><input id="ad-date" type="date" value="' + new Date().toISOString().slice(0,10) + '"></div>' +
     '<div class="field"><label>' + t('note') + '</label><textarea id="ad-note" rows="2"></textarea></div>' +
     '<div class="auth-error" id="ad-error"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitAddDrum()">' + t('save') + '</button>'
+    '<button class="btn btn-primary" onclick="submitAddDrum()">' + t('save') + '</button>'
   );
   document.getElementById('ad-type').addEventListener('change', function(){
     document.getElementById('ad-newtype-wrap').style.display = this.value === '__new__' ? 'block' : 'none';
   });
 }
 function submitAddDrum(){
-  const typeVal = document.getElementById('ad-type').value;
-  const payload = {
+  var typeVal = document.getElementById('ad-type').value;
+  var payload = {
     kabelTuriId: typeVal === '__new__' ? '' : typeVal,
     newCableTypeName: typeVal === '__new__' ? document.getElementById('ad-newtype').value.trim() : '',
     barabanRaqami: document.getElementById('ad-num').value.trim(),
@@ -760,18 +952,20 @@ function submitAddDrum(){
     izoh: document.getElementById('ad-note').value.trim()
   };
   authCall('addDrum', [payload]).then(function(){
-    toast('OK', 'success'); closeModal(); renderDrumsPage();
+    toast('OK', 'success'); closeModal();
+    if (STATE.page === 'drums') renderDrumsPage(); else if (STATE.page === 'dashboard') loadDashboardData();
   }).catch(function(err){ showErr('ad-error', err); });
 }
 
 function openDrumDetail(drumId){
   authCall('getDrumDetail', [drumId]).then(function(data){
-    const d = data.drum;
-    const color = levelColor(d.level);
-    const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
-    let html = '<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;">' +
-      '<div class="ring-wrap" style="width:120px;height:120px;background:conic-gradient(' + color + ' ' + d.percent + '%, #e5e9f1 0);">' +
-        '<div class="ring-center" style="inset:12px;">' + reelSvg() + '</div></div>' +
+    var d = data.drum;
+    var color = levelColor(d.level);
+    var wire = wireColorForType(d.Kabel_nomi);
+    var canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+    var html = '<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;">' +
+      '<div class="ring-wrap" style="width:120px;height:120px;background:conic-gradient(' + color + ' ' + d.percent + '%, #e9edf5 0);">' +
+        '<div class="ring-center" style="inset:12px;">' + reelSvg(wire) + '</div></div>' +
       '<div><div style="font-size:20px;font-weight:800;">' + d.percent + '%</div>' +
       '<div style="color:var(--muted);font-size:13px;">' + d.Qolgan_metr + ' / ' + d.Boshlangich_metr + ' m</div>' +
       '<span class="badge badge-' + d.level + '">' + levelLabel(d.level) + '</span></div></div>' +
@@ -782,7 +976,7 @@ function openDrumDetail(drumId){
       '<div><b>' + t('note') + ':</b> ' + escapeHtml(d.Izoh||'-') + '</div></div>';
 
     if (canEdit) {
-      html += '<div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="openCorrectDrumModal(\'' + d.Baraban_ID + '\',' + d.Qolgan_metr + ')">✏️ ' + t('edit') + '</button></div>';
+      html += '<div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="openCorrectDrumModal(\'' + d.Baraban_ID + '\',' + d.Qolgan_metr + ')">\u270f\ufe0f ' + t('edit') + '</button></div>';
     }
 
     html += '<div style="margin-top:18px;"><div class="section-title" style="font-size:13.5px;">' + t('usageHistory') + '</div>';
@@ -794,30 +988,31 @@ function openDrumDetail(drumId){
     html += '<div style="margin-top:18px;"><div class="section-title" style="font-size:13.5px;">' + t('editHistory') + '</div>';
     html += data.editHistory.length ? data.editHistory.slice().reverse().map(function(h){
       return '<div class="history-item"><div class="h-top">' + escapeHtml(h.amal) + '</div>' +
-        '<div class="h-meta">' + fmtDateTime(h.vaqt) + ' · ' + t('by') + ' ' + escapeHtml(h.user) + '</div>' +
+        '<div class="h-meta">' + fmtDateTime(h.vaqt) + ' \u00b7 ' + t('by') + ' ' + escapeHtml(h.user) + '</div>' +
         (h.sabab ? '<div class="h-meta">' + t('reason') + ': ' + escapeHtml(h.sabab) + '</div>' : '') +
-        (h.eski ? '<div class="h-meta">' + t('old') + ': ' + JSON.stringify(h.eski) + ' → ' + t('newV') + ': ' + JSON.stringify(h.yangi) + '</div>' : '') +
+        (h.eski ? '<div class="h-meta">' + t('old') + ': ' + JSON.stringify(h.eski) + ' \u2192 ' + t('newV') + ': ' + JSON.stringify(h.yangi) + '</div>' : '') +
         '</div>';
     }).join('') : '<div class="empty-state">' + t('noData') + '</div>';
     html += '</div>';
 
-    openModal(d.Baraban_ID + ' — ' + escapeHtml(d.Kabel_nomi), html, true);
+    openModal(d.Baraban_ID + ' \u2014 ' + escapeHtml(d.Kabel_nomi), html, true);
   }).catch(function(err){ toast(err.message, 'error'); });
 }
 
 function openCorrectDrumModal(drumId, currentRemaining){
-  openModal(t('edit') + ' — ' + drumId, '' +
+  openModal(t('edit') + ' \u2014 ' + drumId, '' +
     '<div class="field"><label>' + t('newRemaining') + '</label><input id="cd-new" type="number" value="' + currentRemaining + '"></div>' +
     '<div class="field"><label>' + t('correctionReason') + '</label><textarea id="cd-reason" rows="2"></textarea></div>' +
     '<div class="auth-error" id="cd-error"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitCorrectDrum(\'' + drumId + '\')">' + t('saveCorrection') + '</button>'
+    '<button class="btn btn-primary" onclick="submitCorrectDrum(\'' + drumId + '\')">' + t('saveCorrection') + '</button>'
   );
 }
 function submitCorrectDrum(drumId){
-  const val = Number(document.getElementById('cd-new').value);
-  const reason = document.getElementById('cd-reason').value.trim();
+  var val = Number(document.getElementById('cd-new').value);
+  var reason = document.getElementById('cd-reason').value.trim();
   authCall('correctDrum', [drumId, val, reason]).then(function(){
-    toast('OK', 'success'); closeModal(); renderDrumsPage();
+    toast('OK', 'success'); closeModal();
+    if (STATE.page === 'drums') renderDrumsPage(); else if (STATE.page === 'dashboard') loadDashboardData();
   }).catch(function(err){ showErr('cd-error', err); });
 }
 
@@ -825,22 +1020,21 @@ function submitCorrectDrum(drumId){
    KABEL TURLARI SAHIFASI
    ============================================================ */
 function renderCableTypesPage(){
-  const el = document.getElementById('page-cabletypes');
-  const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
-  el.innerHTML = '<div class="toolbar">' + (canEdit ? '<button class="btn btn-primary" onclick="openAddCableTypeModal()">➕ ' + t('newCableType') + '</button>' : '<div></div>') + '</div>' +
+  var el = document.getElementById('page-cabletypes');
+  var canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
+  el.innerHTML = '<div class="toolbar">' + (canEdit ? '<button class="btn btn-primary" style="width:auto;" onclick="openAddCableTypeModal()">\u2795 ' + t('newCableType') + '</button>' : '<div></div>') + '</div>' +
     '<div class="section-card"><div class="table-wrap" id="ct-table"></div></div>';
 
   authCall('getCableTypes', []).then(function(types){
     STATE.cableTypes = types;
-    const canEdit = STATE.user.role === ROLES.ADMIN || STATE.user.role === ROLES.WAREHOUSE;
     document.getElementById('ct-table').innerHTML = types.length ?
       ('<table><thead><tr><th>ID</th><th>' + t('cableName') + '</th><th>' + t('description') + '</th><th>' + t('status') + '</th>' + (canEdit?'<th></th>':'') + '</tr></thead><tbody>' +
       types.map(function(c){
-        const active = c.Faol===true||c.Faol==='TRUE'||c.Faol==='true';
+        var active = c.Faol===true||c.Faol==='TRUE'||c.Faol==='true';
         return '<tr><td>' + c.Kabel_turi_ID + '</td><td>' + escapeHtml(c.Kabel_nomi) + '</td><td>' + escapeHtml(c.Tavsif||'-') + '</td>' +
           '<td><span class="badge ' + (active?'badge-good':'badge-critical') + '">' + (active?t('active'):t('inactive')) + '</span></td>' +
-          (canEdit ? ('<td><button class="btn btn-ghost btn-sm" onclick="openEditCableTypeModal(\''+c.Kabel_turi_ID+'\',\''+encodeURIComponent(c.Kabel_nomi)+'\',\''+encodeURIComponent(c.Tavsif||'')+'\')">✏️</button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="toggleCableType(\''+c.Kabel_turi_ID+'\',' + (!active) + ')">' + (active?'🚫':'✅') + '</button></td>') : '') +
+          (canEdit ? ('<td><button class="btn btn-ghost btn-sm" onclick="openEditCableTypeModal(\''+c.Kabel_turi_ID+'\',\''+encodeURIComponent(c.Kabel_nomi)+'\',\''+encodeURIComponent(c.Tavsif||'')+'\')">\u270f\ufe0f</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="toggleCableType(\''+c.Kabel_turi_ID+'\',' + (!active) + ')">' + (active?'\ud83d\udeab':'\u2705') + '</button></td>') : '') +
           '</tr>';
       }).join('') + '</tbody></table>') : '<div class="empty-state">' + t('noData') + '</div>';
   }).catch(function(err){ toast(err.message, 'error'); });
@@ -850,7 +1044,7 @@ function openAddCableTypeModal(){
     '<div class="field"><label>' + t('cableName') + '</label><input id="ct-name"></div>' +
     '<div class="field"><label>' + t('description') + '</label><textarea id="ct-desc" rows="2"></textarea></div>' +
     '<div class="auth-error" id="ct-error"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitAddCableType()">' + t('save') + '</button>'
+    '<button class="btn btn-primary" onclick="submitAddCableType()">' + t('save') + '</button>'
   );
 }
 function submitAddCableType(){
@@ -859,12 +1053,12 @@ function submitAddCableType(){
     .catch(function(err){ showErr('ct-error', err); });
 }
 function openEditCableTypeModal(id, nameEnc, descEnc){
-  const name = decodeURIComponent(nameEnc), desc = decodeURIComponent(descEnc);
+  var name = decodeURIComponent(nameEnc), desc = decodeURIComponent(descEnc);
   openModal(t('edit'), '' +
     '<div class="field"><label>' + t('cableName') + '</label><input id="ct-ename" value="' + escapeHtml(name) + '"></div>' +
     '<div class="field"><label>' + t('description') + '</label><textarea id="ct-edesc" rows="2">' + escapeHtml(desc) + '</textarea></div>' +
     '<div class="auth-error" id="ct-eerror"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitEditCableType(\'' + id + '\')">' + t('save') + '</button>'
+    '<button class="btn btn-primary" onclick="submitEditCableType(\'' + id + '\')">' + t('save') + '</button>'
   );
 }
 function submitEditCableType(id){
@@ -880,7 +1074,7 @@ function toggleCableType(id, active){
    SARF HISOBI (USAGE) SAHIFASI
    ============================================================ */
 function renderUsagePage(){
-  const el = document.getElementById('page-usage');
+  var el = document.getElementById('page-usage');
   el.innerHTML = '<div class="section-card" style="max-width:640px;">' +
     '<div class="field"><label>' + t('workDate') + '</label><input id="us-date" type="date" value="' + new Date().toISOString().slice(0,10) + '"></div>' +
     '<div class="field"><label>' + t('projectName') + '</label><input id="us-project"></div>' +
@@ -891,12 +1085,12 @@ function renderUsagePage(){
       '<div class="field"><label>' + t('longitude') + '</label><input id="us-lng" type="text" placeholder="69.24"></div>' +
     '</div>' +
     '<div class="field"><label>' + t('note') + '</label><textarea id="us-note" rows="2"></textarea></div>' +
-    '<div style="font-weight:700;font-size:13px;margin:14px 0 6px;">' + t('drums') + '</div>' +
+    '<div style="font-weight:800;font-size:13px;margin:14px 0 6px;">' + t('drums') + '</div>' +
     '<div id="us-rows"></div>' +
-    '<button class="btn btn-outline btn-sm" onclick="addUsageRow()">➕ ' + t('addDrumRow') + '</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="addUsageRow()">\u2795 ' + t('addDrumRow') + '</button>' +
     '<div class="usage-total" id="us-total">' + t('totalToUse') + ': 0 m</div>' +
     '<div class="auth-error" id="us-error"></div>' +
-    '<button class="btn btn-primary" id="us-submit-btn" style="width:100%;margin-top:12px;" onclick="submitUsage()">💾 ' + t('submitUsage') + '</button>' +
+    '<button class="btn btn-primary" id="us-submit-btn" style="margin-top:12px;" onclick="submitUsage()">\ud83d\udcbe ' + t('submitUsage') + '</button>' +
   '</div>';
 
   authCall('getDrums', []).then(function(drums){
@@ -907,16 +1101,16 @@ function renderUsagePage(){
 }
 function drumOptionsHtml(selected){
   return '<option value="">-- ' + t('selectDrum') + ' --</option>' + STATE.drums.map(function(d){
-    return '<option value="' + d.Baraban_ID + '" ' + (d.Baraban_ID===selected?'selected':'') + '>' + d.Baraban_ID + ' — ' + escapeHtml(d.Kabel_nomi) + ' (' + d.Qolgan_metr + ' m)</option>';
+    return '<option value="' + d.Baraban_ID + '" ' + (d.Baraban_ID===selected?'selected':'') + '>' + d.Baraban_ID + ' \u2014 ' + escapeHtml(d.Kabel_nomi) + ' (' + d.Qolgan_metr + ' m)</option>';
   }).join('');
 }
 function renderUsageRows(){
-  const wrap = document.getElementById('us-rows');
+  var wrap = document.getElementById('us-rows');
   wrap.innerHTML = STATE.usageRows.map(function(row, i){
     return '<div class="usage-row">' +
       '<div class="field" style="margin:0;"><select onchange="STATE.usageRows[' + i + '].barabanId=this.value;calcUsageTotal();">' + drumOptionsHtml(row.barabanId) + '</select></div>' +
       '<div class="field" style="margin:0;"><input type="number" min="1" placeholder="' + t('meters') + '" value="' + row.metr + '" oninput="STATE.usageRows[' + i + '].metr=this.value;calcUsageTotal();"></div>' +
-      '<button class="btn btn-ghost btn-sm" onclick="removeUsageRow(' + i + ')">✕</button>' +
+      '<button class="btn btn-ghost btn-sm" onclick="removeUsageRow(' + i + ')">\u2715</button>' +
     '</div>';
   }).join('');
   calcUsageTotal();
@@ -924,16 +1118,16 @@ function renderUsageRows(){
 function addUsageRow(){ STATE.usageRows.push({barabanId:'',metr:''}); renderUsageRows(); }
 function removeUsageRow(i){ if (STATE.usageRows.length>1){ STATE.usageRows.splice(i,1); renderUsageRows(); } }
 function calcUsageTotal(){
-  const total = STATE.usageRows.reduce(function(s,r){ return s + (Number(r.metr)||0); }, 0);
+  var total = STATE.usageRows.reduce(function(s,r){ return s + (Number(r.metr)||0); }, 0);
   document.getElementById('us-total').textContent = t('totalToUse') + ': ' + total + ' m';
 }
-let usageSubmitLock = false;
+var usageSubmitLock = false;
 function submitUsage(){
   if (usageSubmitLock) return;
   document.getElementById('us-error').style.display = 'none';
-  const items = STATE.usageRows.filter(function(r){ return r.barabanId && Number(r.metr) > 0; })
+  var items = STATE.usageRows.filter(function(r){ return r.barabanId && Number(r.metr) > 0; })
     .map(function(r){ return { barabanId:r.barabanId, metr:Number(r.metr) }; });
-  const payload = {
+  var payload = {
     sana: document.getElementById('us-date').value,
     loyihaNomi: document.getElementById('us-project').value.trim(),
     masulXodimlar: document.getElementById('us-employees').value.trim(),
@@ -947,11 +1141,11 @@ function submitUsage(){
   usageSubmitLock = true;
   document.getElementById('us-submit-btn').disabled = true;
   authCall('saveUsage', [payload]).then(function(res){
-    toast('✅ ' + res.totalMeters + ' m ' + (STATE.lang==='ru'?'сохранено':'saqlandi'), 'success');
+    toast('\u2705 ' + res.totalMeters + ' m ' + (STATE.lang==='ru'?'сохранено':'saqlandi'), 'success');
     renderUsagePage();
   }).catch(function(err){ showErr('us-error', err); }).finally(function(){
     usageSubmitLock = false;
-    const btn = document.getElementById('us-submit-btn'); if (btn) btn.disabled = false;
+    var btn = document.getElementById('us-submit-btn'); if (btn) btn.disabled = false;
   });
 }
 
@@ -959,7 +1153,7 @@ function submitUsage(){
    HISOBOTLAR SAHIFASI
    ============================================================ */
 function renderReportsPage(){
-  const el = document.getElementById('page-reports');
+  var el = document.getElementById('page-reports');
   el.innerHTML =
     '<div class="section-card">' +
       '<div class="filter-grid">' +
@@ -969,15 +1163,15 @@ function renderReportsPage(){
         '<div class="field" style="margin:0;"><label>' + t('employee') + '</label><input id="rf-employee"></div>' +
         '<div class="field" style="margin:0;"><label>' + t('cableType') + '</label><select id="rf-type"><option value="">' + t('all') + '</option></select></div>' +
       '</div>' +
-      '<div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" onclick="applyReportFilters()">🔍 ' + t('filter') + '</button>' +
+      '<div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" style="width:auto;" onclick="applyReportFilters()">\ud83d\udd0d ' + t('filter') + '</button>' +
       '<button class="btn btn-ghost btn-sm" onclick="resetReportFilters()">' + t('reset') + '</button>' +
-      '<button class="btn btn-outline btn-sm" onclick="exportReport()" id="rf-export">⬇️ ' + t('exportExcel') + '</button></div>' +
+      '<button class="btn btn-outline btn-sm" onclick="exportReport()" id="rf-export">\u2b07\ufe0f ' + t('exportExcel') + '</button></div>' +
     '</div>' +
     '<div class="stat-grid" id="rp-stats"></div>' +
     '<div class="section-card"><div class="section-title">' + t('recentUsage') + '</div><div class="table-wrap" id="rp-table"></div></div>';
 
   authCall('getCableTypes', []).then(function(types){
-    const sel = document.getElementById('rf-type');
+    var sel = document.getElementById('rf-type');
     types.forEach(function(c){ sel.innerHTML += '<option value="' + c.Kabel_turi_ID + '">' + escapeHtml(c.Kabel_nomi) + '</option>'; });
   });
   loadReportData({});
@@ -1004,18 +1198,18 @@ function resetReportFilters(){
 function loadReportData(filters){
   authCall('getReportAggregates', [filters]).then(function(data){
     document.getElementById('rp-stats').innerHTML =
-      statCard('➕', t('totalToUse'), data.totalMeters + ' m', '#eff6ff', 'var(--blue)') +
-      statCard('💧', t('totalRemaining'), data.totalRemainingAll + ' m', '#f0fdf4', 'var(--green)') +
-      statCard('📋', t('recordUsage'), data.rows.length, '#fef9c3', '#a16207');
+      statCard('\u2795', t('totalToUse'), data.totalMeters + ' m', '#eaf1ff', 'var(--blue)', '') +
+      statCard('\ud83d\udca7', t('totalRemaining'), data.totalRemainingAll + ' m', '#f0fdf4', 'var(--green)', '') +
+      statCard('\ud83d\udccb', t('recordUsage'), data.rows.length, '#fef9c3', '#a16207', '');
 
     document.getElementById('rp-table').innerHTML = data.rows.length ?
       ('<table><thead><tr><th>' + t('workDate') + '</th><th>ID</th><th>' + t('project') + '</th><th>' + t('employees') + '</th><th>' + t('drumId') + '</th><th>' + t('cableType') + '</th><th>' + t('meters') + '</th><th>' + t('telegramStatus') + '</th></tr></thead><tbody>' +
       data.rows.map(function(r){
-        const okStatus = r.Telegram_holati === 'Yuborildi';
+        var okStatus = r.Telegram_holati === 'Yuborildi';
         return '<tr><td>' + fmtDate(r.Sana) + '</td><td>' + r.Ish_ID + '</td><td>' + escapeHtml(r.Loyiha_nomi) + '</td><td>' + escapeHtml(r.Masul_xodimlar) + '</td>' +
           '<td>' + r.Baraban_ID + '</td><td>' + escapeHtml(r.Kabel_nomi) + '</td><td>' + r.Sarflangan_metr + ' m</td>' +
           '<td><span class="badge ' + (okStatus?'badge-good':'badge-critical') + '">' + escapeHtml(String(r.Telegram_holati||'-')) + '</span>' +
-          (!okStatus ? ' <button class="btn btn-ghost btn-sm" onclick="retryTelegram(\''+r.Sarf_ID+'\')">🔄</button>' : '') + '</td></tr>';
+          (!okStatus ? ' <button class="btn btn-ghost btn-sm" onclick="retryTelegram(\''+r.Sarf_ID+'\')">\ud83d\udd04</button>' : '') + '</td></tr>';
       }).join('') + '</tbody></table>') : '<div class="empty-state">' + t('noData') + '</div>';
   }).catch(function(err){ toast(err.message, 'error'); });
 }
@@ -1023,18 +1217,18 @@ function retryTelegram(sarfId){
   authCall('retryUsageTelegram', [sarfId]).then(function(){ toast('OK','success'); loadReportData(STATE.reportFilters); }).catch(function(err){ toast(err.message,'error'); });
 }
 function exportReport(){
-  const btn = document.getElementById('rf-export'); btn.disabled = true; btn.textContent = '⏳ ...';
+  var btn = document.getElementById('rf-export'); btn.disabled = true; btn.textContent = '\u23f3 ...';
   authCall('exportReportXlsx', [STATE.reportFilters]).then(function(res){
-    const byteChars = atob(res.base64);
-    const byteNumbers = new Array(byteChars.length);
-    for (let i=0;i<byteChars.length;i++) byteNumbers[i] = byteChars.charCodeAt(i);
-    const blob = new Blob([new Uint8Array(byteNumbers)], { type: res.mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = res.filename;
+    var byteChars = atob(res.base64);
+    var byteNumbers = new Array(byteChars.length);
+    for (var i=0;i<byteChars.length;i++) byteNumbers[i] = byteChars.charCodeAt(i);
+    var blob = new Blob([new Uint8Array(byteNumbers)], { type: res.mimeType });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = res.filename;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }).catch(function(err){ toast(err.message, 'error'); }).finally(function(){
-    btn.disabled = false; btn.textContent = '⬇️ ' + t('exportExcel');
+    btn.disabled = false; btn.textContent = '\u2b07\ufe0f ' + t('exportExcel');
   });
 }
 
@@ -1042,8 +1236,8 @@ function exportReport(){
    FOYDALANUVCHILAR SAHIFASI (Admin)
    ============================================================ */
 function renderUsersPage(){
-  const el = document.getElementById('page-users');
-  el.innerHTML = '<div class="toolbar"><button class="btn btn-primary" onclick="openAddUserModal()">➕ ' + t('addUser') + '</button></div>' +
+  var el = document.getElementById('page-users');
+  el.innerHTML = '<div class="toolbar"><button class="btn btn-primary" style="width:auto;" onclick="openAddUserModal()">\u2795 ' + t('addUser') + '</button></div>' +
     '<div class="section-card"><div class="table-wrap" id="u-table"></div></div>';
   loadUsersTable();
 }
@@ -1051,15 +1245,15 @@ function loadUsersTable(){
   authCall('getUsers', []).then(function(users){
     document.getElementById('u-table').innerHTML = '<table><thead><tr><th>' + t('login') + '</th><th>' + t('role') + '</th><th>' + t('status') + '</th><th>' + t('lastLogin') + '</th><th></th></tr></thead><tbody>' +
       users.map(function(u){
-        const active = u.Faol===true||u.Faol==='TRUE'||u.Faol==='true';
+        var active = u.Faol===true||u.Faol==='TRUE'||u.Faol==='true';
         return '<tr><td>' + escapeHtml(u.Login) + '</td>' +
           '<td><select onchange="changeRole(\'' + u.User_ID + '\', this.value)">' +
             ['Admin','Omborchi','Kuzatuvchi'].map(function(r){ return '<option value="'+r+'" '+(r===u.Rol?'selected':'')+'>'+r+'</option>'; }).join('') + '</select></td>' +
           '<td><span class="badge ' + (active?'badge-good':'badge-critical') + '">' + (active?t('active'):t('inactive')) + '</span></td>' +
           '<td>' + fmtDateTime(u.Oxirgi_kirish) + '</td>' +
           '<td>' +
-            '<button class="btn btn-ghost btn-sm" onclick="toggleUserActive(\''+u.User_ID+'\',' + (!active) + ')">' + (active?'🚫':'✅') + '</button>' +
-            '<button class="btn btn-ghost btn-sm" onclick="openResetPasswordModal(\''+u.User_ID+'\')">🔑</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="toggleUserActive(\''+u.User_ID+'\',' + (!active) + ')">' + (active?'\ud83d\udeab':'\u2705') + '</button>' +
+            '<button class="btn btn-ghost btn-sm" onclick="openResetPasswordModal(\''+u.User_ID+'\')">\ud83d\udd11</button>' +
           '</td></tr>';
       }).join('') + '</tbody></table>';
   }).catch(function(err){ toast(err.message, 'error'); });
@@ -1070,7 +1264,7 @@ function openAddUserModal(){
     '<div class="field"><label>' + t('password') + '</label><input id="au-pass" type="password"></div>' +
     '<div class="field"><label>' + t('role') + '</label><select id="au-role"><option value="Kuzatuvchi">Kuzatuvchi</option><option value="Omborchi">Omborchi</option><option value="Admin">Admin</option></select></div>' +
     '<div class="auth-error" id="au-error"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitAddUser()">' + t('save') + '</button>'
+    '<button class="btn btn-primary" onclick="submitAddUser()">' + t('save') + '</button>'
   );
 }
 function submitAddUser(){
@@ -1088,7 +1282,7 @@ function openResetPasswordModal(userId){
   openModal(t('resetPassword'), '' +
     '<div class="field"><label>' + t('newPassword') + '</label><input id="rp-pass" type="password"></div>' +
     '<div class="auth-error" id="rp-error"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitResetPassword(\'' + userId + '\')">' + t('save') + '</button>'
+    '<button class="btn btn-primary" onclick="submitResetPassword(\'' + userId + '\')">' + t('save') + '</button>'
   );
 }
 function submitResetPassword(userId){
@@ -1101,7 +1295,7 @@ function openChangePasswordModal(){
     '<div class="field"><label>' + t('oldPassword') + '</label><input id="cp-old" type="password"></div>' +
     '<div class="field"><label>' + t('newPassword') + '</label><input id="cp-new" type="password"></div>' +
     '<div class="auth-error" id="cp-error"></div>' +
-    '<button class="btn btn-primary" style="width:100%;" onclick="submitChangePassword()">' + t('save') + '</button>'
+    '<button class="btn btn-primary" onclick="submitChangePassword()">' + t('save') + '</button>'
   );
 }
 function submitChangePassword(){
@@ -1114,14 +1308,14 @@ function submitChangePassword(){
    SOZLAMALAR SAHIFASI (Admin)
    ============================================================ */
 function renderSettingsPage(){
-  const el = document.getElementById('page-settings');
+  var el = document.getElementById('page-settings');
   el.innerHTML = '<div class="section-card" style="max-width:480px;">' +
     '<div class="field"><label>' + t('lowStockThreshold') + '</label><input id="st-threshold" type="number" min="1" max="99"></div>' +
-    '<button class="btn btn-primary btn-sm" onclick="submitThreshold()">' + t('save') + '</button>' +
+    '<button class="btn btn-primary btn-sm" style="width:auto;" onclick="submitThreshold()">' + t('save') + '</button>' +
     '<hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">' +
     '<div class="field"><label>' + t('telegramChatId') + '</label><input id="st-chatid"></div>' +
-    '<button class="btn btn-primary btn-sm" onclick="submitChatId()">' + t('updateChatId') + '</button>' +
-    '<button class="btn btn-outline btn-sm" onclick="testTelegram()">📨 ' + t('telegramTest') + '</button>' +
+    '<button class="btn btn-primary btn-sm" style="width:auto;" onclick="submitChatId()">' + t('updateChatId') + '</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="testTelegram()">\ud83d\udce8 ' + t('telegramTest') + '</button>' +
     '<div class="auth-error" id="st-error"></div>' +
     '<div id="st-msg" style="margin-top:10px;font-size:13px;color:var(--muted);"></div>' +
   '</div>';
@@ -1129,7 +1323,7 @@ function renderSettingsPage(){
     document.getElementById('st-threshold').value = s.lowStockPercent;
     document.getElementById('st-chatid').value = s.telegramChatId;
     if (!s.hasTelegramToken) {
-      document.getElementById('st-msg').innerHTML = '⚠️ TELEGRAM_BOT_TOKEN Script Properties\'da topilmadi.';
+      document.getElementById('st-msg').innerHTML = '\u26a0\ufe0f TELEGRAM_BOT_TOKEN Script Properties-da topilmadi.';
     }
   });
 }
@@ -1143,7 +1337,7 @@ function submitChatId(){
 }
 function testTelegram(){
   authCall('testTelegramConnection', []).then(function(res){
-    toast(res.ok ? '✅ OK' : ('❌ ' + res.error), res.ok ? 'success' : 'error');
+    toast(res.ok ? '\u2705 OK' : ('\u274c ' + res.error), res.ok ? 'success' : 'error');
   }).catch(function(err){ toast(err.message, 'error'); });
 }
 
@@ -1154,7 +1348,7 @@ function openModal(title, bodyHtml, wide){
   document.getElementById('modal-root').innerHTML =
     '<div class="modal-overlay" onclick="if(event.target===this)closeModal();">' +
       '<div class="modal-box' + (wide?' wide':'') + '">' +
-        '<div class="modal-head"><h3>' + title + '</h3><button class="close-x" onclick="closeModal()">✕</button></div>' +
+        '<div class="modal-head"><h3>' + title + '</h3><button class="close-x" onclick="closeModal()">\u2715</button></div>' +
         bodyHtml +
       '</div></div>';
 }
