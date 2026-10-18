@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Obyektlar">
 <link rel="manifest" href="manifest.json">
+<script async src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Xavfsiz shahar obyektlari</title>
@@ -44,6 +45,7 @@ input,select{font:inherit;color:inherit}
 .splash-in{display:flex;flex-direction:column;align-items:center;gap:18px;animation:rise .5s both}
 .splash-in .logo{width:72px;height:72px}
 .loader{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+.splash-txt{color:var(--muted);font-size:14px;text-align:center;max-width:260px;line-height:1.5}
 
 /* ---------- Kirish ---------- */
 #loginView{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;
@@ -70,6 +72,7 @@ input,select{font:inherit;color:inherit}
 .lbtn:active{transform:scale(.98)}
 .lbtn:disabled{opacity:.7}
 #loginErr{min-height:20px;margin-top:14px;text-align:center;font-size:14px;color:var(--red)}
+#loginErr.hint{color:var(--muted)}
 
 /* ---------- Ilova ---------- */
 #appView{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
@@ -189,7 +192,15 @@ input,select{font:inherit;color:inherit}
 .mbtn2{width:46px;height:46px;border-radius:14px;background:var(--surface);color:var(--text);border:1px solid var(--line);display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.4);transition:transform .15s,background .2s,color .2s}
 .mbtn2:active{transform:scale(.92)}
 .mbtn2.on{background:#fbbf24;color:#1a1200;border-color:transparent}
-.mapcount{position:absolute;left:12px;bottom:18px;z-index:800;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:12px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.mapcount{position:absolute;left:12px;bottom:18px;z-index:800;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:12px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.mapcount button{color:var(--accent2);font-weight:700;font-size:12px;padding:2px 0}
+.mapchips{position:absolute;top:10px;left:10px;right:62px;z-index:800;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 8px}
+.mapchips::-webkit-scrollbar{display:none}
+.mapchips .chip{background:rgba(19,29,55,.92);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.mapchips .chip.on{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+@keyframes hl{0%,55%{box-shadow:0 0 0 3px var(--accent2)}100%{box-shadow:0 0 0 0 rgba(34,211,238,0)}}
+.card{scroll-margin-top:10px}
+.card.hl{animation:hl 1.8s ease}
 .leaflet-container{font-family:inherit}
 .leaflet-bar{border:1px solid var(--line)!important;box-shadow:0 6px 18px rgba(0,0,0,.4)!important;border-radius:12px!important;overflow:hidden}
 .leaflet-bar a{background:var(--surface)!important;color:var(--text)!important;border-bottom-color:var(--line)!important}
@@ -223,6 +234,7 @@ input,select{font:inherit;color:inherit}
   <div class="splash-in">
     <div class="logo" data-brand="s1"></div>
     <div class="loader"></div>
+    <div class="splash-txt" id="splashTxt">Ma'lumot yuklanmoqda...</div>
   </div>
 </div>
 
@@ -291,6 +303,7 @@ input,select{font:inherit;color:inherit}
     </div>
     <div class="tab" id="tab-map">
       <div id="map"></div>
+      <div class="mapchips" id="mapChips" hidden></div>
       <div class="mapcount" id="mapcount"></div>
       <div class="mapbtns">
         <button class="mbtn2" id="btnFavOnly" aria-label="Faqat tanlanganlar"><span class="ic" data-ic="star"></span></button>
@@ -377,26 +390,43 @@ document.querySelectorAll("[data-brand]").forEach(el => { el.innerHTML = brand(e
 
 /* ---------- Holat ---------- */
 const FIELDS = {
-  serial: { l: "Modem seriyasi", p: "Modem seriyasi bo'yicha qidirish" },
-  name:   { l: "Obyekt nomi",    p: "Obyekt nomi bo'yicha qidirish" },
-  loc:    { l: "Joylashuv",      p: "Koordinata bo'yicha qidirish" },
-  farm:   { l: "Farmoish",       p: "Farmoish bo'yicha qidirish" }
+  serial: { l: "Modem seriyasi", p: "Seriya raqami..." },
+  name:   { l: "Obyekt nomi",    p: "Obyekt nomi..." },
+  loc:    { l: "Joylashuv",      p: "Koordinata..." },
+  farm:   { l: "Farmoish",       p: "Farmoish..." }
 };
 const state = { tuman: "all", status: "all", field: "serial", q: "", favOnly: false };
 let creds = null, user = null, devices = [], byKey = new Map(), favs = [], favSet = new Set();
 let tab = "list", map = null, cluster = null, baseLayer = null, satellite = false, mapDirty = true, needFit = true, userDot = null;
 let listItems = [], shown = 0, io = null, lastLoad = 0, loading = false, loadedOnce = false, multi = false, lastError = "";
 const iconCache = {};
+let dataTxt = "";
 
 /* ---------- Server bilan aloqa ---------- */
-async function api(body) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error("http " + res.status);
-  return res.json();
+async function api(body, timeoutMs) {
+  let lastErr;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), timeoutMs || 90000) : null;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(body),
+        signal: ctl ? ctl.signal : undefined
+      });
+      if (!res.ok) throw new Error("http " + res.status);
+      const txt = await res.text();
+      const r = JSON.parse(txt);
+      Object.defineProperty(r, "_t", { value: txt });
+      return r;
+    } catch (e) {
+      lastErr = e;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+  throw lastErr;
 }
 
 function saveCreds(c, remember) {
@@ -417,6 +447,42 @@ function loadFavs() {
 }
 function saveFavs() { try { localStorage.setItem(favKey(), JSON.stringify(favs)); } catch (e) {} }
 
+/* ---------- Telefon xotirasidagi nusxa (keyingi kirishda darrov ochish uchun) ---------- */
+function idb() {
+  return new Promise((res, rej) => {
+    try {
+      const q = indexedDB.open("xsho", 1);
+      q.onupgradeneeded = () => q.result.createObjectStore("d");
+      q.onsuccess = () => res(q.result);
+      q.onerror = () => rej(q.error);
+    } catch (e) { rej(e); }
+  });
+}
+async function cacheGet() {
+  try {
+    const db = await idb();
+    return await new Promise(res => {
+      const r = db.transaction("d").objectStore("d").get("last");
+      r.onsuccess = () => res(r.result || null);
+      r.onerror = () => res(null);
+    });
+  } catch (e) { return null; }
+}
+async function cachePut(o) {
+  try { const db = await idb(); db.transaction("d", "readwrite").objectStore("d").put(o, "last"); } catch (e) {}
+}
+async function cacheClear() {
+  try {
+    const db = await idb();
+    await new Promise(res => {
+      const t = db.transaction("d", "readwrite");
+      t.objectStore("d").clear();
+      t.oncomplete = () => res();
+      t.onerror = () => res();
+    });
+  } catch (e) {}
+}
+
 /* ---------- Ma'lumotni tayyorlash ---------- */
 function processData(d) {
   devices = []; byKey = new Map();
@@ -425,7 +491,7 @@ function processData(d) {
     t.rows.forEach(r => {
       const v = r.v;
       const dev = {
-        k: r.k, tuman: t.name, cols: t.cols, v: v, g: r.g,
+        k: "", tuman: t.name, cols: t.cols, v: v, g: r.g,
         name: ix.name >= 0 ? v[ix.name] : "",
         farm: ix.farm >= 0 ? v[ix.farm] : "",
         serial: ix.serial >= 0 ? v[ix.serial] : "",
@@ -433,6 +499,7 @@ function processData(d) {
         _m: null
       };
       dev.on = !!dev.serial;
+      dev.k = t.name + "|" + (dev.serial || [v[0], dev.farm, dev.name].join("~"));
       dev._s = { serial: dev.serial.toLowerCase(), name: dev.name.toLowerCase(), loc: dev.loc.toLowerCase(), farm: dev.farm.toLowerCase() };
       let k = dev.k;
       while (byKey.has(k)) k += "'";
@@ -518,7 +585,7 @@ function statusTag(d) {
 function cardHtml(d, i) {
   const fav = favSet.has(d.k);
   const title = d.name || d.serial || "Nomsiz obyekt";
-  return '<article class="card' + (d.g ? "" : " noloc") + '" style="--i:' + Math.min(i, 12) + '">' +
+  return '<article class="card' + (d.g ? "" : " noloc") + '" data-k="' + esc(d.k) + '" style="--i:' + Math.min(i, 12) + '">' +
     '<div class="card-top"><h3>' + esc(title) + '</h3>' +
     '<button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button></div>' +
     '<div class="tags">' + statusTag(d) + (d.g ? "" : '<span class="tag red">Joylashuvi yo\'q</span>') +
@@ -597,19 +664,21 @@ function iconFor(d) {
 
 function popupHtml(d) {
   const fav = favSet.has(d.k);
+  const nav = d.g ? "https://www.google.com/maps/dir/?api=1&destination=" + d.g[0] + "," + d.g[1] : "";
   return '<div class="pp-body"><h4>' + esc(d.name || d.serial || "Nomsiz obyekt") + '</h4>' +
     '<div class="tags">' + statusTag(d) + (multi ? '<span class="tag tum">' + esc(d.tuman) + '</span>' : "") + '</div>' +
     '<dl class="main"><div><dt>Modem seriyasi</dt><dd class="mono">' + esc(d.serial || "—") + '</dd></div>' +
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     '<div class="btns"><button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button>' +
-    '<button class="btn" data-more>Batafsil<span class="ic chev">' + I.chevron + '</span></button></div>' +
-    '<div class="more"><div class="more-in"><div class="more-pad">' + detailsHtml(d) + '</div></div></div></div>';
+    '<button class="btn pri" data-detail="' + esc(d.k) + '">Batafsil</button>' +
+    (nav ? '<a class="btn" style="flex:none;width:44px" aria-label="Yo\'nalish" target="_blank" rel="noopener" href="' + nav + '">' + ic("nav") + '</a>' : "") +
+    '</div></div>';
 }
 
 function getMarker(d) {
   if (!d._m) {
     const m = L.marker(d.g, { icon: iconFor(d), keyboard: false });
-    m.bindPopup(() => popupHtml(d), { maxWidth: 290, minWidth: 240, maxHeight: 340, className: "pp", autoPanPadding: [30, 80] });
+    m.bindPopup(() => popupHtml(d), { maxWidth: 280, minWidth: 230, className: "pp", autoPanPadding: [30, 90] });
     d._m = m;
   }
   return d._m;
@@ -617,15 +686,18 @@ function getMarker(d) {
 
 function setBase() {
   if (baseLayer) map.removeLayer(baseLayer);
+  const blank = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+  // Sputnik rasmi 17-darajadan keyin ko'p joyda yo'q (kulrang "Map data not yet available" chiqadi),
+  // shuning uchun 17 dan keyin tayyor plitkalarni kattalashtirib ko'rsatamiz (maxNativeZoom).
   baseLayer = satellite
-    ? L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Tiles &copy; Esri" })
-    : L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" });
+    ? L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, maxNativeZoom: 17, errorTileUrl: blank, attribution: "Tiles &copy; Esri" })
+    : L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, maxNativeZoom: 19, errorTileUrl: blank, attribution: "&copy; OpenStreetMap" });
   baseLayer.addTo(map);
   baseLayer.bringToBack();
 }
 
 function initMap() {
-  map = L.map("map", { zoomControl: false, attributionControl: true }).setView(MAP_START, 12);
+  map = L.map("map", { zoomControl: false, attributionControl: true, maxZoom: 19 }).setView(MAP_START, 12);
   L.control.zoom({ position: "topright" }).addTo(map);
   setBase();
   cluster = L.markerClusterGroup({
@@ -640,7 +712,7 @@ function initMap() {
     if (userDot) map.removeLayer(userDot);
     userDot = L.marker(e.latlng, { icon: L.divIcon({ className: "", html: '<div class="dot"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }), interactive: false }).addTo(map);
   });
-  map.on("locationerror", () => toast("Joylashuvni aniqlab bo'lmadi. Brauzerda ruxsat bering."));
+  map.on("locationerror", () => toast("Joylashuv aniqlanmadi. Telegram ichida ishlamasa, saytni Chrome yoki Safari'da oching."));
   map.on("popupopen", e => {
     const el = e.popup.getElement();
     if (el && !el._bound) {
@@ -659,7 +731,8 @@ function renderMap() {
   list.forEach(d => { if (d.g) { arr.push(getMarker(d)); pts.push(d.g); } });
   cluster.clearLayers();
   cluster.addLayers(arr);
-  $("mapcount").textContent = pts.length.toLocaleString("ru-RU") + " ta obyekt xaritada";
+  const filt = !!state.q.trim() || state.status !== "all" || state.favOnly;
+  $("mapcount").innerHTML = pts.length.toLocaleString("ru-RU") + " ta obyekt" + (filt ? '<button data-mapclear>Filtrni tozalash</button>' : "");
   $("btnFavOnly").classList.toggle("on", state.favOnly);
   if (needFit && pts.length) {
     map.fitBounds(pts, { padding: [50, 50], maxZoom: 16 });
@@ -687,6 +760,30 @@ function showOnMap(k) {
   }, 120);
 }
 
+/* ---------- Xaritadan Ro'yxatga: obyekt batafsil ochilgan holda ---------- */
+function showInList(k) {
+  const d = byKey.get(k);
+  if (!d) return;
+  if (map) map.closePopup();
+  if (!listItems.includes(d)) {   // qidiruv yoki filtr bu obyektni yashirmasin
+    state.q = ""; state.status = "all"; $("q").value = ""; $("qx").hidden = true;
+    if (state.tuman !== "all" && state.tuman !== d.tuman) state.tuman = "all";
+    syncChips();
+    needFit = true;
+    renderAll();
+  }
+  setTab("list");
+  const idx = listItems.indexOf(d);
+  while (idx >= shown && shown < listItems.length) appendChunk();
+  setTimeout(() => {
+    const card = Array.prototype.find.call(document.querySelectorAll("#listBox .card"), c => c.dataset.k === d.k);
+    if (!card) return;
+    card.classList.add("open");
+    card.scrollIntoView({ block: "start", behavior: "auto" });
+    card.classList.remove("hl"); void card.offsetWidth; card.classList.add("hl");
+  }, 320);
+}
+
 /* ---------- Bo'limlar ---------- */
 const TABS = ["list", "map", "fav"];
 function setTab(t) {
@@ -694,7 +791,7 @@ function setTab(t) {
   TABS.forEach(n => $("tab-" + n).classList.toggle("active", n === t));
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
   $("nav").style.setProperty("--t", TABS.indexOf(t));
-  $("toolbar").hidden = t === "fav";
+  $("toolbar").hidden = t !== "list";
   if (t === "map") {
     if (!map) initMap();
     setTimeout(() => { map.invalidateSize(); if (mapDirty || needFit) renderMap(); }, 60);
@@ -734,6 +831,11 @@ function onAction(e) {
     if (map) setTimeout(() => { if (map._popup) map._popup.update(); }, 340);
     return true;
   }
+  if ((el = t.closest("[data-detail]"))) { showInList(el.dataset.detail); return true; }
+  if (t.closest("[data-mapclear]")) {
+    state.q = ""; state.status = "all"; state.favOnly = false; $("q").value = ""; $("qx").hidden = true;
+    needFit = true; renderAll(); return true;
+  }
   if ((el = t.closest("[data-show]"))) { showOnMap(el.dataset.show); return true; }
   if ((el = t.closest("[data-tuman]"))) {
     state.tuman = el.dataset.tuman; needFit = true; syncChips(); $("tab-list").scrollTop = 0; renderAll(); return true;
@@ -749,16 +851,18 @@ document.addEventListener("click", onAction);
 /* ---------- Tuman tugmalari ---------- */
 function buildChips() {
   multi = user.tumans.length > 1;
-  const box = $("chips");
+  const box = $("chips"), mbox = $("mapChips");
   if (!multi) {
-    box.hidden = true; state.tuman = "all";
+    box.hidden = true; mbox.hidden = true; state.tuman = "all";
     $("sub").textContent = user.tumans[0] || "";
     return;
   }
-  box.hidden = false;
+  box.hidden = false; mbox.hidden = false;
   $("sub").textContent = "Barcha tumanlar";
-  box.innerHTML = ["all"].concat(user.tumans).map(t =>
+  const html = ["all"].concat(user.tumans).map(t =>
     '<button class="chip" data-tuman="' + esc(t) + '">' + (t === "all" ? "Hammasi" : esc(t)) + '</button>').join("");
+  box.innerHTML = html;
+  mbox.innerHTML = html;
   syncChips();
 }
 function syncChips() {
@@ -798,9 +902,10 @@ function updateMenu() {
   $("mMeta").innerHTML = esc(t) + (when ? "<br>" + esc(when) : "");
 }
 
-function logout(msg) {
+async function logout(msg) {
   clearCreds();
   try { if (msg) sessionStorage.setItem("xsho_msg", msg); } catch (e) {}
+  try { await Promise.race([cacheClear(), new Promise(r => setTimeout(r, 800))]); } catch (e) {}
   location.reload();
 }
 
@@ -808,11 +913,13 @@ function logout(msg) {
 function applyData(r) {
   user = r.user;
   processData(r);
+  dataTxt = r._t || "";
   lastLoad = Date.now();
   lastError = "";
   if (!loadedOnce) needFit = true;
   loadedOnce = true;
   updateMenu();
+  if (r.missing && r.missing.length) toast("Varaq topilmadi: " + r.missing.join(", "));
 }
 
 async function loadData(silent) {
@@ -827,8 +934,13 @@ async function loadData(silent) {
       if (/login|parol|bloklan|ko'p xato|biriktirilmagan/i.test(m)) { logout(m); return; }
       lastError = m;
       toast(m);
+    } else if (devices.length && r._t && r._t === dataTxt) {
+      lastLoad = Date.now();
+      updateMenu();
+      if (!silent) toast("Ma'lumot yangilandi");
     } else {
       applyData(r);
+      cachePut({ login: creds.login, ts: lastLoad, t: r._t || "" });
       if (!silent) toast("Ma'lumot yangilandi");
     }
   } catch (e) {
@@ -861,25 +973,31 @@ $("eye").addEventListener("click", () => {
 $("loginForm").addEventListener("submit", async e => {
   e.preventDefault();
   const login = $("login").value.trim(), password = $("password").value;
-  const btn = $("loginBtn"), card = $("loginForm");
-  btn.disabled = true; btn.textContent = "Tekshirilmoqda...";
-  $("loginErr").textContent = "";
+  const btn = $("loginBtn"), card = $("loginForm"), msg = $("loginErr");
+  btn.disabled = true; btn.textContent = "Ma'lumot yuklanmoqda...";
+  msg.className = ""; msg.textContent = "";
+  const t0 = Date.now();
+  const hint = setInterval(() => {
+    const sec = Math.round((Date.now() - t0) / 1000);
+    if (sec >= 6) { msg.className = "hint"; msg.textContent = "Yuklanmoqda... " + sec + " s. Birinchi marta biroz kutish kerak bo'lishi mumkin."; }
+  }, 1000);
   try {
-    const r = await api({ action: "login", login: login, password: password });
+    const r = await api({ action: "data", login: login, password: password });
     if (!r.ok) {
-      $("loginErr").textContent = r.error || "Xatolik";
+      msg.className = ""; msg.textContent = r.error || "Xatolik";
       card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
       return;
     }
     creds = { login: login, password: password };
     saveCreds(creds, $("remember").checked);
-    user = r.user;
     $("password").value = "";
+    applyData(r);
+    cachePut({ login: login, ts: lastLoad, t: r._t || "" });
     enterApp();
-    loadData(true);
   } catch (err) {
-    $("loginErr").textContent = "Aloqa xatosi. Internetni tekshiring.";
+    msg.className = ""; msg.textContent = "Aloqa xatosi. Internetni tekshirib, qayta urinib ko'ring.";
   } finally {
+    clearInterval(hint);
     btn.disabled = false; btn.textContent = "Kirish";
   }
 });
@@ -920,8 +1038,15 @@ $("btnFavOnly").addEventListener("click", () => {
   toast(state.favOnly ? "Faqat tanlanganlar ko'rsatilmoqda" : "Hamma obyektlar ko'rsatilmoqda");
 });
 $("favMap").addEventListener("click", () => { state.favOnly = true; needFit = true; setTab("map"); renderMap(); });
+let clearArm = 0;
 $("favClear").addEventListener("click", () => {
-  if (!confirm("Barcha tanlanganlar o'chirilsinmi?")) return;
+  const lbl = $("favClear").lastChild;
+  if (!clearArm) {
+    lbl.textContent = "Aniqmi?";
+    clearArm = setTimeout(() => { clearArm = 0; lbl.textContent = "Tozalash"; }, 3000);
+    return;
+  }
+  clearTimeout(clearArm); clearArm = 0; lbl.textContent = "Tozalash";
   favs = []; favSet = new Set(); saveFavs();
   devices.forEach(d => { if (d._m) d._m.setIcon(iconFor(d)); });
   state.favOnly = false; mapDirty = true;
@@ -944,22 +1069,57 @@ document.addEventListener("visibilitychange", () => {
   try { msg = sessionStorage.getItem("xsho_msg") || ""; sessionStorage.removeItem("xsho_msg"); } catch (e) {}
   creds = loadCreds();
   if (!creds || !creds.login) { creds = null; showLogin(msg); return; }
+
+  // 1) Telefonda oxirgi nusxa bor bo'lsa — darrov ochamiz, yangisini fonda olamiz
+  const c = await cacheGet();
+  if (c && c.login === creds.login && c.t) {
+    try {
+      const r = JSON.parse(c.t);
+      if (r && r.ok && r.tumans) {
+        Object.defineProperty(r, "_t", { value: c.t });
+        applyData(r);
+        lastLoad = c.ts || Date.now();
+        updateMenu();
+        enterApp();
+        loadData(true);
+        return;
+      }
+    } catch (e) {}
+  }
+
+  // 2) Nusxa yo'q — ma'lumot to'liq kelguncha kutamiz, keyin saytga kiramiz
+  const hintTimer = setTimeout(() => { $("splashTxt").textContent = "Birinchi marta yuklash biroz vaqt oladi, kuting..."; }, 6000);
   try {
     const r = await api({ action: "data", login: creds.login, password: creds.password });
     if (!r.ok) {
       const m = r.error || "Xatolik";
-      if (/login|parol|bloklan|ko'p xato|biriktirilmagan/i.test(m)) { clearCreds(); showLogin(m); }
-      else showLogin(m);
+      if (/login|parol|bloklan|ko'p xato|biriktirilmagan/i.test(m)) clearCreds();
+      showLogin(m);
       return;
     }
-    user = r.user;
-    enterApp();
     applyData(r);
-    renderAll();
+    cachePut({ login: creds.login, ts: lastLoad, t: r._t || "" });
+    enterApp();
   } catch (e) {
     showLogin("Aloqa xatosi. Internetni tekshirib, qayta kiring.");
+  } finally {
+    clearTimeout(hintTimer);
   }
 })();
+
+/* ---------- Telegram ichida ochilganda: to'liq balandlik, pastga surib yopilib ketmasin ---------- */
+function tgInit() {
+  try {
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (!tg) return;
+    tg.ready(); tg.expand();
+    if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+    if (tg.setHeaderColor) tg.setHeaderColor("#0a1020");
+    if (tg.setBackgroundColor) tg.setBackgroundColor("#0a1020");
+  } catch (e) {}
+}
+tgInit();
+window.addEventListener("load", tgInit);
 
 if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
