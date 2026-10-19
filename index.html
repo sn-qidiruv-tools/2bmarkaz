@@ -21,7 +21,7 @@
   --text:#e9eefc; --muted:#8d9cc2; --accent:#3b82f6; --accent2:#22d3ee;
   --ok:#22c55e; --warn:#f59e0b; --red:#f87171;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
 [hidden]{display:none!important}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
@@ -76,7 +76,7 @@ input,select{font:inherit;color:inherit}
 
 /* ---------- Ilova ---------- */
 #appView{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
-.top{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));background:linear-gradient(180deg,#0f1b3b,var(--bg));border-bottom:1px solid var(--line);position:relative;z-index:1200}
+.top{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(max(10px,env(safe-area-inset-top)) + var(--tg-top,0px));background:linear-gradient(180deg,#0f1b3b,var(--bg));border-bottom:1px solid var(--line);position:relative;z-index:1200}
 .top .logo{width:36px;height:36px;flex-shrink:0}
 .ttl{flex:1;min-width:0}
 .ttl h1{font-size:15px;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -93,7 +93,7 @@ input,select{font:inherit;color:inherit}
 .menu .mbtn.out{color:var(--red)}
 .menu .mbtn .ic svg{width:18px;height:18px}
 
-.toolbar{padding:10px 12px 8px;background:var(--bg);border-bottom:1px solid rgba(38,54,92,.6)}
+.toolbar{position:sticky;top:0;z-index:20;padding:10px 12px 8px;background:var(--bg);border-bottom:1px solid rgba(38,54,92,.6)}
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:10px}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex-shrink:0;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--line);transition:all .2s}
@@ -221,6 +221,57 @@ input,select{font:inherit;color:inherit}
 /* ---------- Toast ---------- */
 #toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:9500;max-width:86vw;padding:11px 18px;border-radius:999px;background:#e9eefc;color:#0a1020;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Joylashuvi noto'g'ri yozilgan obyektlar (sariq) ---------- */
+.card.badloc{background:linear-gradient(180deg,rgba(250,204,21,.16),rgba(250,204,21,.05));border-color:rgba(250,204,21,.5)}
+.tag.yel{background:rgba(250,204,21,.2);color:#fde047}
+.badnote{margin:-2px 0 12px;padding:8px 10px;border-radius:10px;background:rgba(250,204,21,.1);border:1px dashed rgba(250,204,21,.45);font-size:12.5px;color:#fde68a;line-height:1.4;word-break:break-word}
+.badnote b{color:#fde047}
+
+/* ---------- Xaritada joylashuv qidirish ---------- */
+.locsearch{position:absolute;left:12px;top:10px;z-index:800;display:flex;align-items:center;height:46px;max-width:calc(100% - 76px);border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.4);overflow:hidden}
+.locsearch>button{width:44px;height:44px;flex:none;display:grid;place-items:center;color:var(--text);transition:color .2s,background .2s}
+.locsearch.open>#locBtn{color:var(--accent2)}
+.locsearch form{display:flex;align-items:center;width:0;opacity:0;transition:width .3s ease,opacity .2s}
+.locsearch.open form{width:min(380px,calc(100vw - 150px));opacity:1}
+.locsearch input{flex:1;min-width:0;height:44px;padding:0 4px;font-size:16px;background:none;border:0;outline:none;color:var(--text)}
+.locsearch input::placeholder{color:var(--muted)}
+.locsearch form button{width:42px;height:44px;flex:none;display:grid;place-items:center;color:var(--accent2)}
+.locsearch.err{animation:shake .4s}
+.locsearch .ic svg{width:20px;height:20px}
+
+/* ---------- Kompyuter (keng ekran) uchun alohida ko'rinish: chapda yo'l-yo'riq, o'rtada ro'yxat, o'ngda xarita ---------- */
+body.split{--panel:clamp(410px,32vw,520px)}
+body.split #appView{display:grid;grid-template-columns:92px 1fr;grid-template-rows:auto 1fr}
+body.split .top{grid-column:1/3;grid-row:1;padding-left:22px;padding-right:22px}
+body.split .top .logo{width:40px;height:40px}
+body.split .ttl h1{font-size:17px}
+body.split .bottom{grid-column:1;grid-row:2;grid-template-columns:1fr;grid-auto-rows:min-content;align-content:start;border-top:0;border-right:1px solid var(--line);padding:10px 0}
+body.split .bottom button{padding:15px 4px 13px;font-size:11.5px}
+body.split .bottom button.on{background:rgba(59,130,246,.12)}
+body.split .bottom button.on::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--accent),var(--accent2))}
+body.split .bottom button.on .ic{transform:scale(1.1)}
+body.split .ind{display:none}
+body.split .badge{left:calc(50% + 8px);top:8px}
+body.split #content{grid-column:2;grid-row:2}
+body.split #tab-list,body.split #tab-fav{right:auto;width:var(--panel);border-right:1px solid var(--line);background:var(--bg)}
+body.split #tab-map{visibility:visible;opacity:1;transform:none;left:var(--panel);transition:left .3s ease}
+body.split.tmap #tab-map{left:0}
+body.split .mapbtns{bottom:26px;right:16px}
+body.split .mapcount{bottom:26px;left:16px}
+body.split .locsearch{left:16px;top:14px}
+body.split .leaflet-top.leaflet-right{top:14px;right:6px}
+body.split #toast{bottom:28px}
+body.split .menu{right:20px}
+@media (hover:hover){
+  .card{transition:border-color .2s,transform .2s,box-shadow .2s}
+  .card:hover{border-color:#3a5189;box-shadow:0 8px 22px rgba(0,0,0,.28)}
+  .btn:hover{border-color:#3a5189;filter:brightness(1.12)}
+  .chip:hover{border-color:#3a5189;color:var(--text)}
+  .chip.on:hover{color:#fff}
+  .tile:hover,.hbtn:hover,.mbtn2:hover,.star:hover{filter:brightness(1.15)}
+  .bottom button:hover{color:#fff}
+}
 </style>
 </head>
 <body>
@@ -272,20 +323,19 @@ input,select{font:inherit;color:inherit}
     </div>
   </header>
 
-  <div class="toolbar" id="toolbar">
-    <div class="chips" id="chips"></div>
-    <div class="searchrow">
-      <label class="sel"><select id="field"></select><span class="ic" data-ic="chevron"></span></label>
-      <div class="sbox">
-        <span class="ic" data-ic="search"></span>
-        <input id="q" type="search" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false">
-        <button class="qx" id="qx" hidden aria-label="Tozalash"><span class="ic" data-ic="x"></span></button>
-      </div>
-    </div>
-  </div>
-
   <main id="content">
     <div class="tab active" id="tab-list">
+    <div class="toolbar" id="toolbar">
+      <div class="chips" id="chips"></div>
+      <div class="searchrow">
+        <label class="sel"><select id="field"></select><span class="ic" data-ic="chevron"></span></label>
+        <div class="sbox">
+          <span class="ic" data-ic="search"></span>
+          <input id="q" type="search" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button class="qx" id="qx" hidden aria-label="Tozalash"><span class="ic" data-ic="x"></span></button>
+        </div>
+      </div>
+    </div>
       <div class="pad">
         <div class="stats" id="stats">
           <button class="tile on" data-status="all"><b id="n-all">0</b><span>Jami</span></button>
@@ -299,6 +349,13 @@ input,select{font:inherit;color:inherit}
     </div>
     <div class="tab" id="tab-map">
       <div id="map"></div>
+      <div class="locsearch" id="locsearch">
+        <button type="button" id="locBtn" aria-label="Joylashuvni koordinata bo'yicha topish"><span class="ic" data-ic="pin"></span></button>
+        <form id="locForm" autocomplete="off">
+          <input id="locQ" type="text" enterkeyhint="search" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Koordinata: 39.84, 64.45">
+          <button type="submit" aria-label="Topish"><span class="ic" data-ic="search"></span></button>
+        </form>
+      </div>
       <div class="mapcount" id="mapcount"></div>
       <div class="mapbtns">
         <button class="mbtn2" id="btnFavOnly" aria-label="Faqat tanlanganlar"><span class="ic" data-ic="star"></span></button>
@@ -361,6 +418,7 @@ const I = {
   layers: '<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>',
   eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   eyeoff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.5 7.6A17 17 0 0 0 2 12s3.6 6 10 6c1.5 0 2.8-.3 4-.8"/><path d="M9.9 10a3 3 0 0 0 4.1 4.1"/></svg>',
+  pin: '<svg viewBox="0 0 24 24"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>',
   user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-5 8-5s6.5 1 8 5"/></svg>',
   lock: '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
 };
@@ -383,6 +441,85 @@ function pinSvg(color, fav) {
 document.querySelectorAll("[data-ic]").forEach(el => { el.innerHTML = I[el.dataset.ic]; });
 document.querySelectorAll("[data-brand]").forEach(el => { el.innerHTML = brand(el.dataset.brand); });
 
+
+/* ---------- Koordinata o'qish: 39.84, 64.45  |  39°48'01"N 64°32'12"E  |  Google Maps havolasi ---------- */
+function normC(s) {
+  s = String(s == null ? "" : s).replace(/ /g, " ");
+  s = s.replace(/[′’‘`´]/g, "'").replace(/[″”“]/g, '"').replace(/''/g, '"').replace(/[º˚∘]/g, "°");
+  s = s.replace(/с\.?\s*ш\.?/gi, "N").replace(/ю\.?\s*ш\.?/gi, "S").replace(/в\.?\s*д\.?/gi, "E").replace(/з\.?\s*д\.?/gi, "W");
+  return s.trim();
+}
+function finC(lat, lng) {
+  if (!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return [Math.round(lat * 1e6) / 1e6, Math.round(lng * 1e6) / 1e6];
+}
+function pairC(items) {
+  if (items.length !== 2) return null;
+  const isLat = h => h === "N" || h === "S", isLng = h => h === "E" || h === "W";
+  let a = items[0], b = items[1], lat, lng;
+  if (a.h && b.h) {
+    if (isLat(a.h) && isLng(b.h)) { lat = a; lng = b; }
+    else if (isLng(a.h) && isLat(b.h)) { lat = b; lng = a; }
+    else return null;
+  } else if (a.h || b.h) {
+    const k = a.h ? a : b, o = a.h ? b : a;
+    if (isLat(k.h)) { lat = k; lng = o; } else { lng = k; lat = o; }
+  } else {
+    lat = a; lng = b;
+    if (Math.abs(a.v) > 50 && Math.abs(b.v) < 50) { lat = b; lng = a; }   // (uzunlik, kenglik) aralashib yozilgan bo'lsa
+  }
+  const sg = x => (x.h === "S" || x.h === "W") ? -Math.abs(x.v) : x.v;
+  return finC(sg(lat), sg(lng));
+}
+function scanC(s, re, build) {
+  const items = []; let bad = false;
+  const rest = s.replace(re, function () {
+    const it = build.apply(null, arguments);
+    if (!it) bad = true; else items.push(it);
+    return " ";
+  });
+  if (bad || !/^[\s,;]*$/.test(rest)) return null;
+  return pairC(items);
+}
+function dmsItem(deg, min, sec, h) {
+  deg = +deg; min = min == null || min === "" ? 0 : +min; sec = sec == null || sec === "" ? 0 : +sec;
+  if (!(deg >= 0 || deg < 0) || min >= 60 || sec >= 60) return null;
+  const neg = deg < 0 || /^-/.test(String(deg));
+  const v = Math.abs(deg) + min / 60 + sec / 3600;
+  return { v: neg ? -v : v, h: h ? h.toUpperCase() : "" };
+}
+function parseCoord(raw) {
+  const s = normC(raw);
+  if (!s) return null;
+  let m;
+  if (/https?:\/\/|google\.|goo\.gl|maps\.app/i.test(s)) {
+    if ((m = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)) || (m = s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)) ||
+        (m = s.match(/[?&](?:q|ll|query|destination|center)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/i))) return finC(+m[1], +m[2]);
+    return null;
+  }
+  const N = "(-?\\d{1,3}(?:\\.\\d+)?)", MS = "(?:(\\d{1,2}(?:\\.\\d+)?)\\s*'\\s*)?(?:(\\d{1,2}(?:\\.\\d+)?)\\s*\"\\s*)?";
+  let r;
+  // N39°48'01" E64°32'12"  (harf oldida)
+  if (/^[NSEW]/i.test(s)) {
+    r = scanC(s, new RegExp("([NSEW])\\s*" + N + "\\s*(?:°\\s*)?" + MS, "gi"), (x, h, d, mi, se) => dmsItem(d, mi, se, h));
+    if (r) return r;
+  }
+  // 39°48'01"N 64°32'12"E  (° belgisi bilan, harf ixtiyoriy)
+  r = scanC(s, new RegExp(N + "\\s*°\\s*" + MS + "([NSEW])?", "gi"), (x, d, mi, se, h) => dmsItem(d, mi, se, h));
+  if (r) return r;
+  // 39 48 01 N 64 32 12 E
+  r = scanC(s, /(\d{1,3})\s+(\d{1,2})\s+(\d{1,2}(?:\.\d+)?)\s*([NSEW])/gi, (x, d, mi, se, h) => dmsItem(d, mi, se, h));
+  if (r) return r;
+  // 39.8444N 64.5367E
+  r = scanC(s, new RegExp(N + "\\s*([NSEW])", "gi"), (x, d, h) => dmsItem(d, 0, 0, h));
+  if (r) return r;
+  // 39.844061, 64.451622  yoki  39.844061 64.451622
+  if ((m = s.match(/^(-?\d{1,3}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)$/))) return pairC([{ v: +m[1], h: "" }, { v: +m[2], h: "" }]);
+  // 39,844061 64,451622  (vergulli kasr)
+  if ((m = s.match(/^(-?\d{1,3},\d+)\s*[;\s]\s*(-?\d{1,3},\d+)$/))) return pairC([{ v: +m[1].replace(",", "."), h: "" }, { v: +m[2].replace(",", "."), h: "" }]);
+  return null;
+}
+
 /* ---------- Holat ---------- */
 const FIELDS = {
   serial: { l: "Modem seriyasi", p: "Seriya raqami..." },
@@ -395,6 +532,10 @@ let creds = null, user = null, devices = [], byKey = new Map(), favs = [], favSe
 let tab = "list", map = null, cluster = null, baseLayer = null, satellite = false, mapDirty = true, needFit = true, userDot = null;
 let listItems = [], shown = 0, io = null, lastLoad = 0, loading = false, loadedOnce = false, multi = false, lastError = "";
 const iconCache = {};
+const mq = window.matchMedia ? window.matchMedia("(min-width:1000px) and (min-height:500px)") : null;
+const isSplit = () => !!(mq && mq.matches);                 // kompyuter / keng ekran
+const mapVisible = () => tab === "map" || isSplit();
+let findMarker = null;
 let dataTxt = "";
 let selectedKey = null;   // xaritada oxirgi ochilgan kamera
 
@@ -487,7 +628,7 @@ function processData(d) {
     t.rows.forEach(r => {
       const v = r.v;
       const dev = {
-        k: "", tuman: t.name, cols: t.cols, v: v, g: r.g,
+        k: "", tuman: t.name, cols: t.cols, v: v, g: r.g || null, bad: false,
         name: ix.name >= 0 ? v[ix.name] : "",
         farm: ix.farm >= 0 ? v[ix.farm] : "",
         serial: ix.serial >= 0 ? v[ix.serial] : "",
@@ -495,6 +636,7 @@ function processData(d) {
         _m: null
       };
       dev.on = !!dev.serial;
+      if (!dev.g && dev.loc.trim()) { dev.g = parseCoord(dev.loc); dev.bad = !dev.g; }   // DMS o'qiladi, o'qilmasa — noto'g'ri yozilgan
       dev.k = t.name + "|" + (dev.serial || [v[0], dev.farm, dev.name].join("~"));
       dev._s = { serial: dev.serial.toLowerCase(), name: dev.name.toLowerCase(), loc: dev.loc.toLowerCase(), farm: dev.farm.toLowerCase() };
       let k = dev.k;
@@ -537,7 +679,7 @@ function renderAll() {
   renderStats(base);
   listItems = viewList(base);
   renderList();
-  if (tab === "map") renderMap(); else mapDirty = true;
+  if (map && mapVisible()) renderMap(); else mapDirty = true;
   if (tab === "fav") renderFav();
   updateFavBadge();
 }
@@ -581,13 +723,14 @@ function statusTag(d) {
 function cardHtml(d, i) {
   const fav = favSet.has(d.k);
   const title = d.name || d.serial || "Nomsiz obyekt";
-  return '<article class="card' + (d.g ? "" : " noloc") + '" data-k="' + esc(d.k) + '" style="--i:' + Math.min(i, 12) + '">' +
+  return '<article class="card' + (d.g ? "" : d.bad ? " badloc" : " noloc") + '" data-k="' + esc(d.k) + '" style="--i:' + Math.min(i, 12) + '">' +
     '<div class="card-top"><h3>' + esc(title) + '</h3>' +
     '<button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button></div>' +
-    '<div class="tags">' + statusTag(d) + (d.g ? "" : '<span class="tag red">Joylashuvi yo\'q</span>') +
+    '<div class="tags">' + statusTag(d) + (d.g ? "" : d.bad ? '<span class="tag yel">Joylashuv noto\'g\'ri yozilgan</span>' : '<span class="tag red">Joylashuvi yo\'q</span>') +
     (multi ? '<span class="tag tum">' + esc(d.tuman) + '</span>' : "") + '</div>' +
     '<dl class="main"><div><dt>Modem seriyasi</dt><dd class="mono">' + esc(d.serial || "—") + '</dd></div>' +
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
+    (d.bad ? '<div class="badnote"><b>Yozilgan:</b> ' + esc(d.loc) + '<br>Xaritada ko\'rinmaydi. Jadvalda to\'g\'rilang, masalan: 39.844061, 64.451622' + '</div>' : "") +
     '<div class="btns">' + (d.g ? '<button class="btn pri" data-show="' + esc(d.k) + '">' + ic("map") + 'Xaritada</button>' : "") +
     '<button class="btn" data-more>Batafsil<span class="ic chev">' + I.chevron + '</span></button></div>' +
     '<div class="more"><div class="more-in"><div class="more-pad">' + detailsHtml(d) + '</div></div></div>' +
@@ -744,7 +887,7 @@ function renderMap(focus) {
 /* Eslab qolingan kameraning oynasini qayta ochish (Ro'yxatdan qaytganda ham, xarita qayta chizilganda ham) */
 function restoreSelected(focus, tries) {
   tries = tries || 0;
-  if (!selectedKey || !map || tab !== "map") return;
+  if (!selectedKey || !map || !mapVisible()) return;
   const key = selectedKey;
   const d = byKey.get(key);
   if (!d || !d.g || !mapList().includes(d)) return;
@@ -770,14 +913,17 @@ function showOnMap(k) {
   }
   selectedKey = k;
   needFit = false;
-  setTab("map", true);
+  if (isSplit()) {             // kompyuterda ro'yxat turaveradi, xarita yonida ochiladi
+    if (!map) initMap();
+    if (mapDirty) renderMap(true); else restoreSelected(true);
+  } else setTab("map", true);
 }
 
 /* ---------- Xaritadan Ro'yxatga: obyekt batafsil ochilgan holda ---------- */
 function showInList(k) {
   const d = byKey.get(k);
   if (!d) return;
-  if (map) map.closePopup();
+  if (map && !isSplit()) map.closePopup();
   if (!listItems.includes(d)) {   // qidiruv yoki filtr bu obyektni yashirmasin
     state.q = ""; state.status = "all"; $("q").value = ""; $("qx").hidden = true;
     if (state.tuman !== "all" && state.tuman !== d.tuman) state.tuman = "all";
@@ -804,14 +950,15 @@ function setTab(t, focus) {
   TABS.forEach(n => $("tab-" + n).classList.toggle("active", n === t));
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
   $("nav").style.setProperty("--t", TABS.indexOf(t));
-  $("toolbar").hidden = t !== "list";
-  if (t === "map") {
+  document.body.classList.toggle("tmap", t === "map");
+  if (t === "map" || isSplit()) {
     if (!map) initMap();
     setTimeout(() => {
       if (!map) return;
       map.invalidateSize();
       if (mapDirty || needFit) renderMap(focus); else restoreSelected(focus);
     }, 60);
+    if (isSplit()) setTimeout(() => { if (map) map.invalidateSize(); }, 360);
   }
   if (t === "fav") renderFav();
 }
@@ -849,6 +996,7 @@ function onAction(e) {
     return true;
   }
   if ((el = t.closest("[data-detail]"))) { showInList(el.dataset.detail); return true; }
+  if (t.closest("[data-locclear]")) { if (findMarker && map) { map.removeLayer(findMarker); findMarker = null; } return true; }
   if (t.closest("[data-mapclear]")) {
     state.q = ""; state.status = "all"; state.favOnly = false; state.tuman = "all"; $("q").value = ""; $("qx").hidden = true;
     syncChips(); needFit = true; renderAll(); return true;
@@ -907,8 +1055,8 @@ function enterApp() {
   state.status = "all"; state.q = ""; state.favOnly = false; state.field = "serial";
   $("q").value = ""; $("field").value = "serial"; $("q").placeholder = FIELDS.serial.p; $("qx").hidden = true;
   updateMenu();
-  setTab("list");
   renderAll();
+  setTab("list");
 }
 
 function updateMenu() {
@@ -1046,6 +1194,39 @@ $("qx").addEventListener("click", () => {
 
 document.querySelectorAll("#nav button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
 
+/* ---------- Xaritada istalgan joylashuvni koordinata bo'yicha topish ---------- */
+function findPoint(g) {
+  if (!map) return;
+  if (findMarker) map.removeLayer(findMarker);
+  const txt = g[0].toFixed(6) + ", " + g[1].toFixed(6);
+  findMarker = L.marker(g, { icon: L.divIcon({ className: "pin", html: pinSvg("#06b6d4", false), iconSize: [36, 44], iconAnchor: [18, 42], popupAnchor: [0, -38] }), keyboard: false }).addTo(map);
+  findMarker.bindPopup('<div class="pp-body"><h4>Qidirilgan nuqta</h4><dl class="main"><div><dt>Koordinata</dt><dd class="mono">' + txt + '</dd></div></dl>' +
+    '<div class="btns"><button class="btn" data-locclear>O\'chirish</button><a class="btn pri" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + g[0] + ',' + g[1] + '">' + ic("nav") + 'Yo\'nalish</a></div></div>',
+    { maxWidth: 280, minWidth: 230, className: "pp", autoPanPadding: [30, 90] });
+  map.setView(g, Math.max(map.getZoom(), 17));
+  findMarker.openPopup();
+}
+function locOpen(open) {
+  const box = $("locsearch");
+  box.classList.toggle("open", open);
+  $("locBtn").innerHTML = ic(open ? "x" : "pin");
+  if (open) setTimeout(() => $("locQ").focus(), 150); else $("locQ").blur();
+}
+$("locBtn").addEventListener("click", () => locOpen(!$("locsearch").classList.contains("open")));
+$("locForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const g = parseCoord($("locQ").value);
+  if (!g) {
+    const b = $("locsearch");
+    b.classList.remove("err"); void b.offsetWidth; b.classList.add("err");
+    toast($("locQ").value.trim() ? "Koordinata noto'g'ri. Masalan: 39.84, 64.45 yoki 39°48'01\"N 64°32'12\"E" : "Koordinatani yozing");
+    return;
+  }
+  $("locQ").blur();
+  findPoint(g);
+});
+
+
 $("btnLocate").addEventListener("click", () => { if (map) map.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true }); });
 $("btnLayer").addEventListener("click", () => { satellite = !satellite; setBase(); toast(satellite ? "Yo'ldosh xaritasi" : "Oddiy xarita"); });
 $("btnFavOnly").addEventListener("click", () => {
@@ -1122,7 +1303,23 @@ document.addEventListener("visibilitychange", () => {
   }
 })();
 
-/* ---------- Telegram ichida ochilganda: to'liq balandlik, pastga surib yopilib ketmasin ---------- */
+/* ---------- Ekran o'zgarganda (telefon <-> kompyuter) ---------- */
+function applyLayout() {
+  document.body.classList.toggle("split", isSplit());
+  if ($("appView").hidden) return;
+  if (isSplit()) { if (!map) initMap(); else if (mapDirty) renderMap(); }
+  if (map) { map.invalidateSize(); setTimeout(() => { if (map) map.invalidateSize(); }, 360); }
+}
+applyLayout();
+if (mq) { if (mq.addEventListener) mq.addEventListener("change", applyLayout); else if (mq.addListener) mq.addListener(applyLayout); }
+
+/* ---------- Telegram ichida ochilganda: to'liq balandlik; kompyuter Telegram'ida kichik oyna o'zi kengayadi ---------- */
+const TG_DESK = ["tdesktop", "macos", "weba", "webk", "web"];
+let tgFull = false, tgBound = false;
+function tgInsets(tg) {
+  const a = tg.safeAreaInset || {}, c = tg.contentSafeAreaInset || {};
+  document.documentElement.style.setProperty("--tg-top", ((a.top || 0) + (c.top || 0)) + "px");
+}
 function tgInit() {
   try {
     const tg = window.Telegram && window.Telegram.WebApp;
@@ -1131,6 +1328,17 @@ function tgInit() {
     if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
     if (tg.setHeaderColor) tg.setHeaderColor("#0a1020");
     if (tg.setBackgroundColor) tg.setBackgroundColor("#0a1020");
+    const desk = TG_DESK.indexOf(tg.platform) >= 0;
+    if (desk && !tgFull && window.innerWidth < 1000 && !tg.isFullscreen && tg.requestFullscreen && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) {
+      tgFull = true;
+      try { tg.requestFullscreen(); } catch (e) {}
+    }
+    tgInsets(tg);
+    if (!tgBound && tg.onEvent) {
+      tgBound = true;
+      ["safeAreaChanged", "contentSafeAreaChanged", "fullscreenChanged"].forEach(ev => tg.onEvent(ev, () => { tgInsets(tg); applyLayout(); }));
+      tg.onEvent("viewportChanged", applyLayout);
+    }
   } catch (e) {}
 }
 tgInit();
