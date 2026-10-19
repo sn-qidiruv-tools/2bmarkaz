@@ -194,10 +194,6 @@ input,select{font:inherit;color:inherit}
 .mbtn2.on{background:#fbbf24;color:#1a1200;border-color:transparent}
 .mapcount{position:absolute;left:12px;bottom:18px;z-index:800;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:12px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.4)}
 .mapcount button{color:var(--accent2);font-weight:700;font-size:12px;padding:2px 0}
-.mapchips{position:absolute;top:10px;left:10px;right:62px;z-index:800;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 8px}
-.mapchips::-webkit-scrollbar{display:none}
-.mapchips .chip{background:rgba(19,29,55,.92);box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.mapchips .chip.on{background:linear-gradient(135deg,#3b82f6,#2563eb)}
 @keyframes hl{0%,55%{box-shadow:0 0 0 3px var(--accent2)}100%{box-shadow:0 0 0 0 rgba(34,211,238,0)}}
 .card{scroll-margin-top:10px}
 .card.hl{animation:hl 1.8s ease}
@@ -303,7 +299,6 @@ input,select{font:inherit;color:inherit}
     </div>
     <div class="tab" id="tab-map">
       <div id="map"></div>
-      <div class="mapchips" id="mapChips" hidden></div>
       <div class="mapcount" id="mapcount"></div>
       <div class="mapbtns">
         <button class="mbtn2" id="btnFavOnly" aria-label="Faqat tanlanganlar"><span class="ic" data-ic="star"></span></button>
@@ -401,6 +396,7 @@ let tab = "list", map = null, cluster = null, baseLayer = null, satellite = fals
 let listItems = [], shown = 0, io = null, lastLoad = 0, loading = false, loadedOnce = false, multi = false, lastError = "";
 const iconCache = {};
 let dataTxt = "";
+let selectedKey = null;   // xaritada oxirgi ochilgan kamera
 
 /* ---------- Server bilan aloqa ---------- */
 async function api(body, timeoutMs) {
@@ -678,7 +674,7 @@ function popupHtml(d) {
 function getMarker(d) {
   if (!d._m) {
     const m = L.marker(d.g, { icon: iconFor(d), keyboard: false });
-    m.bindPopup(() => popupHtml(d), { maxWidth: 280, minWidth: 230, className: "pp", autoPanPadding: [30, 90] });
+    m.bindPopup(() => { selectedKey = d.k; return popupHtml(d); }, { maxWidth: 280, minWidth: 230, className: "pp", autoPanPadding: [30, 90] });
     d._m = m;
   }
   return d._m;
@@ -712,18 +708,22 @@ function initMap() {
     if (userDot) map.removeLayer(userDot);
     userDot = L.marker(e.latlng, { icon: L.divIcon({ className: "", html: '<div class="dot"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }), interactive: false }).addTo(map);
   });
+  map.on("click", () => { selectedKey = null; });
   map.on("locationerror", () => toast("Joylashuv aniqlanmadi. Telegram ichida ishlamasa, saytni Chrome yoki Safari'da oching."));
   map.on("popupopen", e => {
     const el = e.popup.getElement();
     if (el && !el._bound) {
       el._bound = true;
-      el.addEventListener("click", ev => { if (onAction(ev)) ev.stopPropagation(); });
+      el.addEventListener("click", ev => {
+        if (ev.target.closest && ev.target.closest(".leaflet-popup-close-button")) selectedKey = null;
+        if (onAction(ev)) ev.stopPropagation();
+      });
     }
   });
   renderMap();
 }
 
-function renderMap() {
+function renderMap(focus) {
   if (!map) return;
   mapDirty = false;
   const list = mapList();
@@ -731,33 +731,46 @@ function renderMap() {
   list.forEach(d => { if (d.g) { arr.push(getMarker(d)); pts.push(d.g); } });
   cluster.clearLayers();
   cluster.addLayers(arr);
-  const filt = !!state.q.trim() || state.status !== "all" || state.favOnly;
+  const filt = !!state.q.trim() || state.status !== "all" || state.favOnly || (multi && state.tuman !== "all");
   $("mapcount").innerHTML = pts.length.toLocaleString("ru-RU") + " ta obyekt" + (filt ? '<button data-mapclear>Filtrni tozalash</button>' : "");
   $("btnFavOnly").classList.toggle("on", state.favOnly);
   if (needFit && pts.length) {
     map.fitBounds(pts, { padding: [50, 50], maxZoom: 16 });
     needFit = false;
   }
+  restoreSelected(focus);
+}
+
+/* Eslab qolingan kameraning oynasini qayta ochish (Ro'yxatdan qaytganda ham, xarita qayta chizilganda ham) */
+function restoreSelected(focus, tries) {
+  tries = tries || 0;
+  if (!selectedKey || !map || tab !== "map") return;
+  const key = selectedKey;
+  const d = byKey.get(key);
+  if (!d || !d.g || !mapList().includes(d)) return;
+  const m = getMarker(d);
+  // marker klaster kutubxonasiga to'liq qo'shilguncha kutamiz (katta ro'yxatda bo'lib-bo'lib qo'shiladi)
+  if (!m.__parent && !m._icon) {
+    if (tries < 25) setTimeout(() => { if (selectedKey === key) restoreSelected(focus, tries + 1); }, 150);
+    return;
+  }
+  if (m.isPopupOpen && m.isPopupOpen() && !focus) return;
+  if (focus) map.setView(d.g, Math.max(map.getZoom(), 16), { animate: false });
+  cluster.zoomToShowLayer(m, () => m.openPopup());
 }
 
 function showOnMap(k) {
   const d = byKey.get(k);
   if (!d || !d.g) return;
-  needFit = false;
-  setTab("map");
-  if (!mapList().includes(d)) {
+  if (!mapList().includes(d)) {   // qidiruv yoki filtr bu kamerani yashirmasin
     state.tuman = "all"; state.status = "all"; state.q = ""; state.favOnly = false;
     $("q").value = ""; $("qx").hidden = true;
     syncChips();
     renderAll();
   }
-  setTimeout(() => {
-    if (!map) return;
-    map.invalidateSize();
-    const m = getMarker(d);
-    map.setView(d.g, Math.max(map.getZoom(), 16), { animate: false });
-    cluster.zoomToShowLayer(m, () => m.openPopup());
-  }, 120);
+  selectedKey = k;
+  needFit = false;
+  setTab("map", true);
 }
 
 /* ---------- Xaritadan Ro'yxatga: obyekt batafsil ochilgan holda ---------- */
@@ -786,7 +799,7 @@ function showInList(k) {
 
 /* ---------- Bo'limlar ---------- */
 const TABS = ["list", "map", "fav"];
-function setTab(t) {
+function setTab(t, focus) {
   tab = t;
   TABS.forEach(n => $("tab-" + n).classList.toggle("active", n === t));
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
@@ -794,7 +807,11 @@ function setTab(t) {
   $("toolbar").hidden = t !== "list";
   if (t === "map") {
     if (!map) initMap();
-    setTimeout(() => { map.invalidateSize(); if (mapDirty || needFit) renderMap(); }, 60);
+    setTimeout(() => {
+      if (!map) return;
+      map.invalidateSize();
+      if (mapDirty || needFit) renderMap(focus); else restoreSelected(focus);
+    }, 60);
   }
   if (t === "fav") renderFav();
 }
@@ -833,8 +850,8 @@ function onAction(e) {
   }
   if ((el = t.closest("[data-detail]"))) { showInList(el.dataset.detail); return true; }
   if (t.closest("[data-mapclear]")) {
-    state.q = ""; state.status = "all"; state.favOnly = false; $("q").value = ""; $("qx").hidden = true;
-    needFit = true; renderAll(); return true;
+    state.q = ""; state.status = "all"; state.favOnly = false; state.tuman = "all"; $("q").value = ""; $("qx").hidden = true;
+    syncChips(); needFit = true; renderAll(); return true;
   }
   if ((el = t.closest("[data-show]"))) { showOnMap(el.dataset.show); return true; }
   if ((el = t.closest("[data-tuman]"))) {
@@ -851,18 +868,16 @@ document.addEventListener("click", onAction);
 /* ---------- Tuman tugmalari ---------- */
 function buildChips() {
   multi = user.tumans.length > 1;
-  const box = $("chips"), mbox = $("mapChips");
+  const box = $("chips");
   if (!multi) {
-    box.hidden = true; mbox.hidden = true; state.tuman = "all";
+    box.hidden = true; state.tuman = "all";
     $("sub").textContent = user.tumans[0] || "";
     return;
   }
-  box.hidden = false; mbox.hidden = false;
+  box.hidden = false;
   $("sub").textContent = "Barcha tumanlar";
-  const html = ["all"].concat(user.tumans).map(t =>
+  box.innerHTML = ["all"].concat(user.tumans).map(t =>
     '<button class="chip" data-tuman="' + esc(t) + '">' + (t === "all" ? "Hammasi" : esc(t)) + '</button>').join("");
-  box.innerHTML = html;
-  mbox.innerHTML = html;
   syncChips();
 }
 function syncChips() {
