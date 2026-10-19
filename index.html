@@ -515,6 +515,8 @@ function parseCoord(raw) {
   if (r) return r;
   // 39.844061, 64.451622  yoki  39.844061 64.451622
   if ((m = s.match(/^(-?\d{1,3}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)$/))) return pairC([{ v: +m[1], h: "" }, { v: +m[2], h: "" }]);
+  // 39.497867-64.794780  (chiziqcha bilan ajratilgan)
+  if ((m = s.match(/^(\d{1,3}\.\d+)\s*-\s*(\d{1,3}\.\d+)$/))) return pairC([{ v: +m[1], h: "" }, { v: +m[2], h: "" }]);
   // 39,844061 64,451622  (vergulli kasr)
   if ((m = s.match(/^(-?\d{1,3},\d+)\s*[;\s]\s*(-?\d{1,3},\d+)$/))) return pairC([{ v: +m[1].replace(",", "."), h: "" }, { v: +m[2].replace(",", "."), h: "" }]);
   return null;
