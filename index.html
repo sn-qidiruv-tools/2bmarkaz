@@ -311,6 +311,43 @@ body.split .menu{right:20px}
 button.srow:active{background:rgba(59,130,246,.1)}
 body.split .sheet{align-items:center}
 body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-height:84vh}
+
+.ser{display:flex;align-items:center;gap:8px}
+.cpy{width:30px;height:30px;flex:none;display:grid;place-items:center;border-radius:9px;background:var(--surface2);border:1px solid var(--line);color:var(--accent2);transition:color .2s,transform .15s}
+.cpy:active{transform:scale(.9)}
+.cpy .ic svg{width:15px;height:15px}
+.cpy.done{color:var(--ok);border-color:var(--ok)}
+
+/* ---------- Xabar yuborish oynasi ---------- */
+.mlabel{display:flex;align-items:center;gap:8px;margin:2px 2px 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.mlabel b{padding:1px 9px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px}
+.mgrp{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.mgrp button{padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--line)}
+.mgrp button.on{color:#fff;background:linear-gradient(135deg,#3b82f6,#2563eb);border-color:transparent}
+.mfind{margin-bottom:8px}
+.mfind input{height:40px}
+.mlist{max-height:230px;overflow-y:auto;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.mrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+.mrow:last-child{border-bottom:0}
+.mrow input{width:19px;height:19px;accent-color:var(--accent);flex:none}
+.mrow .mn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow em{font-style:normal;font-size:12px;color:var(--muted);flex:none}
+.mload{padding:22px 14px;text-align:center;color:var(--muted);font-size:14px}
+.mload.err{color:var(--red)}
+#msgText{width:100%;padding:12px 14px;font-size:16px;line-height:1.4;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--text);outline:none;resize:vertical;min-height:110px;transition:border-color .2s,box-shadow .2s}
+#msgText:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.mfile{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 14px}
+.mattach{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:12px;font-size:14px;font-weight:600;background:var(--surface2);border:1px solid var(--line);cursor:pointer}
+.mattach .ic svg{width:18px;height:18px}
+.mfinfo{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--accent2);max-width:100%}
+.mfinfo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.mfinfo button{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;color:var(--muted);background:var(--surface)}
+.mfinfo svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.mres{margin-top:14px;padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.5;animation:rise .3s both}
+.mres.good{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4);color:#86efac}
+.mres.warn{background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.4);color:#fde68a}
+.mres.bad{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);color:#fca5a5}
+.mres ul{margin:6px 0 0 18px}
 </style>
 </head>
 <body>
@@ -358,6 +395,7 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
       <div class="role" id="mRole"></div>
       <div class="meta" id="mMeta"></div>
       <button class="mbtn" id="mRefresh"><span class="ic" data-ic="refresh"></span>Ma'lumotni yangilash</button>
+      <button class="mbtn" id="mMsg" hidden><span class="ic" data-ic="send"></span>Xabar yuborish</button>
       <button class="mbtn" id="mStats"><span class="ic" data-ic="chart"></span>Statistika</button>
       <button class="mbtn out" id="mLogout"><span class="ic" data-ic="logout"></span>Chiqish</button>
     </div>
@@ -385,8 +423,7 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
         <div id="pinBox"></div>
         <div class="resline" id="resline"><span id="resTxt"></span>
           <span class="exp" id="exp" hidden>
-            <button data-exp="csv" aria-label="CSV yuklab olish"><span class="ic" data-ic="download"></span>CSV</button>
-            <button data-exp="copy" aria-label="Nusxalash"><span class="ic" data-ic="copy"></span>Nusxa</button>
+            <button data-exp="xlsx" aria-label="Excel faylni yuklab olish"><span class="ic" data-ic="download"></span>Excel</button>
           </span>
         </div>
         <div id="listBox"></div>
@@ -439,6 +476,25 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
   </div>
 </div>
 
+<div class="sheet" id="msgSheet" hidden>
+  <div class="sbk" data-sheetclose></div>
+  <div class="spanel">
+    <div class="shead"><div><h2>Xabar yuborish</h2><small id="msgSub">Telegram bot orqali xodimlarga</small></div><button class="hbtn" data-sheetclose aria-label="Yopish"><span class="ic" data-ic="x"></span></button></div>
+    <div class="mlabel">Kimga <b id="msgCount">0</b></div>
+    <div class="mgrp" id="msgGrp"></div>
+    <div class="sbox mfind"><span class="ic" data-ic="search"></span><input id="msgFind" type="search" placeholder="Ism bo'yicha qidirish..." autocomplete="off"></div>
+    <div class="mlist" id="msgList"></div>
+    <div class="mlabel" style="margin-top:14px">Xabar</div>
+    <textarea id="msgText" rows="5" maxlength="4000" placeholder="Xabar matnini yozing..."></textarea>
+    <div class="mfile">
+      <label class="mattach"><input type="file" id="mFile" hidden><span class="ic" data-ic="clip"></span>Rasm yoki fayl biriktirish</label>
+      <div class="mfinfo" id="msgFileInfo" hidden></div>
+    </div>
+    <button class="lbtn" id="msgSend" disabled>Yuborish</button>
+    <div id="msgRes"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -472,6 +528,8 @@ const I = {
   layers: '<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>',
   eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   eyeoff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.5 7.6A17 17 0 0 0 2 12s3.6 6 10 6c1.5 0 2.8-.3 4-.8"/><path d="M9.9 10a3 3 0 0 0 4.1 4.1"/></svg>',
+  send: '<svg viewBox="0 0 24 24"><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg>',
+  clip: '<svg viewBox="0 0 24 24"><path d="M20 11.5l-7.8 7.8a5 5 0 0 1-7-7l8-8a3.3 3.3 0 0 1 4.7 4.7l-8 8a1.7 1.7 0 0 1-2.4-2.4l7.3-7.3"/></svg>',
   chart: '<svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20.5h18"/></svg>',
   download: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/></svg>',
   copy: '<svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>',
@@ -601,9 +659,9 @@ let dataTxt = "";
 let selectedKey = null;   // xaritada oxirgi ochilgan kamera
 
 /* ---------- Server bilan aloqa ---------- */
-async function api(body, timeoutMs) {
+async function api(body, timeoutMs, attempts) {
   let lastErr;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < (attempts || 2); attempt++) {
     const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
     const timer = ctl ? setTimeout(() => ctl.abort(), timeoutMs || 90000) : null;
     try {
@@ -777,6 +835,19 @@ function detailsHtml(d) {
   return rows;
 }
 
+function serialDd(d) {
+  if (!d.serial) return '<dd class="mono">—</dd>';
+  return '<dd class="mono ser"><button class="cpy" data-copy="' + esc(d.serial) + '" aria-label="Seriya raqamini nusxalash">' + ic("copy") + '</button><span>' + esc(d.serial) + '</span></dd>';
+}
+
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+  try {
+    const ta = document.createElement("textarea"); ta.value = t; ta.style.cssText = "position:fixed;opacity:0;top:0";
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+
 function statusTag(d) {
   return d.on ? '<span class="tag ok">Ishlayapti</span>' : '<span class="tag wait">Ishga tushmagan</span>';
 }
@@ -789,7 +860,7 @@ function cardHtml(d, i) {
     '<button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button></div>' +
     '<div class="tags">' + statusTag(d) + (d.g ? "" : d.bad ? '<span class="tag yel">Joylashuv noto\'g\'ri yozilgan</span>' : '<span class="tag red">Joylashuvi yo\'q</span>') +
     (multi ? '<span class="tag tum">' + esc(d.tuman) + '</span>' : "") + '</div>' +
-    '<dl class="main"><div><dt>Modem seriyasi</dt><dd class="mono">' + esc(d.serial || "—") + '</dd></div>' +
+    '<dl class="main"><div><dt>Modem seriyasi</dt>' + serialDd(d) + '</div>' +
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     (d.bad ? '<div class="badnote"><b>Yozilgan:</b> ' + esc(d.loc) + '<br>Xaritada ko\'rinmaydi. Jadvalda to\'g\'rilang, masalan: 39.844061, 64.451622' + '</div>' : "") +
     '<div class="btns">' + (d.g ? '<button class="btn pri" data-show="' + esc(d.k) + '">' + ic("map") + 'Xaritada</button>' : "") +
@@ -878,7 +949,7 @@ function popupHtml(d) {
   const nav = d.g ? "https://www.google.com/maps/dir/?api=1&destination=" + d.g[0] + "," + d.g[1] : "";
   return '<div class="pp-body"><h4>' + esc(d.name || d.serial || "Nomsiz obyekt") + '</h4>' +
     '<div class="tags">' + statusTag(d) + (multi ? '<span class="tag tum">' + esc(d.tuman) + '</span>' : "") + '</div>' +
-    '<dl class="main"><div><dt>Modem seriyasi</dt><dd class="mono">' + esc(d.serial || "—") + '</dd></div>' +
+    '<dl class="main"><div><dt>Modem seriyasi</dt>' + serialDd(d) + '</div>' +
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     '<div class="btns"><button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button>' +
     '<button class="btn pri" data-detail="' + esc(d.k) + '">Batafsil</button>' +
@@ -1049,6 +1120,14 @@ function onAction(e) {
   const t = e.target;
   if (!t.closest) return false;
   let el;
+  if ((el = t.closest("[data-copy]"))) {
+    const v = el.dataset.copy;
+    copyText(v).then(okc => {
+      if (okc) { el.classList.add("done"); setTimeout(() => el.classList.remove("done"), 1200); toast("Nusxalandi: " + v); }
+      else toast("Nusxalab bo'lmadi");
+    });
+    return true;
+  }
   if ((el = t.closest("[data-fav]"))) { toggleFav(el.dataset.fav); return true; }
   if ((el = t.closest("[data-more]"))) {
     const box = el.closest(".card,.pp");
@@ -1059,7 +1138,7 @@ function onAction(e) {
   if ((el = t.closest("[data-detail]"))) { showInList(el.dataset.detail); return true; }
   if (t.closest("[data-pinclose]")) { pinKey = null; renderPin(); return true; }
   if ((el = t.closest("[data-exp]"))) { doExport(el.dataset.exp); return true; }
-  if (t.closest("[data-sheetclose]")) { closeStats(); return true; }
+  if (t.closest("[data-sheetclose]")) { closeSheet(t.closest(".sheet")); return true; }
   if ((el = t.closest("[data-statgo]"))) { statGo(el.dataset.statgo, el.dataset.status); return true; }
   if (t.closest("[data-locclear]")) { if (findMarker && map) { map.removeLayer(findMarker); findMarker = null; } return true; }
   if (t.closest("[data-mapclear]")) {
@@ -1125,6 +1204,7 @@ function enterApp() {
 }
 
 function updateMenu() {
+  if (user) $("mMsg").hidden = user.lavozim !== "Admin";
   let t = user ? (user.tumans.join(", ")) : "";
   let when = lastLoad ? "Yangilandi: " + new Date(lastLoad).toTimeString().slice(0, 5) : "";
   $("mMeta").innerHTML = esc(t) + (when ? "<br>" + esc(when) : "");
@@ -1259,6 +1339,136 @@ $("qx").addEventListener("click", () => {
 
 document.querySelectorAll("#nav button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
 
+/* ---------- Xabar yuborish (Admin → xodimlarning Telegram chatiga) ---------- */
+let msgUsers = [], msgSel = new Set(), msgFile = null, msgSending = false, msgArm = 0, msgNoChat = 0;
+
+function fmtSize(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
+
+function blobToB64(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(",")[1] || "");
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+async function prepFile(f) {
+  if (/^image\/(jpeg|png|webp)$/i.test(f.type) && typeof createImageBitmap === "function") {
+    try {                                    // katta rasmni kichraytiramiz (tez yuboriladi, Telegram baribir siqadi)
+      const bmp = await createImageBitmap(f);
+      const k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(bmp.width * k)); cv.height = Math.max(1, Math.round(bmp.height * k));
+      const cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(bmp, 0, 0, cv.width, cv.height);
+      const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.86));
+      if (blob && blob.size < 8 * 1048576) return { name: f.name.replace(/\.\w+$/, "") + ".jpg", type: "image/jpeg", size: blob.size, b64: await blobToB64(blob) };
+    } catch (e) {}
+  }
+  if (f.size > 8 * 1048576) throw new Error("big");
+  return { name: f.name, type: f.type || "application/octet-stream", size: f.size, b64: await blobToB64(f) };
+}
+
+function updateMsgBtn() {
+  const btn = $("msgSend");
+  const can = !msgSending && msgSel.size > 0 && ($("msgText").value.trim() || msgFile);
+  btn.disabled = !can;
+  if (!msgSending && !msgArm) btn.textContent = msgSel.size ? "Yuborish (" + msgSel.size + " kishiga)" : "Yuborish";
+  $("msgCount").textContent = msgSel.size + " / " + msgUsers.length;
+}
+function renderMsgGroups() {
+  const names = [];
+  msgUsers.forEach(u => { if (u.tuman && names.indexOf(u.tuman) < 0) names.push(u.tuman); });
+  const allOn = msgUsers.length && msgSel.size === msgUsers.length;
+  $("msgGrp").innerHTML = '<button data-mgrp="*" class="' + (allOn ? "on" : "") + '">Hammasi</button>' + names.map(n => {
+    const ids = msgUsers.filter(u => u.tuman === n);
+    const on = ids.length && ids.every(u => msgSel.has(u.id));
+    return '<button data-mgrp="' + esc(n) + '" class="' + (on ? "on" : "") + '">' + esc(n) + " (" + ids.length + ")</button>";
+  }).join("");
+}
+function renderMsgList() {
+  const q = $("msgFind").value.trim().toLowerCase();
+  const list = msgUsers.filter(u => !q || u.ism.toLowerCase().indexOf(q) >= 0);
+  $("msgList").innerHTML = list.length ? list.map(u =>
+    '<label class="mrow"><input type="checkbox" data-mu="' + u.id + '"' + (msgSel.has(u.id) ? " checked" : "") + '><span class="mn">' + esc(u.ism) + '</span><em>' + esc(u.tuman || u.lavozim) + '</em></label>').join("")
+    : '<div class="mload">' + (msgUsers.length ? "Hech kim topilmadi" : "Chat ID yozilgan xodim yo'q") + '</div>';
+  renderMsgGroups(); updateMsgBtn();
+}
+async function openMsg() {
+  const sh = $("msgSheet");
+  sh.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.add("show")));
+  $("msgRes").innerHTML = "";
+  if (msgUsers.length) { renderMsgList(); }
+  else $("msgList").innerHTML = '<div class="mload">Yuklanmoqda...</div>';
+  try {
+    const r = await api({ action: "recipients", login: creds.login, password: creds.password }, 60000, 1);
+    if (!r.ok) { $("msgList").innerHTML = '<div class="mload err">' + esc(r.error || "Xatolik") + '</div>'; return; }
+    const keep = new Set(msgSel);
+    msgUsers = r.users || []; msgNoChat = r.noChat || 0;
+    msgSel = new Set(msgUsers.filter(u => keep.has(u.id)).map(u => u.id));
+    $("msgSub").textContent = msgNoChat ? "Chat ID yozilmagan: " + msgNoChat + " ta xodim ro'yxatda yo'q" : "Telegram bot orqali xodimlarga";
+    renderMsgList();
+  } catch (e) { $("msgList").innerHTML = '<div class="mload err">Aloqa xatosi. Qayta urinib ko\'ring.</div>'; }
+}
+$("mMsg").addEventListener("click", () => { $("menu").hidden = true; openMsg(); });
+$("msgFind").addEventListener("input", renderMsgList);
+$("msgText").addEventListener("input", updateMsgBtn);
+$("msgList").addEventListener("change", e => {
+  const id = e.target && e.target.dataset && e.target.dataset.mu;
+  if (!id) return;
+  if (e.target.checked) msgSel.add(+id); else msgSel.delete(+id);
+  renderMsgGroups(); updateMsgBtn();
+});
+$("msgGrp").addEventListener("click", e => {
+  const b = e.target.closest("[data-mgrp]");
+  if (!b) return;
+  const g = b.dataset.mgrp, ids = (g === "*" ? msgUsers : msgUsers.filter(u => u.tuman === g)).map(u => u.id);
+  const all = ids.length && ids.every(id => msgSel.has(id));
+  ids.forEach(id => { if (all) msgSel.delete(id); else msgSel.add(id); });
+  renderMsgList();
+});
+function renderMsgFile() {
+  const box = $("msgFileInfo");
+  box.hidden = !msgFile;
+  if (msgFile) box.innerHTML = '<span>' + esc(msgFile.name) + '</span><em style="font-style:normal;color:var(--muted)">' + fmtSize(msgFile.size) + '</em><button data-mfclear aria-label="Olib tashlash">' + I.x + '</button>';
+}
+$("msgFileInfo").addEventListener("click", e => { if (e.target.closest("[data-mfclear]")) { msgFile = null; renderMsgFile(); updateMsgBtn(); } });
+$("mFile").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  try { msgFile = await prepFile(f); renderMsgFile(); updateMsgBtn(); }
+  catch (err) { toast(err && err.message === "big" ? "Fayl 8 MB dan katta bo'lmasin" : "Faylni o'qib bo'lmadi"); }
+});
+$("msgSend").addEventListener("click", async () => {
+  if (msgSending || $("msgSend").disabled) return;
+  const btn = $("msgSend"), n = msgSel.size;
+  if (!msgArm) {                               // tasodifan yuborib yubormaslik uchun ikki marta bosiladi
+    btn.textContent = "Aniqmi? " + n + " kishiga yuborish";
+    msgArm = setTimeout(() => { msgArm = 0; updateMsgBtn(); }, 4000);
+    return;
+  }
+  clearTimeout(msgArm); msgArm = 0;
+  msgSending = true; btn.disabled = true; btn.textContent = "Yuborilmoqda...";
+  const res = $("msgRes"); res.innerHTML = "";
+  try {
+    const r = await api({
+      action: "send", login: creds.login, password: creds.password,
+      sid: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      to: Array.from(msgSel), text: $("msgText").value.trim(),
+      file: msgFile ? { name: msgFile.name, type: msgFile.type, b64: msgFile.b64 } : null
+    }, 240000, 1);                             // qayta urinish yo'q: ikki marta yuborilib ketmasin
+    if (!r.ok) { res.innerHTML = '<div class="mres bad">' + esc(r.error || "Xatolik") + '</div>'; }
+    else {
+      const bad = r.failed || [];
+      res.innerHTML = '<div class="mres ' + (bad.length ? "warn" : "good") + '"><b>' + r.sent + ' ta yuborildi</b>' + (bad.length ? ", " + bad.length + " ta bormadi:<ul>" + bad.map(f => "<li>" + esc(f.ism) + " — " + esc(f.err) + "</li>").join("") + "</ul>" : "") + "</div>";
+      if (r.sent) { $("msgText").value = ""; msgFile = null; renderMsgFile(); }
+    }
+  } catch (e) {
+    res.innerHTML = '<div class="mres warn">Javob kelmadi. Xabar yuborilgan bo\'lishi mumkin, qayta yuborishdan oldin xodimlardan so\'rab ko\'ring.</div>';
+  } finally { msgSending = false; updateMsgBtn(); }
+});
+
 /* ---------- Statistika ---------- */
 function openStats() {
   const ser = new Map();
@@ -1295,11 +1505,12 @@ function openStats() {
   sh.hidden = false;
   requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.add("show")));
 }
-function closeStats() {
-  const sh = $("statSheet");
+function closeSheet(sh) {
+  if (!sh) return;
   sh.classList.remove("show");
   setTimeout(() => { if (!sh.classList.contains("show")) sh.hidden = true; }, 320);
 }
+function closeStats() { closeSheet($("statSheet")); }
 function statGo(tu, st) {
   pinKey = null;
   state.tuman = multi ? tu : "all"; state.status = st; state.q = ""; state.favOnly = false;
@@ -1310,9 +1521,9 @@ function statGo(tu, st) {
   renderAll();
 }
 $("mStats").addEventListener("click", () => { $("menu").hidden = true; openStats(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("statSheet").hidden) closeStats(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".sheet:not([hidden])").forEach(closeSheet); });
 
-/* ---------- Ro'yxatni yuklab olish / nusxalash (faqat Admin) ---------- */
+/* ---------- Ro'yxatni Excel (.xlsx) qilib yuklab olish (faqat Admin, brauzerning o'zida) ---------- */
 function exportTable() {
   const names = [], seen = new Set();
   new Set(listItems.map(d => d.cols)).forEach(cols => cols.forEach(c => { if (!seen.has(c)) { seen.add(c); names.push(c); } }));
@@ -1323,15 +1534,73 @@ function exportTable() {
   });
   return [head].concat(rows);
 }
-function csvCell(v) {
-  v = String(v == null ? "" : v);
-  if (/^[=+@\t\r]/.test(v)) v = "'" + v;
-  return /[";\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-}
-async function saveFile(name, text, mime) {
-  const blob = new Blob([text], { type: mime });
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+async function deflateRaw(u8) {
+  if (typeof CompressionStream === "undefined") return null;
   try {
-    const f = new File([blob], name, { type: mime });
+    const cs = new CompressionStream("deflate-raw"), w = cs.writable.getWriter();
+    w.write(u8); w.close();
+    return new Uint8Array(await new Response(cs.readable).arrayBuffer());
+  } catch (e) { return null; }
+}
+async function zipFiles(files, mime) {
+  const enc = new TextEncoder(), parts = [], central = [];
+  let offset = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name), crc = crc32(f.data);
+    let comp = await deflateRaw(f.data), method = 8;
+    if (!comp || comp.length >= f.data.length) { comp = f.data; method = 0; }
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, method, true);
+    lh.setUint16(12, 0x21, true); lh.setUint32(14, crc, true); lh.setUint32(18, comp.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, comp);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, method, true);
+    ch.setUint16(14, 0x21, true); ch.setUint32(16, crc, true); ch.setUint32(20, comp.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), name);
+    offset += 30 + name.length + comp.length;
+  }
+  let csize = 0; central.forEach(c => { csize += c.length; });
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), { type: mime });
+}
+function xmlEsc(v) { return String(v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function colName(i) { let s = ""; for (i++; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + (i - 1) % 26) + s; return s; }
+async function buildXlsx(table) {
+  const nc = table[0].length, nr = table.length, last = colName(nc - 1) + nr;
+  const widths = table[0].map(h => String(h).length);
+  for (let r = 1; r < nr; r++) { const row = table[r]; for (let c = 0; c < nc; c++) { const l = String(row[c]).length; if (l > widths[c]) widths[c] = l; } }
+  const cols = widths.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + Math.min(60, Math.max(9, Math.round(w * 1.1 + 2))) + '" customWidth="1"/>').join("");
+  const out = [];
+  for (let r = 0; r < nr; r++) {
+    const row = table[r]; let cells = "";
+    for (let c = 0; c < nc; c++) {
+      const v = row[c];
+      if (v === "" || v == null) continue;
+      cells += '<c r="' + colName(c) + (r + 1) + '" t="inlineStr"' + (r === 0 ? ' s="1"' : "") + '><is><t xml:space="preserve">' + xmlEsc(v) + "</t></is></c>";
+    }
+    out.push('<row r="' + (r + 1) + '"' + (r === 0 ? ' ht="22" customHeight="1"' : "") + ">" + cells + "</row>");
+  }
+  const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  const NS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+  const RN = 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  const sheet = X + "<worksheet " + NS + '><dimension ref="A1:' + last + '"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>' + cols + "</cols><sheetData>" + out.join("") + '</sheetData><autoFilter ref="A1:' + last + '"/></worksheet>';
+  const enc = new TextEncoder();
+  const files = [
+    ["[Content_Types].xml", X + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+    ["_rels/.rels", X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ["xl/workbook.xml", X + "<workbook " + NS + " " + RN + '><sheets><sheet name="Obyektlar" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+    ["xl/_rels/workbook.xml.rels", X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ["xl/styles.xml", X + "<styleSheet " + NS + '><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF2563EB"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'],
+    ["xl/worksheets/sheet1.xml", sheet]
+  ].map(f => ({ name: f[0], data: enc.encode(f[1]) }));
+  return zipFiles(files, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+}
+async function saveBlob(name, blob) {
+  try {
+    const f = new File([blob], name, { type: blob.type });
     if (!isSplit() && navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f] }); return; }
   } catch (e) { if (e && e.name === "AbortError") return; }
   const a = document.createElement("a");
@@ -1339,23 +1608,18 @@ async function saveFile(name, text, mime) {
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
 }
-async function doExport(kind) {
-  if (!user || user.lavozim !== "Admin" || !listItems.length) return;
-  const t = exportTable();
-  if (kind === "copy") {
-    const txt = t.map(r => r.map(v => String(v).replace(/[\t\r\n]+/g, " ")).join("\t")).join("\n");
-    try { await navigator.clipboard.writeText(txt); }
-    catch (e) {
-      const ta = document.createElement("textarea"); ta.value = txt; ta.style.cssText = "position:fixed;opacity:0";
-      document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e2) {} ta.remove();
-    }
-    toast(listItems.length.toLocaleString("ru-RU") + " ta qator nusxalandi. Jadvalga qo'yishingiz mumkin");
-    return;
-  }
-  const csv = "\ufeff" + t.map(r => r.map(csvCell).join(";")).join("\r\n");
-  const day = new Date().toISOString().slice(0, 10);
-  await saveFile("obyektlar_" + day + ".csv", csv, "text/csv;charset=utf-8");
-  toast("CSV tayyor: " + listItems.length.toLocaleString("ru-RU") + " ta qator");
+let exporting = false;
+async function doExport() {
+  if (exporting || !user || user.lavozim !== "Admin" || !listItems.length) return;
+  exporting = true;
+  const btn = document.querySelector('[data-exp="xlsx"]');
+  if (btn) btn.disabled = true;
+  try {
+    const blob = await buildXlsx(exportTable());
+    await saveBlob("obyektlar_" + new Date().toISOString().slice(0, 10) + ".xlsx", blob);
+    toast("Excel tayyor: " + listItems.length.toLocaleString("ru-RU") + " ta qator");
+  } catch (e) { toast("Faylni tayyorlab bo'lmadi"); }
+  finally { exporting = false; if (btn) btn.disabled = false; }
 }
 
 /* ---------- Xaritada istalgan joylashuvni koordinata bo'yicha topish ---------- */
