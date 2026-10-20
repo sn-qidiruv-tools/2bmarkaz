@@ -348,6 +348,8 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
 .mres.warn{background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.4);color:#fde68a}
 .mres.bad{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);color:#fca5a5}
 .mres ul{margin:6px 0 0 18px}
+.btn.chk{color:var(--accent2)}
+.btn.chk .ic svg{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -505,6 +507,7 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
 
 /* ================= SOZLAMA ================= */
 const API_URL = "https://script.google.com/macros/s/AKfycbybkxT1P6qIxTcB9pIn247R7Jc7CEPSs8jchCSHawzcfwtgmEd_YK291RhwLXyvBb0-/exec";
+const BOT_URL = "https://t.me/bg_garb_bot";   // modem real holatini ko'rsatadigan bot
 const REFRESH_MS = 10 * 60 * 1000;   // avtomatik yangilanish
 const MAP_START = [39.7747, 64.4286]; // Buxoro
 const CHUNK = 30;                     // ro'yxatda bir yo'la chiqadigan kartalar soni
@@ -528,6 +531,7 @@ const I = {
   layers: '<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>',
   eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   eyeoff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.5 7.6A17 17 0 0 0 2 12s3.6 6 10 6c1.5 0 2.8-.3 4-.8"/><path d="M9.9 10a3 3 0 0 0 4.1 4.1"/></svg>',
+  pulse: '<svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg>',
   send: '<svg viewBox="0 0 24 24"><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg>',
   clip: '<svg viewBox="0 0 24 24"><path d="M20 11.5l-7.8 7.8a5 5 0 0 1-7-7l8-8a3.3 3.3 0 0 1 4.7 4.7l-8 8a1.7 1.7 0 0 1-2.4-2.4l7.3-7.3"/></svg>',
   chart: '<svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20.5h18"/></svg>',
@@ -848,6 +852,17 @@ async function copyText(t) {
   } catch (e) { return false; }
 }
 
+/* Real holatini tekshirish: seriya raqami nusxalanadi va bot chati ochiladi (yozish maydoniga "qo'yish" kifoya) */
+function checkInBot(serial) {
+  const p = copyText(serial);                       // bosish paytida boshlanadi (brauzer ruxsat beradi)
+  try {
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg && tg.openTelegramLink && tg.initData) tg.openTelegramLink(BOT_URL);
+    else window.open(BOT_URL, "_blank", "noopener");
+  } catch (e) { window.open(BOT_URL, "_blank", "noopener"); }
+  p.then(okc => toast(okc ? "Seriya nusxalandi: botda yozish maydoniga qo'ying" : "Nusxalab bo'lmadi: " + serial));
+}
+
 function statusTag(d) {
   return d.on ? '<span class="tag ok">Ishlayapti</span>' : '<span class="tag wait">Ishga tushmagan</span>';
 }
@@ -864,6 +879,7 @@ function cardHtml(d, i) {
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     (d.bad ? '<div class="badnote"><b>Yozilgan:</b> ' + esc(d.loc) + '<br>Xaritada ko\'rinmaydi. Jadvalda to\'g\'rilang, masalan: 39.844061, 64.451622' + '</div>' : "") +
     '<div class="btns">' + (d.g ? '<button class="btn pri" data-show="' + esc(d.k) + '">' + ic("map") + 'Xaritada</button>' : "") +
+    (d.serial ? '<button class="btn chk" data-check="' + esc(d.serial) + '" aria-label="Real holatini botda tekshirish">' + ic("pulse") + 'Holat</button>' : "") +
     '<button class="btn" data-more>Batafsil<span class="ic chev">' + I.chevron + '</span></button></div>' +
     '<div class="more"><div class="more-in"><div class="more-pad">' + detailsHtml(d) + '</div></div></div>' +
     '</article>';
@@ -953,6 +969,7 @@ function popupHtml(d) {
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     '<div class="btns"><button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button>' +
     '<button class="btn pri" data-detail="' + esc(d.k) + '">Batafsil</button>' +
+    (d.serial ? '<button class="btn chk" style="flex:none;width:44px" data-check="' + esc(d.serial) + '" aria-label="Real holatini botda tekshirish">' + ic("pulse") + '</button>' : "") +
     (nav ? '<a class="btn" style="flex:none;width:44px" aria-label="Yo\'nalish" target="_blank" rel="noopener" href="' + nav + '">' + ic("nav") + '</a>' : "") +
     '</div></div>';
 }
@@ -1120,6 +1137,7 @@ function onAction(e) {
   const t = e.target;
   if (!t.closest) return false;
   let el;
+  if ((el = t.closest("[data-check]"))) { checkInBot(el.dataset.check); return true; }
   if ((el = t.closest("[data-copy]"))) {
     const v = el.dataset.copy;
     copyText(v).then(okc => {
