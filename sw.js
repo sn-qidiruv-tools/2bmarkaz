@@ -1,4 +1,4 @@
-const CACHE = "xsho-v6";
+const CACHE = "xsho-v7";
 const SHELL = ["./", "index.html", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
