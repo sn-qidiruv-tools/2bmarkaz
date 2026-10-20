@@ -351,6 +351,10 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
 .btn.chk{color:var(--accent2)}
 .card .btns .btn{padding:0 8px;font-size:13px;gap:5px}
 .btn.chk .ic svg{width:18px;height:18px}
+.ptnote{display:block;width:100%;margin:0 0 10px;padding:9px 11px;font-size:16px;line-height:1.35;border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:var(--text);outline:none;resize:none;transition:border-color .2s,box-shadow .2s}
+.ptnote:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.ptnote::placeholder{color:var(--muted)}
+.ptcard{border-color:rgba(34,211,238,.4)}
 </style>
 </head>
 <body>
@@ -659,7 +663,7 @@ const iconCache = {};
 const mq = window.matchMedia ? window.matchMedia("(min-width:1000px) and (min-height:500px)") : null;
 const isSplit = () => !!(mq && mq.matches);                 // kompyuter / keng ekran
 const mapVisible = () => tab === "map" || isSplit();
-let findMarker = null, pinKey = null;
+let findMarker = null, findPt = null, pinKey = null, pts = [], ptMarkers = new Map(), noteTimer = 0;
 let dataTxt = "";
 let selectedKey = null;   // xaritada oxirgi ochilgan kamera
 
@@ -707,6 +711,15 @@ function loadFavs() {
   favSet = new Set(favs);
 }
 function saveFavs() { try { localStorage.setItem(favKey(), JSON.stringify(favs)); } catch (e) {} }
+/* O'zim topgan nuqtalar (koordinata bo'yicha qidirilib yulduzcha bosilgan): telefonda saqlanadi */
+function ptKey() { return "xsho_p_" + (creds ? creds.login.toLowerCase() : ""); }
+function loadPts() {
+  try { pts = JSON.parse(localStorage.getItem(ptKey()) || "[]"); } catch (e) { pts = []; }
+  if (!Array.isArray(pts)) pts = [];
+  pts = pts.filter(p => p && p.id && Array.isArray(p.g) && p.g.length === 2);
+}
+function savePts() { clearTimeout(noteTimer); try { localStorage.setItem(ptKey(), JSON.stringify(pts)); } catch (e) {} }
+window.addEventListener("pagehide", savePts);
 
 /* ---------- Telefon xotirasidagi nusxa (keyingi kirishda darrov ochish uchun) ---------- */
 function idb() {
@@ -934,20 +947,106 @@ function appendChunk() {
 
 function renderFav() {
   const items = favs.map(k => byKey.get(k)).filter(Boolean);
-  $("favCount").textContent = items.length + " ta obyekt";
-  $("favBox").innerHTML = items.length
-    ? items.map((d, i) => cardHtml(d, i)).join("")
-    : '<div class="empty">' + favIcon + '<b>Hali hech narsa tanlanmagan</b><p>Ro\'yxatda yoki xaritada obyektdagi yulduzchani bosing, u shu yerga tushadi.</p></div>';
+  const total = items.length + pts.length;
+  $("favCount").textContent = total + " ta" + (pts.length ? " (" + pts.length + " ta o'zim topgan nuqta)" : " obyekt");
+  $("favBox").innerHTML = total
+    ? pts.slice().reverse().map(ptCardHtml).join("") + items.map((d, i) => cardHtml(d, i)).join("")
+    : '<div class="empty">' + favIcon + '<b>Hali hech narsa tanlanmagan</b><p>Ro\'yxatda yoki xaritada obyektdagi yulduzchani bosing. Xaritada o\'zingiz topgan nuqtaga ham yulduzcha va izoh qo\'yish mumkin.</p></div>';
   $("favMap").hidden = !items.length;
-  $("favClear").hidden = !items.length;
+  $("favClear").hidden = !total;
 }
 
 function updateFavBadge() {
-  const n = favs.filter(k => byKey.has(k)).length;
+  const n = favs.filter(k => byKey.has(k)).length + pts.length;
   const b = $("favBadge");
   b.hidden = !n;
   b.textContent = n;
 }
+
+/* ---------- O'zim topgan nuqtalar: karta, oyna, belgi ---------- */
+const ptTxt = g => g[0].toFixed(6) + ", " + g[1].toFixed(6);
+const ptNav = g => "https://www.google.com/maps/dir/?api=1&destination=" + g[0] + "," + g[1];
+function ptCoordHtml(g) {
+  const t = ptTxt(g);
+  return '<dd class="mono ser"><button class="cpy" data-copy="' + t + '" aria-label="Koordinatani nusxalash">' + ic("copy") + '</button><span>' + t + '</span></dd>';
+}
+function ptCardHtml(p) {
+  return '<article class="card ptcard" data-pt="' + esc(p.id) + '"><div class="card-top"><h3>Mening nuqtam</h3>' +
+    '<button class="star on" data-ptdel="' + esc(p.id) + '" aria-label="Olib tashlash">' + I.star + '</button></div>' +
+    '<div class="tags"><span class="tag tum">Koordinata bo\'yicha topilgan</span></div>' +
+    '<dl class="main" style="grid-template-columns:1fr"><div><dt>Koordinata</dt>' + ptCoordHtml(p.g) + '</div></dl>' +
+    '<textarea class="ptnote" data-ptnote="' + esc(p.id) + '" rows="2" maxlength="500" placeholder="Izoh yozing...">' + esc(p.note || "") + '</textarea>' +
+    '<div class="btns"><button class="btn pri" data-ptshow="' + esc(p.id) + '">' + ic("map") + 'Xaritada</button>' +
+    '<a class="btn" target="_blank" rel="noopener" href="' + ptNav(p.g) + '">' + ic("nav") + 'Yo\'nalish</a></div></article>';
+}
+function ptPopupHtml(p) {
+  const saved = !!p.id;
+  return '<div class="pp-body"><h4>' + (saved ? "Saqlangan nuqta" : "Qidirilgan nuqta") + '</h4>' +
+    '<dl class="main"><div><dt>Koordinata</dt>' + ptCoordHtml(p.g) + '</div></dl>' +
+    '<textarea class="ptnote" data-ptnote="' + esc(p.id || "") + '" rows="2" maxlength="500" placeholder="Izoh yozing...">' + esc(p.note || "") + '</textarea>' +
+    '<div class="btns"><button class="star' + (saved ? " on" : "") + '" data-ptfav="' + esc(p.id || "") + '" aria-label="Tanlash">' + I.star + '</button>' +
+    (saved ? '<button class="btn" data-ptdel="' + esc(p.id) + '">O\'chirish</button>' : '<button class="btn" data-locclear>O\'chirish</button>') +
+    '<a class="btn pri" target="_blank" rel="noopener" href="' + ptNav(p.g) + '">' + ic("nav") + 'Yo\'nalish</a></div></div>';
+}
+const PT_POPUP = { maxWidth: 280, minWidth: 230, className: "pp", autoPanPadding: [30, 90] };
+function ptIcon(saved) {
+  const k = "pt" + (saved ? 1 : 0);
+  if (!iconCache[k]) iconCache[k] = L.divIcon({ className: "pin", html: pinSvg("#06b6d4", saved), iconSize: [36, 44], iconAnchor: [18, 42], popupAnchor: [0, -38] });
+  return iconCache[k];
+}
+function renderPts() {
+  if (!map) return;
+  const ids = new Set(pts.map(p => p.id));
+  ptMarkers.forEach((m, id) => { if (!ids.has(id)) { map.removeLayer(m); ptMarkers.delete(id); } });
+  pts.forEach(p => {
+    if (ptMarkers.has(p.id)) return;
+    const m = L.marker(p.g, { icon: ptIcon(true), keyboard: false, zIndexOffset: 1000 }).addTo(map);
+    m.bindPopup(() => ptPopupHtml(pts.find(x => x.id === p.id) || p), PT_POPUP);
+    ptMarkers.set(p.id, m);
+  });
+}
+function afterPtChange() {
+  savePts(); renderPts(); updateFavBadge();
+  if (tab === "fav") renderFav();
+}
+function savePtFromFind() {                 // qidirilgan nuqtaga yulduzcha bosildi
+  if (!findPt) return;
+  const p = { id: "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), g: findPt.g, note: findPt.note || "", ts: Date.now() };
+  pts.push(p);
+  if (findMarker && map) { map.removeLayer(findMarker); findMarker = null; }
+  findPt = null;
+  afterPtChange();
+  const m = ptMarkers.get(p.id);
+  if (m) m.openPopup();
+  toast("Tanlanganlarga qo'shildi");
+}
+function delPt(id) {
+  pts = pts.filter(p => p.id !== id);
+  if (map) map.closePopup();
+  afterPtChange();
+  toast("Nuqta olib tashlandi");
+}
+function showPt(id) {
+  const p = pts.find(x => x.id === id);
+  if (!p) return;
+  if (!isSplit()) setTab("map");
+  else if (!map) initMap();
+  setTimeout(() => {
+    if (!map) return;
+    map.invalidateSize(); renderPts();
+    map.setView(p.g, Math.max(map.getZoom(), 17));
+    const m = ptMarkers.get(id);
+    if (m) m.openPopup();
+  }, isSplit() ? 60 : 400);
+}
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (!t || !t.dataset || t.dataset.ptnote === undefined) return;
+  const id = t.dataset.ptnote;
+  if (!id) { if (findPt) findPt.note = t.value; return; }
+  const p = pts.find(x => x.id === id);
+  if (p) { p.note = t.value; clearTimeout(noteTimer); noteTimer = setTimeout(savePts, 400); }
+});
 
 /* ---------- Xarita ---------- */
 function iconFor(d) {
@@ -1008,6 +1107,7 @@ function initMap() {
     }
   });
   map.addLayer(cluster);
+  renderPts();
   map.on("locationfound", e => {
     if (userDot) map.removeLayer(userDot);
     userDot = L.marker(e.latlng, { icon: L.divIcon({ className: "", html: '<div class="dot"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }), interactive: false }).addTo(map);
@@ -1159,7 +1259,13 @@ function onAction(e) {
   if ((el = t.closest("[data-exp]"))) { doExport(el.dataset.exp); return true; }
   if (t.closest("[data-sheetclose]")) { closeSheet(t.closest(".sheet")); return true; }
   if ((el = t.closest("[data-statgo]"))) { statGo(el.dataset.statgo, el.dataset.status); return true; }
-  if (t.closest("[data-locclear]")) { if (findMarker && map) { map.removeLayer(findMarker); findMarker = null; } return true; }
+  if (t.closest("[data-locclear]")) { if (findMarker && map) { map.removeLayer(findMarker); findMarker = null; } findPt = null; return true; }
+  if ((el = t.closest("[data-ptfav]"))) {
+    if (el.dataset.ptfav) delPt(el.dataset.ptfav); else savePtFromFind();
+    return true;
+  }
+  if ((el = t.closest("[data-ptdel]"))) { delPt(el.dataset.ptdel); return true; }
+  if ((el = t.closest("[data-ptshow]"))) { showPt(el.dataset.ptshow); return true; }
   if (t.closest("[data-mapclear]")) {
     state.q = ""; state.status = "all"; state.favOnly = false; state.tuman = "all"; $("q").value = ""; $("qx").hidden = true;
     syncChips(); needFit = true; renderAll(); return true;
@@ -1214,6 +1320,7 @@ function enterApp() {
   $("mName").textContent = nm;
   $("mRole").textContent = user.lavozim;
   loadFavs();
+  loadPts();
   buildChips();
   state.status = "all"; state.q = ""; state.favOnly = false; state.field = "serial";
   $("q").value = ""; $("field").value = "serial"; $("q").placeholder = FIELDS.serial.p; $("qx").hidden = true;
@@ -1644,13 +1751,18 @@ async function doExport() {
 /* ---------- Xaritada istalgan joylashuvni koordinata bo'yicha topish ---------- */
 function findPoint(g) {
   if (!map) return;
-  if (findMarker) map.removeLayer(findMarker);
-  const txt = g[0].toFixed(6) + ", " + g[1].toFixed(6);
-  findMarker = L.marker(g, { icon: L.divIcon({ className: "pin", html: pinSvg("#06b6d4", false), iconSize: [36, 44], iconAnchor: [18, 42], popupAnchor: [0, -38] }), keyboard: false }).addTo(map);
-  findMarker.bindPopup('<div class="pp-body"><h4>Qidirilgan nuqta</h4><dl class="main"><div><dt>Koordinata</dt><dd class="mono">' + txt + '</dd></div></dl>' +
-    '<div class="btns"><button class="btn" data-locclear>O\'chirish</button><a class="btn pri" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + g[0] + ',' + g[1] + '">' + ic("nav") + 'Yo\'nalish</a></div></div>',
-    { maxWidth: 280, minWidth: 230, className: "pp", autoPanPadding: [30, 90] });
+  const ex = pts.find(p => Math.abs(p.g[0] - g[0]) < 1e-6 && Math.abs(p.g[1] - g[1]) < 1e-6);
+  if (findMarker) { map.removeLayer(findMarker); findMarker = null; }
+  findPt = null;
   map.setView(g, Math.max(map.getZoom(), 17));
+  if (ex) {                                  // bu nuqta allaqachon saqlangan
+    const m = ptMarkers.get(ex.id);
+    if (m) m.openPopup();
+    return;
+  }
+  findPt = { id: null, g: g, note: "" };
+  findMarker = L.marker(g, { icon: ptIcon(false), keyboard: false, zIndexOffset: 1000 }).addTo(map);
+  findMarker.bindPopup(() => ptPopupHtml(findPt || { id: null, g: g, note: "" }), PT_POPUP);
   findMarker.openPopup();
 }
 function locOpen(open) {
@@ -1691,6 +1803,7 @@ $("favClear").addEventListener("click", () => {
   }
   clearTimeout(clearArm); clearArm = 0; lbl.textContent = "Tozalash";
   favs = []; favSet = new Set(); saveFavs();
+  pts = []; savePts(); renderPts();
   devices.forEach(d => { if (d._m) d._m.setIcon(iconFor(d)); });
   state.favOnly = false; mapDirty = true;
   renderFav(); updateFavBadge();
