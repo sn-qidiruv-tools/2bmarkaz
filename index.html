@@ -349,6 +349,7 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
 .mres.bad{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);color:#fca5a5}
 .mres ul{margin:6px 0 0 18px}
 .btn.chk{color:var(--accent2)}
+.card .btns .btn{padding:0 8px;font-size:13px;gap:5px}
 .btn.chk .ic svg{width:18px;height:18px}
 </style>
 </head>
@@ -531,7 +532,7 @@ const I = {
   layers: '<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>',
   eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   eyeoff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.5 7.6A17 17 0 0 0 2 12s3.6 6 10 6c1.5 0 2.8-.3 4-.8"/><path d="M9.9 10a3 3 0 0 0 4.1 4.1"/></svg>',
-  pulse: '<svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></svg>',
+  pulse: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M7.6 10.6l2.2 2.2 3.8-4.2"/></svg>',
   send: '<svg viewBox="0 0 24 24"><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg>',
   clip: '<svg viewBox="0 0 24 24"><path d="M20 11.5l-7.8 7.8a5 5 0 0 1-7-7l8-8a3.3 3.3 0 0 1 4.7 4.7l-8 8a1.7 1.7 0 0 1-2.4-2.4l7.3-7.3"/></svg>',
   chart: '<svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20.5h18"/></svg>',
@@ -879,7 +880,7 @@ function cardHtml(d, i) {
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     (d.bad ? '<div class="badnote"><b>Yozilgan:</b> ' + esc(d.loc) + '<br>Xaritada ko\'rinmaydi. Jadvalda to\'g\'rilang, masalan: 39.844061, 64.451622' + '</div>' : "") +
     '<div class="btns">' + (d.g ? '<button class="btn pri" data-show="' + esc(d.k) + '">' + ic("map") + 'Xaritada</button>' : "") +
-    (d.serial ? '<button class="btn chk" data-check="' + esc(d.serial) + '" aria-label="Real holatini botda tekshirish">' + ic("pulse") + 'Holat</button>' : "") +
+    (d.serial ? '<button class="btn chk" data-check="' + esc(d.serial) + '" aria-label="Diagnostika (botda tekshirish)">' + ic("pulse") + 'Diagnostika</button>' : "") +
     '<button class="btn" data-more>Batafsil<span class="ic chev">' + I.chevron + '</span></button></div>' +
     '<div class="more"><div class="more-in"><div class="more-pad">' + detailsHtml(d) + '</div></div></div>' +
     '</article>';
@@ -969,7 +970,7 @@ function popupHtml(d) {
     '<div><dt>Farmoish</dt><dd>' + esc(d.farm || "—") + '</dd></div></dl>' +
     '<div class="btns"><button class="star' + (fav ? " on" : "") + '" data-fav="' + esc(d.k) + '" aria-label="Tanlash">' + I.star + '</button>' +
     '<button class="btn pri" data-detail="' + esc(d.k) + '">Batafsil</button>' +
-    (d.serial ? '<button class="btn chk" style="flex:none;width:44px" data-check="' + esc(d.serial) + '" aria-label="Real holatini botda tekshirish">' + ic("pulse") + '</button>' : "") +
+    (d.serial ? '<button class="btn chk" style="flex:none;width:44px" data-check="' + esc(d.serial) + '" aria-label="Diagnostika (botda tekshirish)">' + ic("pulse") + '</button>' : "") +
     (nav ? '<a class="btn" style="flex:none;width:44px" aria-label="Yo\'nalish" target="_blank" rel="noopener" href="' + nav + '">' + ic("nav") + '</a>' : "") +
     '</div></div>';
 }
