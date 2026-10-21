@@ -440,7 +440,7 @@ body.split .spanel{border-radius:22px;border-bottom:1px solid var(--line);max-he
     <div class="tab" id="tab-map">
       <div id="map"></div>
       <div class="locsearch" id="locsearch">
-        <button type="button" id="locBtn" aria-label="Joylashuvni koordinata bo'yicha topish"><span class="ic" data-ic="pin"></span></button>
+        <button type="button" id="locBtn" aria-label="Joylashuvni koordinata bo'yicha topish"><span class="ic" data-ic="search"></span></button>
         <form id="locForm" autocomplete="off">
           <input id="locQ" type="text" enterkeyhint="search" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Koordinata: 39.84, 64.45">
           <button type="submit" aria-label="Topish"><span class="ic" data-ic="search"></span></button>
@@ -542,6 +542,7 @@ const I = {
   chart: '<svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20.5h18"/></svg>',
   download: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/></svg>',
   copy: '<svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
   pin: '<svg viewBox="0 0 24 24"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>',
   user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-5 8-5s6.5 1 8 5"/></svg>',
   lock: '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
@@ -1765,13 +1766,30 @@ function findPoint(g) {
   findMarker.bindPopup(() => ptPopupHtml(findPt || { id: null, g: g, note: "" }), PT_POPUP);
   findMarker.openPopup();
 }
+/* Qidiruv tugmasi: yopiq — lupa; ochiq va matn bor — X (matnni tozalaydi); ochiq va matn yo'q — "<" (oynani yopadi va topilgan nuqtani xaritadan olib tashlaydi) */
+function locIcon() {
+  const open = $("locsearch").classList.contains("open");
+  $("locBtn").innerHTML = ic(!open ? "search" : $("locQ").value ? "x" : "back");
+}
 function locOpen(open) {
-  const box = $("locsearch");
-  box.classList.toggle("open", open);
-  $("locBtn").innerHTML = ic(open ? "x" : "pin");
+  $("locsearch").classList.toggle("open", open);
+  locIcon();
   if (open) setTimeout(() => $("locQ").focus(), 150); else $("locQ").blur();
 }
-$("locBtn").addEventListener("click", () => locOpen(!$("locsearch").classList.contains("open")));
+function locDropFound() {                     // saqlanmagan (yulduzchasiz) topilgan nuqtani olib tashlaydi; saqlanganlar qoladi
+  if (findMarker && map) {
+    if (findMarker.isPopupOpen && findMarker.isPopupOpen()) map.closePopup();
+    map.removeLayer(findMarker);
+  }
+  findMarker = null; findPt = null;
+}
+$("locBtn").addEventListener("click", () => {
+  const open = $("locsearch").classList.contains("open");
+  if (!open) { locOpen(true); return; }
+  if ($("locQ").value) { $("locQ").value = ""; locIcon(); $("locQ").focus(); return; }   // 1-bosish: faqat yozuvni o'chiradi
+  locDropFound(); locOpen(false);                                                        // 2-bosish ("<"): yopadi + nuqtani olib tashlaydi
+});
+$("locQ").addEventListener("input", locIcon);
 $("locForm").addEventListener("submit", e => {
   e.preventDefault();
   const g = parseCoord($("locQ").value);
